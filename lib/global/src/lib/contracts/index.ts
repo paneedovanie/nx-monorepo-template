@@ -1,0 +1,24 @@
+import { user } from './user-controller.contract';
+import { auth } from './auth-controller.contract';
+import { transaction } from './transaction-controller.contract';
+import { initContract } from '@ts-rest/core';
+import { category } from './category-controller.contract';
+import { store } from './store-controller.contract';
+import { product } from './product-controller.contract';
+import { order } from './order-controller.contract';
+import { payment } from './payment-controller.contract';
+import { role } from './role-controller.contract';
+import { permission } from './permission-controller.contract';
+
+export const contract = initContract().router({
+  user,
+  auth,
+  transaction,
+  category,
+  store,
+  product,
+  order,
+  payment,
+  role,
+  permission,
+});
