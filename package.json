@@ -2,7 +2,11 @@
   "name": "nx-monorepo-template",
   "version": "0.0.0",
   "license": "MIT",
-  "private": true,
+  "private": true, 
+  "scripts": {
+    "build": "nx build api && nx build web",
+    "start": "node dist/packages/api/main.js"
+ },
   "devDependencies": {
     "@nestjs/schematics": "9.1.0",
     "@nestjs/testing": "9.1.1",
