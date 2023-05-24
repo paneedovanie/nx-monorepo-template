@@ -41,6 +41,8 @@ import express from 'express';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(express.static(configuration().multer.dest)).forRoutes('/');
+    consumer
+      .apply(express.static(configuration().multer.dest))
+      .forRoutes('/files');
   }
 }

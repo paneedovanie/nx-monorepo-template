@@ -43,7 +43,7 @@ export class ProductEntity {
         const protocol = process.env.PROTOCOL ?? 'http';
         const host = process.env.HOST ?? 'localhost';
         const port = process.env.PORT ?? '3000';
-        return v && `${protocol}://${host}:${port}/${v}`;
+        return v && `${protocol}://${host}:${port}/files/${v}`;
       },
     },
   })
