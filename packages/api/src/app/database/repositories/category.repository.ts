@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import {
+  DataSource,
+  FindOptionsRelations,
+  FindOptionsWhere,
+  IsNull,
+  Not,
+} from 'typeorm';
 import { CategoryEntity } from '../entities';
 import { BaseRepository } from './base.repository';
 
@@ -11,5 +17,25 @@ export class CategoryRepository extends BaseRepository<CategoryEntity> {
 
   searchFields(): string[] {
     return ['title'];
+  }
+
+  protected mapRelations(): Record<string, BaseRepository<any>> {
+    return { parent: this };
+  }
+
+  protected relations(): FindOptionsRelations<CategoryEntity> {
+    return { parent: true, children: true };
+  }
+
+  protected modifyWhere({
+    isRoot,
+    ...conditions
+  }: FindOptionsWhere<CategoryEntity> & {
+    isRoot: boolean;
+  }): FindOptionsWhere<CategoryEntity> {
+    if (isRoot !== undefined) {
+      conditions.parent = isRoot ? IsNull() : Not(IsNull());
+    }
+    return conditions;
   }
 }

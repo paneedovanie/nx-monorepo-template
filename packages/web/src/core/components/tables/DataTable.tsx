@@ -1,4 +1,8 @@
 import {
+  ArrowDownward as ArrowDownwardIcon,
+  ArrowUpward as ArrowUpwardIcon,
+} from '@mui/icons-material';
+import {
   Table,
   Paper,
   TableBody,
@@ -11,12 +15,15 @@ import {
   Typography,
   TableProps,
   SxProps,
+  IconButton,
 } from '@mui/material';
-import { ChangeEvent, ReactNode } from 'react';
+import { PaginationOrder } from '@nx-monorepo-template/global';
+import { ChangeEvent, ReactNode, useEffect, useState } from 'react';
 
 interface Column<T> extends TableCellProps {
   label: string;
   name: string;
+  sortable?: boolean;
   sx?: SxProps;
   render?: (v: T) => ReactNode;
 }
@@ -29,8 +36,10 @@ interface DataTableProps<T> {
   count?: number;
   pagination?: boolean;
   tableProps?: TableProps;
+  isLoading?: boolean;
   onPage?: (_page: number) => void;
   onPerPage?: (_perPage: number) => void;
+  onSort?: (order?: PaginationOrder) => void;
 }
 
 export const DataTable = <T,>({
@@ -41,48 +50,102 @@ export const DataTable = <T,>({
   count,
   pagination = true,
   tableProps,
+  isLoading,
   onPage,
   onPerPage,
+  onSort,
 }: DataTableProps<T>) => {
+  const [order, setOrder] = useState<PaginationOrder>();
+
+  const sort = (columnName: string) => {
+    if (order?.by !== columnName) {
+      setOrder({ by: columnName, dir: 'ASC' });
+      onSort?.({ by: columnName, dir: 'ASC' });
+    } else if (order.dir === 'ASC') {
+      setOrder({ by: columnName, dir: 'DESC' });
+      onSort?.({ by: columnName, dir: 'DESC' });
+    } else if (order) {
+      setOrder(undefined);
+      onSort?.(undefined);
+    }
+  };
+
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader {...tableProps}>
           <TableHead>
             <TableRow>
-              {columns?.map(({ render, ...column }, i) => (
+              {columns?.map(({ render, sortable, ...column }, i) => (
                 <TableCell
                   {...column}
                   sx={{ fontWeight: 'bold', ...column.sx }}
                   key={i}
                 >
                   {column.label}
+                  {sortable && (
+                    <IconButton onClick={() => sort(column.name)}>
+                      {order?.by !== column.name ? (
+                        <ArrowUpwardIcon
+                          sx={{
+                            fontSize: 16,
+                            opacity: 0.6,
+                          }}
+                        />
+                      ) : order?.dir === 'ASC' ? (
+                        <ArrowUpwardIcon
+                          sx={{
+                            fontSize: 16,
+                          }}
+                        />
+                      ) : (
+                        <ArrowDownwardIcon
+                          sx={{
+                            fontSize: 16,
+                          }}
+                        />
+                      )}
+                    </IconButton>
+                  )}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.map((row: T, i: number) => {
-              return (
-                <TableRow hover role="checkbox" tabIndex={-1} key={i}>
-                  {columns?.map((column, j) => {
-                    return (
-                      <TableCell key={j}>
-                        {column.render?.(row) ??
-                          row[column.name as keyof unknown]}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              );
-            })}
-            {!data?.length && (
+            {isLoading ? (
               <TableRow>
                 <TableCell colSpan={columns?.length}>
-                  {' '}
-                  <Typography sx={{ textAlign: 'center' }}>No data</Typography>
+                  <Typography sx={{ textAlign: 'center' }}>
+                    Loading...
+                  </Typography>
                 </TableCell>
               </TableRow>
+            ) : (
+              <>
+                {data?.map((row: T, i: number) => {
+                  return (
+                    <TableRow hover role="checkbox" tabIndex={-1} key={i}>
+                      {columns?.map((column, j) => {
+                        return (
+                          <TableCell key={j}>
+                            {column.render?.(row) ??
+                              row[column.name as keyof unknown]}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
+                {!data?.length && (
+                  <TableRow>
+                    <TableCell colSpan={columns?.length}>
+                      <Typography sx={{ textAlign: 'center' }}>
+                        No data
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </>
             )}
           </TableBody>
         </Table>

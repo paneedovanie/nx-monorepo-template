@@ -12,8 +12,6 @@ import {
   UserRepository,
 } from '../../../database';
 import { BaseService } from '../../../core';
-import { BaseRepository } from '../../../database/repositories/base.repository';
-import { FindOptionsRelations, FindOptionsWhere, In } from 'typeorm';
 
 @Injectable()
 export class TransactionService extends BaseService<TransactionEntity> {
@@ -24,40 +22,6 @@ export class TransactionService extends BaseService<TransactionEntity> {
     private readonly paymentRepository: PaymentRepository
   ) {
     super(repository);
-  }
-
-  protected mapRelations(): Record<string, BaseRepository<any>> {
-    return {
-      sender: this.userRepository,
-      receiver: this.userRepository,
-    };
-  }
-
-  protected relations(): FindOptionsRelations<TransactionEntity> {
-    return {
-      sender: true,
-      receiver: true,
-    };
-  }
-
-  protected where({
-    ids,
-    userIds,
-    ...conditions
-  }: FindOptionsWhere<TransactionEntity> & {
-    ids?: string[];
-    userIds?: string[];
-  }):
-    | FindOptionsWhere<TransactionEntity>
-    | FindOptionsWhere<TransactionEntity>[] {
-    if (ids) conditions.id = In(ids);
-    if (userIds) {
-      return [
-        { ...conditions, sender: In(userIds) },
-        { ...conditions, receiver: In(userIds) },
-      ];
-    }
-    return conditions;
   }
 
   async balance(userId: string) {

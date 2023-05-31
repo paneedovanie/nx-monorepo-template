@@ -10,6 +10,8 @@ export const PaginationOptionsSchema = z.object({
     (a) => (a ? parseInt(z.string().parse(a)) : 5),
     z.number().optional()
   ),
+  orderBy: z.string().optional(),
+  orderDir: z.enum(['ASC', 'DESC']).optional(),
 });
 
 export const PaginationResponseSchema = z.object({

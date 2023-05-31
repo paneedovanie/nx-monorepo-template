@@ -1,22 +1,27 @@
 import { DataTable, useTsQueryClient, usePagination } from '@/core';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, TextField, Toolbar, Typography } from '@mui/material';
 import { Order, Store } from '@nx-monorepo-template/global';
 import { useNavigate } from 'react-router-dom';
 import { RemoveRedEye as EyeIcon } from '@mui/icons-material';
+import { BaseSyntheticEvent, useState } from 'react';
 
 export const PaymentsTable = ({ store }: { store: Store }) => {
   const tsQueryClient = useTsQueryClient();
   const navigate = useNavigate();
   const { page, perPage, setPage, setPerPage } = usePagination();
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
 
   const { data } = tsQueryClient.order.getAll.useQuery(
-    ['getPayments', perPage, page],
+    ['getPayments', perPage, page, startDate, endDate],
     {
       query: {
         storeIds: [store.id],
         isPaid: true,
         perPage,
         page,
+        startDate,
+        endDate,
       },
     }
   );
@@ -25,16 +30,22 @@ export const PaymentsTable = ({ store }: { store: Store }) => {
 
   return (
     <>
-      <Box
-        sx={{
-          p: 2,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Typography variant="h5">Filters here</Typography>
-      </Box>
+      <Toolbar sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <TextField
+          type="date"
+          label="Start Date"
+          onChange={(e: BaseSyntheticEvent) => setStartDate(e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          type="date"
+          label="End Date"
+          onChange={(e: BaseSyntheticEvent) => setEndDate(e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+        />
+      </Toolbar>
       <DataTable<Order>
         columns={[
           {

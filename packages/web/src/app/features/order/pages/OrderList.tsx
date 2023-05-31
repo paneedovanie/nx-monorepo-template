@@ -1,8 +1,8 @@
 import {
   DataTable,
   useTsQueryClient,
-  useAuthContext,
   usePagination,
+  Breadcrumbs,
 } from '@/core';
 import { Box, Card, CardContent, IconButton, Typography } from '@mui/material';
 import { RemoveRedEye as EyeIcon } from '@mui/icons-material';
@@ -15,19 +15,22 @@ const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
 `;
 
-export const PublicOrderList = () => {
+export const OrderList = () => {
   const tsQueryClient = useTsQueryClient();
   const navigate = useNavigate();
-  const { user } = useAuthContext();
-  const { perPage, page, setPage, setPerPage } = usePagination();
+  const { perPage, page, order, setPage, setPerPage, setOrder } = usePagination(
+    {},
+    { query: true }
+  );
 
   const { data } = tsQueryClient.order.getAll.useQuery(
-    ['getOrders', perPage, page],
+    ['getOrders', perPage, page, order?.by, order?.dir],
     {
       query: {
-        userIds: [user?.id as string],
         perPage,
         page,
+        orderBy: order?.by,
+        orderDir: order?.dir,
       },
     }
   );
@@ -36,6 +39,10 @@ export const PublicOrderList = () => {
 
   return (
     <Container>
+      <Breadcrumbs
+        items={[{ label: 'Dashboard', to: '/manage' }, { label: 'Orders' }]}
+        sx={{ my: 1 }}
+      />
       <Card>
         <CardContent>
           <Typography sx={{ mb: 1 }} variant="h5">
@@ -78,6 +85,7 @@ export const PublicOrderList = () => {
             {
               name: 'status',
               label: 'Status',
+              sortable: true,
               render: ({ status }) => {
                 return (
                   <span style={{ textTransform: 'capitalize' }}>{status}</span>
@@ -128,6 +136,7 @@ export const PublicOrderList = () => {
           data={orders?.list}
           onPage={setPage}
           onPerPage={setPerPage}
+          onSort={setOrder}
         />
       </Card>
     </Container>

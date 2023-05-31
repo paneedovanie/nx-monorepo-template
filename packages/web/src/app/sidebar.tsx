@@ -5,6 +5,7 @@ import {
   Category as CategoryIcon,
   Store as StoreIcon,
   Engineering as EngineeringIcon,
+  AddShoppingCart as AddShoppingCartIcon,
 } from '@mui/icons-material';
 import { RolePermission } from '@nx-monorepo-template/global';
 
@@ -42,5 +43,11 @@ export const sidebarItems = [
     label: 'Roles',
     to: '/manage/roles',
     permissions: [RolePermission.RoleUpdate],
+  },
+  {
+    icon: <AddShoppingCartIcon />,
+    label: 'Orders',
+    to: '/manage/orders',
+    permissions: [RolePermission.OrderGetAll],
   },
 ];

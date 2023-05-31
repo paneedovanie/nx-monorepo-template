@@ -80,10 +80,4 @@ export class AuthController implements NestControllerInterface<typeof c> {
   async verifyClientToken(data) {
     return this.authService.verifyClientToken(data);
   }
-
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file) {
-    console.log(file);
-  }
 }

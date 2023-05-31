@@ -5,7 +5,6 @@ import {
   RoleRepository,
 } from '../../../database';
 import { BaseService } from '../../../core';
-import { FindOptionsRelations } from 'typeorm';
 
 @Injectable()
 export class RoleService extends BaseService<RoleEntity> {
@@ -14,12 +13,6 @@ export class RoleService extends BaseService<RoleEntity> {
     protected readonly permissionRepository: PermissionRepository
   ) {
     super(repository);
-  }
-
-  protected relations(): FindOptionsRelations<RoleEntity> {
-    return {
-      permissions: true,
-    };
   }
 
   public async updatePermissions(id: string, permissionIds: string[]) {

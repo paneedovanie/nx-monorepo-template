@@ -236,6 +236,7 @@ export const FormGenerator = <R, I extends FormikValues = any>({
     errors,
     isValid,
     isSubmitting,
+    dirty,
     handleChange,
     handleSubmit,
     resetForm,
@@ -295,7 +296,7 @@ export const FormGenerator = <R, I extends FormikValues = any>({
             <Button
               type="submit"
               variant="contained"
-              disabled={!isValid || isSubmitting}
+              disabled={!dirty || !isValid || isSubmitting}
             >
               Submit
             </Button>

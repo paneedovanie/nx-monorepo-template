@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, FindOptionsRelations } from 'typeorm';
 import { RoleEntity } from '../entities';
 import { BaseRepository } from './base.repository';
 
@@ -7,5 +7,11 @@ import { BaseRepository } from './base.repository';
 export class RoleRepository extends BaseRepository<RoleEntity> {
   constructor(dataSource: DataSource) {
     super(RoleEntity, dataSource);
+  }
+
+  protected relations(): FindOptionsRelations<RoleEntity> {
+    return {
+      permissions: true,
+    };
   }
 }

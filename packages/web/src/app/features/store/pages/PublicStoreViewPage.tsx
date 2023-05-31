@@ -34,7 +34,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { BaseSyntheticEvent, Fragment, useState } from 'react';
+import { BaseSyntheticEvent, Fragment, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { CartDialog } from '../components';
@@ -76,15 +76,18 @@ export const PublicStoreViewPage = () => {
   const store = storeResult?.body;
 
   const { data: productsResult, isFetching: isFetchingProducts } =
-    tsQueryClient.product.getAll.useQuery(['getProducts', store?.id], {
-      query: {
-        store: store?.id,
-        categoryIds,
-        search,
-        perPage,
-        page,
-      },
-    });
+    tsQueryClient.product.getAll.useQuery(
+      ['getProducts', store?.id, categoryIds, page],
+      {
+        query: {
+          store: store?.id,
+          categoryIds,
+          search,
+          perPage,
+          page,
+        },
+      }
+    );
   const products = productsResult?.body;
   const count = Math.floor((products?.count ?? 0) / (products?.perPage ?? 10));
 
@@ -100,6 +103,12 @@ export const PublicStoreViewPage = () => {
   );
 
   const categories = categoriesResult?.body;
+
+  const pageCount = useMemo(() => {
+    const count = products?.count ?? 0;
+    const perPage = products?.perPage ?? 0;
+    return Math.ceil(count / perPage);
+  }, [products]);
 
   const renderTree = (node: Category, parentActive?: boolean) => {
     const active =
@@ -314,13 +323,13 @@ export const PublicStoreViewPage = () => {
           </Grid>
         )}
         {!!count && (
-          <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 1 }}>
             <Pagination
               sx={{ m: 'auto' }}
               page={products?.page}
-              count={10}
-              onChange={(e: BaseSyntheticEvent) => {
-                setPage(e.target.value);
+              count={pageCount}
+              onChange={(e: BaseSyntheticEvent, value: number) => {
+                setPage(value);
               }}
               color="primary"
             />

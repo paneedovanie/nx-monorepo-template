@@ -1,22 +1,30 @@
 import { DataTable, useTsQueryClient, usePagination } from '@/core';
 import { RemoveRedEye as EyeIcon } from '@mui/icons-material';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, TextField, Toolbar, Typography } from '@mui/material';
 import { Store, Order, OrderProduct } from '@nx-monorepo-template/global';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { BaseSyntheticEvent, useState } from 'react';
 
 export const OrdersTable = ({ store }: { store: Store }) => {
   const tsQueryClient = useTsQueryClient();
   const navigate = useNavigate();
-  const { page, perPage, setPage, setPerPage } = usePagination();
+  const { page, perPage, order, setPage, setPerPage, setOrder } =
+    usePagination();
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
 
-  const { data } = tsQueryClient.order.getAll.useQuery(
-    ['getOrders', perPage, page],
+  const { data, isLoading } = tsQueryClient.order.getAll.useQuery(
+    ['getOrders', perPage, page, startDate, endDate, order?.by, order?.dir],
     {
       query: {
         storeIds: [store.id],
         perPage,
         page,
+        startDate,
+        endDate,
+        orderBy: order?.by,
+        orderDir: order?.dir,
       },
     }
   );
@@ -24,25 +32,34 @@ export const OrdersTable = ({ store }: { store: Store }) => {
   const orders = data?.body;
   return (
     <>
-      <Box
-        sx={{
-          p: 2,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Typography variant="h5">Filters Here</Typography>
-      </Box>
+      <Toolbar sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <TextField
+          type="date"
+          label="Start Date"
+          onChange={(e: BaseSyntheticEvent) => setStartDate(e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          type="date"
+          label="End Date"
+          onChange={(e: BaseSyntheticEvent) => setEndDate(e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+        />
+      </Toolbar>
       <DataTable<Order>
+        isLoading={isLoading}
         columns={[
           {
             name: 'ref',
             label: 'Reference No.',
+            sortable: true,
           },
           {
-            name: 'store',
+            name: 'store.title',
             label: 'Store',
+            sortable: true,
             render: ({ store }) => {
               return store.title;
             },
@@ -50,6 +67,7 @@ export const OrdersTable = ({ store }: { store: Store }) => {
           {
             name: 'items',
             label: 'Total Items',
+            sortable: true,
             render: ({ items }) => {
               const reducer = (curr: number, item: OrderProduct) => {
                 return curr + item.count;
@@ -70,6 +88,7 @@ export const OrdersTable = ({ store }: { store: Store }) => {
           {
             name: 'status',
             label: 'Status',
+            sortable: true,
             render: ({ status }) => {
               return status;
             },
@@ -84,6 +103,7 @@ export const OrdersTable = ({ store }: { store: Store }) => {
           {
             name: 'createdAt',
             label: 'Created At',
+            sortable: true,
             render: ({ createdAt }) => {
               return (
                 <Typography variant="caption">
@@ -118,6 +138,7 @@ export const OrdersTable = ({ store }: { store: Store }) => {
         data={orders?.list}
         onPage={setPage}
         onPerPage={setPerPage}
+        onSort={setOrder}
       />
     </>
   );
