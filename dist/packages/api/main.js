@@ -1978,7 +1978,7 @@ const config_1 = __webpack_require__(5793);
 const configuration_1 = tslib_1.__importDefault(__webpack_require__(6806));
 const database_1 = __webpack_require__(1309);
 const express_1 = tslib_1.__importDefault(__webpack_require__(6860));
-const serve_static_1 = __webpack_require__(385);
+const serve_static_1 = __webpack_require__(5385);
 const path_1 = __webpack_require__(1017);
 const isDevelopment = "production" === 'development';
 let AppModule = class AppModule {
@@ -8066,7 +8066,7 @@ module.exports = require("@nestjs/platform-express");
 
 /***/ }),
 
-/***/ 385:
+/***/ 5385:
 /***/ ((module) => {
 
 module.exports = require("@nestjs/serve-static");
