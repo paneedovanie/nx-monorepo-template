@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { DataSource, FindOptionsRelations } from 'typeorm';
 import { StoreRatingEntity } from '../entities';
 import { BaseRepository } from '../../core';
 import { UserRepository } from './user.repository';
 import { CreateStore, UpdateStore } from '@nx-monorepo-template/global';
+import { StoreRepository } from './store.repository';
 
 @Injectable()
 export class StoreRatingRepository extends BaseRepository<
@@ -13,7 +14,8 @@ export class StoreRatingRepository extends BaseRepository<
 > {
   constructor(
     dataSource: DataSource,
-    private readonly storeRepository: UserRepository,
+    @Inject(forwardRef(() => StoreRepository))
+    private readonly storeRepository: StoreRepository,
     private readonly userRepository: UserRepository
   ) {
     super(StoreRatingEntity, dataSource);

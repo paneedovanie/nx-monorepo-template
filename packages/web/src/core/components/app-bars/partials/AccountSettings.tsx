@@ -34,7 +34,6 @@ export const AccountSettings = () => {
         <IconButton
           onClick={handleMenu}
           size="small"
-          sx={{ ml: 2 }}
           aria-controls={anchorEl ? 'account-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={anchorEl ? 'true' : undefined}

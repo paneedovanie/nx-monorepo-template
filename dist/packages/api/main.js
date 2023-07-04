@@ -4090,6 +4090,7 @@ const typeorm_1 = __webpack_require__(5250);
 const entities_1 = __webpack_require__(5962);
 const core_1 = __webpack_require__(575);
 const user_repository_1 = __webpack_require__(5420);
+const store_repository_1 = __webpack_require__(6116);
 let StoreRatingRepository = class StoreRatingRepository extends core_1.BaseRepository {
     constructor(dataSource, storeRepository, userRepository) {
         super(entities_1.StoreRatingEntity, dataSource);
@@ -4111,7 +4112,8 @@ let StoreRatingRepository = class StoreRatingRepository extends core_1.BaseRepos
 };
 StoreRatingRepository = tslib_1.__decorate([
     (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_1.DataSource !== "undefined" && typeorm_1.DataSource) === "function" ? _a : Object, typeof (_b = typeof user_repository_1.UserRepository !== "undefined" && user_repository_1.UserRepository) === "function" ? _b : Object, typeof (_c = typeof user_repository_1.UserRepository !== "undefined" && user_repository_1.UserRepository) === "function" ? _c : Object])
+    tslib_1.__param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => store_repository_1.StoreRepository))),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_1.DataSource !== "undefined" && typeorm_1.DataSource) === "function" ? _a : Object, typeof (_b = typeof store_repository_1.StoreRepository !== "undefined" && store_repository_1.StoreRepository) === "function" ? _b : Object, typeof (_c = typeof user_repository_1.UserRepository !== "undefined" && user_repository_1.UserRepository) === "function" ? _c : Object])
 ], StoreRatingRepository);
 exports.StoreRatingRepository = StoreRatingRepository;
 

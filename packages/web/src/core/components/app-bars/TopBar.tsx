@@ -62,7 +62,14 @@ export const TopBar = ({
           <Box sx={{ flexGrow: 1 }}>
             <Typography
               variant="h6"
-              sx={{ cursor: 'pointer', display: 'inline' }}
+              sx={{
+                cursor: 'pointer',
+                display: 'block',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                width: [150, 'auto'],
+              }}
               onClick={() => {
                 navigate('/');
               }}

@@ -88,10 +88,14 @@ export const HomePage = () => {
             placeholder="Search"
           />
         </Box>
-        <Typography>Tags</Typography>
-        <Box>
-          <Tags tags={tags?.list} input onChange={setSelectedTags} />
-        </Box>
+        {!!tags?.list.length && (
+          <>
+            <Typography>Tags</Typography>
+            <Box>
+              <Tags tags={tags?.list} input onChange={setSelectedTags} />
+            </Box>
+          </>
+        )}
       </Toolbar>
       <Grid container spacing={1} direction="column">
         {stores?.list.map((item: Store, i: number) => {
