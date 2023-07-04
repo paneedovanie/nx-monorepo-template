@@ -2053,7 +2053,7 @@ exports["default"] = () => {
             synchronize: false,
             namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(),
             logging: true,
-            ssl: { rejectUnauthorized: false },
+            ssl: isDevelopment ? false : { rejectUnauthorized: false },
         },
         jwt: {
             secret: (_g = process.env.JWT_SECRET) !== null && _g !== void 0 ? _g : 'supersecret',
@@ -8203,12 +8203,15 @@ const common_1 = __webpack_require__("@nestjs/common");
 const core_1 = __webpack_require__("@nestjs/core");
 const app_module_1 = __webpack_require__("./src/app/app.module.ts");
 const configuration_1 = tslib_1.__importDefault(__webpack_require__("./src/app/config/configuration.ts"));
+const path_1 = __webpack_require__("path");
 function bootstrap() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);
+        // const app = await NestFactory.create(AppModule);
         // const globalPrefix = 'api/v1';
         // app.setGlobalPrefix(globalPrefix);
         app.enableCors();
+        app.useStaticAssets((0, path_1.join)(__dirname, '../', 'web'));
         const port = (0, configuration_1.default)().port;
         yield app.listen(port);
         common_1.Logger.log(`🚀 Application is running on: http://localhost:${port}`);

@@ -27,7 +27,7 @@ export default () => ({
     synchronize: false,
     namingStrategy: new SnakeNamingStrategy(),
     logging: true,
-    ssl: { rejectUnauthorized: false },
+    ssl: isDevelopment ? false : { rejectUnauthorized: false },
   },
   jwt: {
     secret: process.env.JWT_SECRET ?? 'supersecret',
