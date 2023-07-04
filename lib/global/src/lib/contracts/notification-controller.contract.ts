@@ -1,0 +1,65 @@
+import { initContract } from '@ts-rest/core';
+import {
+  NotificationSchema,
+  GetNotificationsOptionsSchema,
+  GetNotificationsResponseSchema,
+  NotificationsCountSchema,
+} from '../schemas';
+import { z } from 'zod';
+
+const prefix = `/api/v1/notifications`;
+
+export const notification = initContract().router({
+  count: {
+    method: 'GET',
+    path: `${prefix}/count`,
+    responses: {
+      200: NotificationsCountSchema,
+    },
+    summary: 'Notifications Count',
+  },
+  get: {
+    method: 'GET',
+    path: `${prefix}/:id`,
+    responses: {
+      200: NotificationSchema,
+    },
+    summary: 'Get a notification by id',
+  },
+  getAll: {
+    method: 'GET',
+    path: `${prefix}`,
+    query: GetNotificationsOptionsSchema,
+    responses: {
+      200: GetNotificationsResponseSchema,
+    },
+    summary: 'Get a paginated list of notifications',
+  },
+  delete: {
+    method: 'DELETE',
+    path: `${prefix}/:id`,
+    body: z.any().optional(),
+    responses: {
+      204: z.any().optional(),
+    },
+    summary: 'Delete notification',
+  },
+  read: {
+    method: 'PATCH',
+    path: `${prefix}/:id/read`,
+    body: z.any().optional(),
+    responses: {
+      201: z.any().optional(),
+    },
+    summary: 'Read notification',
+  },
+  readAll: {
+    method: 'PATCH',
+    path: `${prefix}/read-all`,
+    body: z.any().optional(),
+    responses: {
+      201: z.any().optional(),
+    },
+    summary: 'Read all notifications',
+  },
+});

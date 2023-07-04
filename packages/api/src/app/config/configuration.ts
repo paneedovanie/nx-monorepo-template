@@ -1,22 +1,13 @@
-import {
-  UserEntity,
-  CredentialEntity,
-  TransactionEntity,
-  CategoryEntity,
-  PermissionEntity,
-  RoleEntity,
-  StoreEntity,
-  ProductEntity,
-  OrderEntity,
-  PaymentEntity,
-} from '../database';
-import migrations from '../database/migrations';
+import entities from '../database/entities';
+// import migrations from '../database/migrations';
 import seeds from '../database/seeds';
 import factories from '../database/factories';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { resolve } from 'path';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
+
+console.log(resolve(__dirname, '../database/migrations'));
 
 export default () => ({
   protocol: process.env.PROTOCOL ?? 'http',
@@ -31,19 +22,8 @@ export default () => ({
     username: process.env.DATABASE_USERNAME ?? 'postgres',
     password: process.env.DATABASE_PASSWORD ?? 'password',
     database: process.env.DATABASE_NAME ?? 'users_ms',
-    entities: [
-      UserEntity,
-      CredentialEntity,
-      TransactionEntity,
-      CategoryEntity,
-      PermissionEntity,
-      RoleEntity,
-      StoreEntity,
-      ProductEntity,
-      OrderEntity,
-      PaymentEntity,
-    ],
-    migrations,
+    entities,
+    migrations: [resolve(__dirname, '../database/migrations/*.{ts,js}')],
     seeds,
     factories,
     autoLoadEntities: true,

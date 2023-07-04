@@ -9,6 +9,7 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
+  BeforeInsert,
 } from 'typeorm';
 import { CredentialEntity } from './credential.entity';
 import { RoleEntity } from './role.entity';
@@ -19,6 +20,9 @@ import { StoreEntity } from './store.entity';
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ unique: true })
+  uniqueCode: string;
 
   @OneToOne(() => CredentialEntity, (credential) => credential.user)
   credential: CredentialEntity;
@@ -50,4 +54,18 @@ export class UserEntity {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @BeforeInsert()
+  async generateRandomString() {
+    const timestamp = new Date().getTime().toString();
+    const characters = 'T5NYVA3ISZU7M';
+    let uniqueCode = '';
+
+    for (let i = 0; i < timestamp.length; i++) {
+      const digit = parseInt(timestamp[i]);
+      uniqueCode += characters.charAt(digit);
+    }
+
+    this.uniqueCode = uniqueCode;
+  }
 }

@@ -9,6 +9,10 @@ import { order } from './order-controller.contract';
 import { payment } from './payment-controller.contract';
 import { role } from './role-controller.contract';
 import { permission } from './permission-controller.contract';
+import { statistic } from './statistic-controller.contract';
+import { notification } from './notification-controller.contract';
+import { storeRating } from './store-rating-controller.contract';
+import { tag } from './tag-controller.contract';
 
 export const contract = initContract().router({
   user,
@@ -21,4 +25,8 @@ export const contract = initContract().router({
   payment,
   role,
   permission,
+  statistic,
+  notification,
+  storeRating,
+  tag,
 });

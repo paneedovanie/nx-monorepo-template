@@ -5,23 +5,40 @@ import {
   TsRest,
   TsRestRequest,
 } from '@ts-rest/nest';
-import { Controller, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  ForbiddenException,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { contract, RolePermission } from '@nx-monorepo-template/global';
 import { JwtAuthGuard, PermissionGuard } from '../../auth/guards';
 import { Permissions } from '../../auth';
 import { PaymentService } from '../services';
+import { OrderService } from '../../order';
 
 const c = nestControllerContract(contract.payment);
 type RequestShapes = NestRequestShapes<typeof c>;
 
 @Controller()
 export class PaymentController implements NestControllerInterface<typeof c> {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(
+    private readonly paymentService: PaymentService,
+    private readonly orderService: OrderService
+  ) {}
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(RolePermission.PaymentCreate)
   @TsRest(c.create)
-  async create(@TsRestRequest() { body }: RequestShapes['create']) {
+  async create(
+    @TsRestRequest() { body }: RequestShapes['create'],
+    @Request() { user }
+  ) {
+    const order = await this.orderService.getById(body.order);
+    if (order.user !== user.id && order.store.owner.id !== user.id) {
+      throw new ForbiddenException();
+    }
+
     const payment = await this.paymentService.create(body);
 
     return { status: 201 as const, body: payment };

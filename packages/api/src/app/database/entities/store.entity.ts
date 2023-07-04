@@ -6,9 +6,12 @@ import {
   ManyToOne,
   Index,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { ProductEntity } from './product.entity';
+import { TagEntity } from './tag.entity';
 
 @Entity('stores')
 @Index(['title', 'owner'], { unique: true })
@@ -42,13 +45,13 @@ export class StoreEntity {
   @Column()
   description: string;
 
+  @ManyToMany(() => TagEntity, (tag) => tag.stores)
+  @JoinTable({ name: 'store_tags' })
+  tags: TagEntity[];
+
   @CreateDateColumn()
   createdAt: Date;
 
-  get imageUrl(): string {
-    const protocol = process.env.PROTOCOL ?? 'http';
-    const host = process.env.HOST ?? 'host';
-    const port = process.env.PORT ?? 'port';
-    return this.image && `${protocol}://${host}:${port}/${this.image}`;
-  }
+  @Column({ select: false, insert: false, readonly: true, nullable: true })
+  rating: number;
 }

@@ -1,4 +1,4 @@
-import { FormGenerator, useTsQueryClient } from '@/core';
+import { FormGenerator, formatCurrency, useTsQueryClient } from '@/core';
 import {
   Dialog,
   DialogActions,
@@ -69,7 +69,7 @@ export const PayDialog = ({
             </TableCell>
             <TableCell>
               <Typography variant="h4">
-                {balance?.balance ?? 'Fetching...'}
+                {formatCurrency(balance?.balance) ?? 'Fetching...'}
               </Typography>
             </TableCell>
           </TableRow>
@@ -78,7 +78,7 @@ export const PayDialog = ({
               <Typography>Total Cost:</Typography>
             </TableCell>
             <TableCell>
-              <Typography variant="h4">{totalCost}</Typography>
+              <Typography variant="h4">{formatCurrency(totalCost)}</Typography>
             </TableCell>
           </TableRow>
           <TableRow>
@@ -87,7 +87,7 @@ export const PayDialog = ({
             </TableCell>
             <TableCell>
               <Typography color={change < 0 ? 'error' : 'success'} variant="h4">
-                {change}
+                {formatCurrency(change)}
               </Typography>
             </TableCell>
           </TableRow>
@@ -100,6 +100,7 @@ export const PayDialog = ({
           }}
           schema={PaySchema}
           successMessage={'Payment created'}
+          defaultEnableSubmit
           onSubmit={(v, options) => {
             mutate({ body: v }, options);
           }}

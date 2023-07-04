@@ -10,8 +10,8 @@ import {
 import { OrderEntity } from './order.entity';
 
 enum PaymentType {
-  CASH = 'cash',
-  ONLINE = 'online',
+  Cash = 'cash',
+  Online = 'online',
 }
 
 @Entity('payments')
@@ -25,7 +25,7 @@ export class PaymentEntity {
   @Column({
     type: 'enum',
     enum: PaymentType,
-    default: PaymentType.CASH,
+    default: PaymentType.Cash,
   })
   type: PaymentType;
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, FindOptionsRelations } from 'typeorm';
 import { PermissionEntity } from '../entities';
-import { BaseRepository } from './base.repository';
+import { BaseRepository } from '../../core';
 
 @Injectable()
 export class PermissionRepository extends BaseRepository<PermissionEntity> {

@@ -25,7 +25,7 @@ export const CategoryDialog = ({
   const tsQueryClient = useTsQueryClient();
   const [search, setSearch] = useState<string>();
   const { data: categoriesResult } = tsQueryClient.category.getAll.useQuery(
-    ['getParentCategories'],
+    ['getParentCategories', search],
     {
       query: {
         search,

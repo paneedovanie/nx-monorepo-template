@@ -4,3 +4,6 @@ export * from './app-bars';
 export * from './tables';
 export * from './state';
 export * from './breadcrumbs';
+export * from './allow';
+export * from './ratings';
+export * from './tags';

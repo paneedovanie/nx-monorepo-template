@@ -3,13 +3,15 @@ import {
   FormGeneratorItem,
   useTsQueryClient,
   useAuthContext,
+  usePagination,
 } from '@/core';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { Store, CreateStore, UpdateStore } from '@nx-monorepo-template/global';
+import { Store, CreateStore, UpdateStore, Tag } from '@nx-monorepo-template/global';
 import {
   CreateStoreSchema,
   UpdateStoreSchema,
 } from '@nx-monorepo-template/global';
+import { SyntheticEvent } from 'react';
 
 export const StoreDialog = ({
   data,
@@ -24,6 +26,25 @@ export const StoreDialog = ({
 }) => {
   const tsQueryClient = useTsQueryClient();
   const { user } = useAuthContext();
+
+  const { search, perPage, page, setSearch } = usePagination();
+
+  const { data: tagsResult } = tsQueryClient.tag.getAll.useQuery(
+    ['getTags', search],
+    {
+      query: {
+        search,
+        type: 'product',
+        perPage,
+        page,
+      },
+    },
+    {
+      cacheTime: 0,
+    }
+  );
+
+  const tags = tagsResult?.body;
 
   const { mutate: create } = tsQueryClient.store.create.useMutation({
     onSuccess: (v) => {
@@ -41,6 +62,7 @@ export const StoreDialog = ({
     title: data?.title ?? '',
     description: data?.description ?? '',
     owner: data?.owner?.id ?? user?.id ?? '',
+    tags: data?.tags.map((tag: Tag) => tag.id) ?? [],
   };
 
   const items: FormGeneratorItem[] = [
@@ -62,6 +84,22 @@ export const StoreDialog = ({
       label: 'Image',
       name: 'image',
       component: 'FileField',
+    },
+    {
+      label: 'Tags',
+      name: 'tags',
+      valueKey: 'id',
+      labelKey: 'title',
+      component: 'AutoComplete',
+      props: {
+        freeSolo: true,
+        multiple: true,
+        defaultValue: data?.tags,
+        options: tags?.list ?? [],
+        onInputChange: (event: SyntheticEvent, value: string) => {
+          setSearch(value);
+        },
+      },
     },
   ];
 

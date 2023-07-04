@@ -6,6 +6,8 @@ import {
   Store as StoreIcon,
   Engineering as EngineeringIcon,
   AddShoppingCart as AddShoppingCartIcon,
+  Notifications as NotificationsIcon,
+  LocalOffer as LocalOfferIcon,
 } from '@mui/icons-material';
 import { RolePermission } from '@nx-monorepo-template/global';
 
@@ -19,6 +21,7 @@ export const sidebarItems = [
     icon: <WalletIcon />,
     label: 'Wallet',
     to: '/manage/wallet',
+    permissions: [RolePermission.TransactionBalance],
   },
   {
     icon: <AccountIcon />,
@@ -33,10 +36,15 @@ export const sidebarItems = [
     permissions: [RolePermission.CategoryGetAll],
   },
   {
+    icon: <LocalOfferIcon />,
+    label: 'Tags',
+    to: '/manage/tags',
+  },
+  {
     icon: <StoreIcon />,
     label: 'Stores',
     to: '/manage/stores',
-    permissions: [RolePermission.StoreUpdate],
+    permissions: [RolePermission.OrderGetAll],
   },
   {
     icon: <EngineeringIcon />,
@@ -49,5 +57,10 @@ export const sidebarItems = [
     label: 'Orders',
     to: '/manage/orders',
     permissions: [RolePermission.OrderGetAll],
+  },
+  {
+    icon: <NotificationsIcon />,
+    label: 'Notifications',
+    to: '/manage/notifications',
   },
 ];

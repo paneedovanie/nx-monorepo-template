@@ -30,8 +30,5 @@ export const theme = {
   radius: defaultSize,
 };
 
-export const app = {
-  title: 'Users',
-};
-
-export const apiBaseUrl = 'http://localhost:3000';
+// export const apiBaseUrl = 'http://localhost:3000';
+export const apiBaseUrl = '';

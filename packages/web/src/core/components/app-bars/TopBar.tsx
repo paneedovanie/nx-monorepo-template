@@ -8,21 +8,17 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  Menu,
-  MenuItem,
   Toolbar,
   Typography,
   Box,
 } from '@mui/material';
 import { useAuthContext } from '../contexts/AuthContext';
-import {
-  Menu as MenuIcon,
-  AccountCircle as AccountCircleIcon,
-} from '@mui/icons-material';
+import { Menu as MenuIcon } from '@mui/icons-material';
 import { ReactNode, useState } from 'react';
-import { app, useMedia } from '@/core';
+import { useMedia } from '@/core';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { RolePermission } from '@nx-monorepo-template/global';
+import { RolePermission, app } from '@nx-monorepo-template/global';
+import { AccountSettings, Notifications } from './partials';
 
 export const TopBar = ({
   drawerWidth,
@@ -36,18 +32,12 @@ export const TopBar = ({
     permissions?: RolePermission[];
   }[];
 }) => {
+  const { user } = useAuthContext();
   const navigate = useNavigate();
   const media = useMedia();
   const location = useLocation();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openSidebar, setOpenSidebar] = useState(true);
-  const { user, clear, checkPermission } = useAuthContext();
-
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => setAnchorEl(null);
+  const { checkPermission } = useAuthContext();
 
   const toggleSidebar = () => {
     setOpenSidebar(!openSidebar);
@@ -81,94 +71,8 @@ export const TopBar = ({
             </Typography>
           </Box>
           <div>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <AccountCircleIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              {user
-                ? [
-                    <MenuItem
-                      key={1}
-                      onClick={() => {
-                        navigate('/orders');
-                        handleClose();
-                      }}
-                    >
-                      Orders
-                    </MenuItem>,
-                    <MenuItem
-                      key={2}
-                      onClick={() => {
-                        navigate('/manage');
-                        handleClose();
-                      }}
-                    >
-                      Manage
-                    </MenuItem>,
-                    <MenuItem
-                      key={3}
-                      onClick={() => {
-                        navigate('/manage/profile');
-                        handleClose();
-                      }}
-                    >
-                      Profile
-                    </MenuItem>,
-                    <MenuItem
-                      key={4}
-                      onClick={() => {
-                        navigate('/manage/my-account');
-                        handleClose();
-                      }}
-                    >
-                      My account
-                    </MenuItem>,
-                    <MenuItem key={5} onClick={clear}>
-                      Logout
-                    </MenuItem>,
-                  ]
-                : [
-                    <MenuItem
-                      key={1}
-                      onClick={() => {
-                        navigate('/login');
-                        handleClose();
-                      }}
-                    >
-                      Login
-                    </MenuItem>,
-                    <MenuItem
-                      key={2}
-                      onClick={() => {
-                        navigate('/register');
-                        handleClose();
-                      }}
-                    >
-                      Register
-                    </MenuItem>,
-                  ]}
-            </Menu>
+            {user && <Notifications />}
+            <AccountSettings />
           </div>
         </Toolbar>
       </AppBar>

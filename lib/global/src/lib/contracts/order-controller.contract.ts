@@ -5,6 +5,7 @@ import {
   GetOrdersOptionsSchema,
   GetOrdersResponseSchema,
   UpdateOrderSchema,
+  UnrestrictedSchema,
 } from '../schemas';
 import { z } from 'zod';
 
@@ -40,6 +41,7 @@ export const order = initContract().router({
   update: {
     method: 'PATCH',
     path: `${prefix}/:id`,
+    query: UnrestrictedSchema,
     body: UpdateOrderSchema,
     responses: {
       201: OrderSchema,

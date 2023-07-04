@@ -3,9 +3,9 @@ import {
   PaginationOptionsSchema,
   PaginationResponseSchema,
 } from './pagination';
-import { StoreSchema } from './store';
 import { CategorySchema } from './category';
 import { FileSchema } from './file';
+import { StoreSchema } from './store';
 
 const base = {
   title: z.string(),
@@ -13,10 +13,19 @@ const base = {
   price: z.number().min(0.01, 'Price must be greater than 0.01'),
 };
 
+export const ProductSchemaNonCircular = z.object({
+  id: z.string(),
+  category: CategorySchema,
+  categories: CategorySchema.array(),
+  image: z.string(),
+  ...base,
+});
+
 export const ProductSchema = z.object({
   id: z.string(),
-  store: StoreSchema,
+  store: z.lazy(() => StoreSchema),
   category: CategorySchema,
+  categories: CategorySchema.array(),
   image: z.string(),
   ...base,
 });

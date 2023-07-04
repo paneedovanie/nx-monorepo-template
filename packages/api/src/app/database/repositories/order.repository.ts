@@ -11,13 +11,18 @@ import {
   Not,
 } from 'typeorm';
 import { OrderEntity } from '../entities';
-import { BaseRepository } from './base.repository';
+import { BaseRepository } from '../../core';
 import { UserRepository } from './user.repository';
 import { StoreRepository } from './store.repository';
 import { PaymentRepository } from './payment.repository';
+import { CreateOrder, UpdateOrder } from '@nx-monorepo-template/global';
 
 @Injectable()
-export class OrderRepository extends BaseRepository<OrderEntity> {
+export class OrderRepository extends BaseRepository<
+  OrderEntity,
+  CreateOrder,
+  UpdateOrder
+> {
   constructor(
     dataSource: DataSource,
     private readonly userRepository: UserRepository,
@@ -27,7 +32,7 @@ export class OrderRepository extends BaseRepository<OrderEntity> {
     super(OrderEntity, dataSource);
   }
 
-  protected mapRelations(): Record<string, BaseRepository<any>> {
+  protected mapRelations(): Record<string, BaseRepository<unknown>> {
     return {
       user: this.userRepository,
       store: this.storeRepository,
@@ -39,7 +44,7 @@ export class OrderRepository extends BaseRepository<OrderEntity> {
     return {
       user: true,
       payment: true,
-      store: true,
+      store: { owner: true },
     };
   }
 

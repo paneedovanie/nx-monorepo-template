@@ -8,6 +8,7 @@ import {
   UserSchema,
   VerifyQuerySchema,
 } from '../schemas';
+import { z } from 'zod';
 
 const prefix = `/api/v1/auth`;
 
@@ -52,14 +53,14 @@ export const auth = initContract().router({
     path: `${prefix}/verify-email`,
     query: VerifyQuerySchema,
     responses: {
-      200: String,
+      200: z.string(),
     },
     summary: "Verify user's email",
   },
   resendVerifyEmail: {
     method: 'POST',
     path: `${prefix}/resend-verify-email`,
-    body: {},
+    body: z.string().nullable(),
     responses: {
       201: LoginResponseSchema,
     },

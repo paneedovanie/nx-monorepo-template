@@ -3,14 +3,17 @@ import {
   DataTable,
   useTsQueryClient,
   usePagination,
+  Allow,
 } from '@/core';
 import {
   Box,
   Button,
   Card,
   CardContent,
+  Checkbox,
   IconButton,
   Typography,
+  colors,
 } from '@mui/material';
 import {
   RemoveRedEye as EyeIcon,
@@ -19,8 +22,12 @@ import {
 } from '@mui/icons-material';
 import styled from 'styled-components';
 import { useState } from 'react';
-import { Store } from '@nx-monorepo-template/global';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  RolePermission,
+  Store,
+  generateColor,
+} from '@nx-monorepo-template/global';
+import { useNavigate } from 'react-router-dom';
 import { StoreDialog } from '../components';
 
 const Container = styled.div`
@@ -38,11 +45,12 @@ export const StoreListPage = () => {
   );
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedItem] = useState<Store>();
+  const [unrestricted, setUnrestricted] = useState(false);
 
   const { data, refetch: refetchStores } = tsQueryClient.store.getAll.useQuery(
-    ['getStores', search, perPage, page],
+    ['getStores', search, perPage, page, unrestricted],
     {
-      query: { search, perPage, page },
+      query: { search, perPage, page, unrestricted },
     },
     {
       onSuccess: () => {
@@ -73,12 +81,25 @@ export const StoreListPage = () => {
             justifyContent: 'space-between',
           }}
         >
-          <Typography sx={{ mb: 1 }} variant="h5">
-            Stores
-          </Typography>
-          <Button variant="contained" onClick={() => setDialogOpen(true)}>
-            Add
-          </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Typography variant="h5">Stores</Typography>
+            <Allow permissions={[RolePermission.OrderGetAllUnrestricted]}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Checkbox
+                  value={unrestricted}
+                  onChange={(e) => {
+                    setUnrestricted(e.target.checked);
+                  }}
+                />
+                <Typography>All</Typography>
+              </Box>
+            </Allow>
+          </Box>
+          <Allow permissions={[RolePermission.StoreCreate]}>
+            <Button variant="contained" onClick={() => setDialogOpen(true)}>
+              Add
+            </Button>
+          </Allow>
         </CardContent>
         <DataTable<Store>
           columns={[
@@ -86,10 +107,31 @@ export const StoreListPage = () => {
               name: 'image',
               label: 'Image',
               render: (store) => {
-                return store.image ? (
-                  <img src={store.image} alt="store" width={30} height={30} />
-                ) : (
-                  <StoreIcon sx={{ width: 30, height: 30 }} />
+                return (
+                  <Box
+                    sx={{
+                      borderRadius: '50%',
+                      backgroundColor: generateColor(store.title),
+                      color: 'white',
+                      width: 30,
+                      height: 30,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {store.image ? (
+                      <img
+                        src={store.image}
+                        alt="store"
+                        width={30}
+                        height={30}
+                      />
+                    ) : (
+                      <StoreIcon
+                        sx={{ width: 30, height: 30 }}
+                        color="inherit"
+                      />
+                    )}
+                  </Box>
                 );
               },
             },
@@ -100,6 +142,14 @@ export const StoreListPage = () => {
             {
               name: 'description',
               label: 'Description',
+            },
+            {
+              name: 'owner',
+              label: 'Owner',
+              display: unrestricted,
+              render: (store) => {
+                return store.owner?.firstName + ' ' + store.owner?.lastName;
+              },
             },
             {
               name: 'actions',

@@ -1,11 +1,16 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { DataSource, FindOptionsRelations } from 'typeorm';
 import { PaymentEntity } from '../entities';
-import { BaseRepository } from './base.repository';
+import { BaseRepository } from '../../core';
 import { OrderRepository } from './order.repository';
+import { CreatePayment, UpdatePayment } from '@nx-monorepo-template/global';
 
 @Injectable()
-export class PaymentRepository extends BaseRepository<PaymentEntity> {
+export class PaymentRepository extends BaseRepository<
+  PaymentEntity,
+  CreatePayment,
+  UpdatePayment
+> {
   constructor(
     dataSource: DataSource,
     @Inject(forwardRef(() => OrderRepository))
@@ -14,7 +19,7 @@ export class PaymentRepository extends BaseRepository<PaymentEntity> {
     super(PaymentEntity, dataSource);
   }
 
-  protected mapRelations(): Record<string, BaseRepository<any>> {
+  protected mapRelations(): Record<string, BaseRepository<unknown>> {
     return {
       order: this.orderRepository,
     };

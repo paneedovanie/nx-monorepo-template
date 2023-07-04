@@ -7,6 +7,11 @@ import {
   GetPaymentsOptionsSchema,
 } from '../schemas';
 
+export enum PaymentType {
+  Cash = 'cash',
+  Online = 'online',
+}
+
 export type Payment = z.infer<typeof PaymentSchema>;
 
 export type CreatePayment = z.infer<typeof CreatePaymentSchema>;

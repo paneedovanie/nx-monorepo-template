@@ -10,7 +10,7 @@ export const convertJsonToFormData = (
 
       if (typeof value === 'object' && !(value instanceof File)) {
         if (Array.isArray(value)) {
-          value.forEach((item: any, index: number) => {
+          value.forEach((item: Record<string, any>, index: number) => {
             const nestedPropName = `${propName}[${index}]`;
             convertJsonToFormData(item, formData, nestedPropName); // Recursively convert nested array item
           });
@@ -36,4 +36,16 @@ export const parseDataForm = (data: Record<string, any>) => {
   }
 
   return data;
+};
+
+export const cleanObject = (obj: Record<string, any>) => {
+  for (const key in obj) {
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      cleanObject(obj[key]);
+    }
+    if ([undefined, null].includes(obj[key])) {
+      delete obj[key];
+    }
+  }
+  return obj;
 };

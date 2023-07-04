@@ -53,7 +53,7 @@ const initRequests = (_client: any, contract: any): any => {
   );
 };
 
-export const useTsQueryClient = (): typeof baseClient => {
+export const useTsQueryClient = () => {
   const baseClient = initQueryClient(contract, {
     baseUrl: apiBaseUrl,
     baseHeaders: {
@@ -68,5 +68,5 @@ export const useTsQueryClient = (): typeof baseClient => {
       return tsRestFetchApi(args);
     },
   });
-  return initRequests(baseClient, contract);
+  return initRequests(baseClient, contract) as typeof baseClient;
 };

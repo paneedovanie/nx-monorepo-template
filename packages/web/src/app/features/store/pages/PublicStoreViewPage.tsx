@@ -4,6 +4,10 @@ import {
   Loading,
   Empty,
   useTsQueryClient,
+  StarRating,
+  useAuthContext,
+  formatCurrency,
+  Tags,
 } from '@/core';
 import {
   Add as AddIcon,
@@ -15,6 +19,7 @@ import {
   Inventory as InventoryIcon,
 } from '@mui/icons-material';
 import {
+  Avatar,
   Box,
   Button,
   Card,
@@ -22,6 +27,7 @@ import {
   CardContent,
   CardMedia,
   Checkbox,
+  Chip,
   Drawer,
   Grid,
   IconButton,
@@ -33,12 +39,14 @@ import {
   TextField,
   Toolbar,
   Typography,
+  colors,
 } from '@mui/material';
 import { BaseSyntheticEvent, Fragment, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { CartDialog } from '../components';
-import { Category } from '@nx-monorepo-template/global';
+import { CartDialog, StoreRatingDialog } from '../components';
+import { Category, Product, generateColor } from '@nx-monorepo-template/global';
+import { format } from 'date-fns';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
@@ -60,6 +68,8 @@ export const PublicStoreViewPage = () => {
   const params = useParams();
   const { search, page, perPage, setSearch, setPage } = usePagination();
   const [categoryIds, setCategoryIds] = useState<string[]>();
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
 
   const id = params.id as string;
 
@@ -67,12 +77,10 @@ export const PublicStoreViewPage = () => {
     window !== undefined ? () => window.document.body : undefined;
   const [filterOpen, setFilterOpen] = useState(false);
 
-  const { data: storeResult } = tsQueryClient.store.get.useQuery(
-    ['getStore', id],
-    {
+  const { data: storeResult, isFetching: isFetchingStore } =
+    tsQueryClient.store.get.useQuery(['getStore', id], {
       params: { id },
-    }
-  );
+    });
   const store = storeResult?.body;
 
   const { data: productsResult, isFetching: isFetchingProducts } =
@@ -103,6 +111,15 @@ export const PublicStoreViewPage = () => {
   );
 
   const categories = categoriesResult?.body;
+
+  const { data: ratingsResult, isFetching } =
+    tsQueryClient.storeRating.getAll.useQuery(['getStoreRatings'], {
+      query: {
+        store: id,
+      },
+    });
+
+  const ratings = ratingsResult?.body;
 
   const pageCount = useMemo(() => {
     const count = products?.count ?? 0;
@@ -148,6 +165,13 @@ export const PublicStoreViewPage = () => {
     );
   };
 
+  if (isFetchingStore) {
+    return <Loading />;
+  } else if (!store) {
+    navigate('/');
+    return null;
+  }
+
   return (
     <Container>
       <Drawer
@@ -174,35 +198,105 @@ export const PublicStoreViewPage = () => {
         <Grid item xs={12}>
           <Card>
             <CardContent>
-              <div
-                style={{
+              <Box
+                sx={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  position: 'relative',
+                  flexDirection: ['column', null, 'row'],
                 }}
               >
-                {store?.image ? (
-                  <img
-                    src={store?.image}
-                    alt="store"
-                    height={150}
-                    width={150}
-                  />
-                ) : (
-                  <StoreIcon
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    position: 'relative',
+                    gap: 2,
+                  }}
+                >
+                  <Box
                     sx={{
-                      height: 150,
-                      width: 150,
-                      mb: 4,
+                      maxWidth: 200,
+                      minWidth: 200,
+                      maxHeight: 200,
+                      minHeight: 200,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      backgroundColor: generateColor(store.title),
+                      color: 'white',
+                      borderRadius: '50%',
+                      overflow: 'hidden',
                     }}
-                  />
-                )}
-                <Typography variant="h4">{store?.title}</Typography>
-                <Typography>{store?.description}</Typography>
-              </div>
+                  >
+                    {store?.image ? (
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: 200,
+                          backgroundImage: `url('${store.image}')`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                        }}
+                      />
+                    ) : (
+                      <StoreIcon
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                        }}
+                        color="inherit"
+                      />
+                    )}
+                  </Box>
+                  <Box>
+                    <Tags tags={store?.tags} />
+                    <Typography variant="h4">{store?.title}</Typography>
+                    <StarRating rating={store?.rating ?? 0} />
+                    <Typography>{store?.description}</Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItem: 'center',
+                    }}
+                  >
+                    <Typography variant="h5" sx={{ mb: 1 }}>
+                      Ratings and Reviews
+                    </Typography>
+                    {user && <StoreRatingDialog storeId={id} />}
+                  </Box>
+                  {ratings?.list.map((rating, i) => {
+                    return (
+                      <Box sx={{ mb: 1 }} key={i}>
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
+                          <Avatar sx={{ fontSize: 14, width: 24, height: 24 }}>
+                            {rating.user.firstName.charAt(0)}
+                          </Avatar>
+                          <Typography variant="subtitle1">
+                            {rating.user.firstName}
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{ display: 'flex', gap: 1, alignItems: 'center' }}
+                        >
+                          <StarRating rating={rating.rating} />
+                          <Typography variant="caption">
+                            {format(new Date(rating.createdAt), 'MMMM dd, Y')}
+                          </Typography>
+                        </Box>
+                        <Typography>{rating.comment}</Typography>
+                      </Box>
+                    );
+                  })}
+                  {!ratings?.list.length && <Typography>No review</Typography>}
+                </Box>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -249,7 +343,7 @@ export const PublicStoreViewPage = () => {
           <Loading size="small" text="Fetching..." />
         ) : (
           <Grid container spacing={1}>
-            {products?.list?.map((item, i) => {
+            {products?.list?.map((item: Product, i: number) => {
               return (
                 <Grid item xs={12} md={6} xl={3} key={i}>
                   <Card>
@@ -266,19 +360,42 @@ export const PublicStoreViewPage = () => {
                           height: 140,
                           display: 'flex',
                           justifyContent: 'center',
+                          backgroundColor: generateColor(item.title),
+                          color: 'white',
                         }}
                       >
-                        <InventoryIcon sx={{ height: 140, width: 140 }} />
+                        <InventoryIcon
+                          sx={{ height: 140, width: 140 }}
+                          color="inherit"
+                        />
                       </Box>
                     )}
                     <CardContent>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        {item.categories.map((category: Category, i) => {
+                          const color = generateColor(category.title);
+                          return (
+                            <Chip
+                              key={i}
+                              icon={<CategoryIcon color="inherit" />}
+                              label={category.title}
+                              size="small"
+                              variant="outlined"
+                              sx={{ borderColor: color, color }}
+                            />
+                          );
+                        })}
+                      </Box>
+
                       <Box sx={{ mb: 2 }}>
                         <Typography variant="h5">{item.title}</Typography>
                         <Typography variant="caption">
                           {item.description}
                         </Typography>
                       </Box>
-                      <Typography>Price: {item.price}</Typography>
+                      <Typography>
+                        Price: {formatCurrency(item.price)}
+                      </Typography>
                     </CardContent>
                     <CardActions>
                       <IconButton

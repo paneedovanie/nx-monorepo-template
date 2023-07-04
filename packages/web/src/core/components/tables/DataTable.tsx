@@ -18,12 +18,13 @@ import {
   IconButton,
 } from '@mui/material';
 import { PaginationOrder } from '@nx-monorepo-template/global';
-import { ChangeEvent, ReactNode, useEffect, useState } from 'react';
+import { ChangeEvent, ReactNode, useState } from 'react';
 
 interface Column<T> extends TableCellProps {
   label: string;
   name: string;
   sortable?: boolean;
+  display?: boolean;
   sx?: SxProps;
   render?: (v: T) => ReactNode;
 }
@@ -70,45 +71,50 @@ export const DataTable = <T,>({
     }
   };
 
+  const handleFilterDisplay = ({ display }: Column<T>) =>
+    display === undefined ? true : display;
+
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader {...tableProps}>
           <TableHead>
             <TableRow>
-              {columns?.map(({ render, sortable, ...column }, i) => (
-                <TableCell
-                  {...column}
-                  sx={{ fontWeight: 'bold', ...column.sx }}
-                  key={i}
-                >
-                  {column.label}
-                  {sortable && (
-                    <IconButton onClick={() => sort(column.name)}>
-                      {order?.by !== column.name ? (
-                        <ArrowUpwardIcon
-                          sx={{
-                            fontSize: 16,
-                            opacity: 0.6,
-                          }}
-                        />
-                      ) : order?.dir === 'ASC' ? (
-                        <ArrowUpwardIcon
-                          sx={{
-                            fontSize: 16,
-                          }}
-                        />
-                      ) : (
-                        <ArrowDownwardIcon
-                          sx={{
-                            fontSize: 16,
-                          }}
-                        />
-                      )}
-                    </IconButton>
-                  )}
-                </TableCell>
-              ))}
+              {columns
+                ?.filter(handleFilterDisplay)
+                .map(({ render, sortable, display, ...column }, i) => (
+                  <TableCell
+                    {...column}
+                    sx={{ fontWeight: 'bold', ...column.sx }}
+                    key={i}
+                  >
+                    {column.label}
+                    {sortable && (
+                      <IconButton onClick={() => sort(column.name)}>
+                        {order?.by !== column.name ? (
+                          <ArrowUpwardIcon
+                            sx={{
+                              fontSize: 16,
+                              opacity: 0.6,
+                            }}
+                          />
+                        ) : order?.dir === 'ASC' ? (
+                          <ArrowUpwardIcon
+                            sx={{
+                              fontSize: 16,
+                            }}
+                          />
+                        ) : (
+                          <ArrowDownwardIcon
+                            sx={{
+                              fontSize: 16,
+                            }}
+                          />
+                        )}
+                      </IconButton>
+                    )}
+                  </TableCell>
+                ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -125,7 +131,7 @@ export const DataTable = <T,>({
                 {data?.map((row: T, i: number) => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={i}>
-                      {columns?.map((column, j) => {
+                      {columns?.filter(handleFilterDisplay).map(({display, ...column}, j) => {
                         return (
                           <TableCell key={j}>
                             {column.render?.(row) ??

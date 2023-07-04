@@ -87,6 +87,12 @@ const TransactionPermissions = {
       description: 'Allow to get all transactions',
       roles: ['Superadmin', 'User'],
     },
+    {
+      code: 'transaction.get_transactions_unrestricted',
+      title: 'Get All Transactions Unrestricted',
+      description: 'Allow to get all transactions of all users',
+      roles: ['Superadmin'],
+    },
   ],
 };
 
@@ -145,8 +151,14 @@ const StorePermissions = {
     },
     {
       code: 'store.get_all',
-      title: 'Get All Categories',
+      title: 'Get All Stores',
       description: 'Allow to get all stores',
+      roles: ['Superadmin', 'User'],
+    },
+    {
+      code: 'store.get_all_unrestricted',
+      title: 'Get All Stores Unrestricted',
+      description: 'Allow to get all stores of all users',
       roles: ['Superadmin', 'User'],
     },
     {
@@ -156,10 +168,22 @@ const StorePermissions = {
       roles: ['Superadmin', 'User'],
     },
     {
+      code: 'store.update_unrestricted',
+      title: 'Update Store Unrestricted',
+      description: 'Allow to update store unrestricted',
+      roles: ['Superadmin'],
+    },
+    {
       code: 'store.delete',
       title: 'Delete Store',
       description: 'Allow to delete store',
       roles: ['Superadmin', 'User'],
+    },
+    {
+      code: 'store.delete_unrestricted',
+      title: 'Delete Store Unrestricted',
+      description: 'Allow to delete store unrestricted',
+      roles: ['Superadmin'],
     },
   ],
 };
@@ -224,16 +248,34 @@ const OrderPermissions = {
       roles: ['Superadmin', 'User'],
     },
     {
+      code: 'order.get_all_unrestricted',
+      title: 'Get All Orders Unrestricted',
+      description: 'Allow to get all categories unrestricted',
+      roles: ['Superadmin'],
+    },
+    {
       code: 'order.update',
       title: 'Update Order',
       description: 'Allow to update order',
       roles: ['Superadmin', 'User'],
     },
     {
+      code: 'order.update_unrestricted',
+      title: 'Update Order Unrestricted',
+      description: 'Allow to update order unrestricted',
+      roles: ['Superadmin'],
+    },
+    {
       code: 'order.delete',
       title: 'Delete Order',
       description: 'Allow to delete order',
       roles: ['Superadmin', 'User'],
+    },
+    {
+      code: 'order.delete_unrestricted',
+      title: 'Delete Order Unrestricted',
+      description: 'Allow to delete order unrestricted',
+      roles: ['Superadmin'],
     },
   ],
 };
@@ -246,25 +288,25 @@ const PaymentPermissions = {
       code: 'payment.create',
       title: 'Create Payment',
       description: 'Allow to create payment',
-      roles: ['Superadmin'],
+      roles: ['Superadmin', 'User'],
     },
     {
       code: 'payment.get',
       title: 'Get Payment',
       description: 'Allow to get payment',
-      roles: ['Superadmin'],
+      roles: ['Superadmin', 'User'],
     },
     {
       code: 'payment.get_all',
       title: 'Get All Payments',
       description: 'Allow to get all categories',
-      roles: ['Superadmin'],
+      roles: ['Superadmin', 'User'],
     },
     {
       code: 'payment.update',
       title: 'Update Payment',
       description: 'Allow to update payment',
-      roles: ['Superadmin'],
+      roles: ['Superadmin', 'User'],
     },
     {
       code: 'payment.delete',

@@ -4,8 +4,10 @@ import {
   useAuthContext,
   useCartContext,
   usePagination,
+  formatCurrency,
 } from '@/core';
 import {
+  Badge,
   Box,
   Button,
   CardContent,
@@ -35,7 +37,7 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
   const [open, setOpen] = useState(false);
 
   const { data } = tsQueryClient.product.getAll.useQuery(
-    ['getProducts'],
+    ['getProducts', length],
     {
       query: {
         ids: Object.keys(cart) ?? [],
@@ -53,16 +55,17 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
 
   return (
     <>
-      <Button
-        onClick={handleOpen}
-        sx={{ display: 'flex', alignItems: 'center' }}
-        variant="contained"
-      >
-        <ShoppingCartIcon />
-        <Typography sx={{ ml: 1, display: ['none', 'inline'] }}>
+      <Badge badgeContent={length} color="error">
+        <IconButton
+          onClick={handleOpen}
+          sx={{ display: 'flex', alignItems: 'center' }}
+        >
+          <ShoppingCartIcon />
+          {/* <Typography sx={{ ml: 1, display: ['none', 'inline'] }}>
           Cart
-        </Typography>
-      </Button>
+        </Typography> */}
+        </IconButton>
+      </Badge>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -107,7 +110,7 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
                 return (
                   <Typography>
                     {cart[product.id]
-                      ? cart[product.id] * product.price
+                      ? formatCurrency(cart[product.id] * product.price)
                       : 'N/A'}
                   </Typography>
                 );

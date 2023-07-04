@@ -1,4 +1,10 @@
-import { DataTable, Loading, useTsQueryClient } from '@/core';
+import {
+  DataTable,
+  Loading,
+  formatCurrency,
+  useAuthContext,
+  useTsQueryClient,
+} from '@/core';
 import {
   Box,
   Button,
@@ -18,21 +24,23 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { PayDialog } from './PayDialog';
 import { Inventory as InventoryIcon } from '@mui/icons-material';
 
-export const OrderCard = ({ isPublic = false }: { isPublic?: boolean }) => {
+export const OrderCard = () => {
   const tsQueryClient = useTsQueryClient();
   const params = useParams();
   const navigate = useNavigate();
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
+  const { user } = useAuthContext();
 
   const { data, isFetching, refetch } = tsQueryClient.order.get.useQuery(
-    ['getOrder'],
+    ['getOrder', params.id],
     {
       params: { id: params.id as string },
     }
   );
 
   const order = data?.body;
+  const isCustomer = order?.user.id === user?.id;
 
   const totalCost = useMemo(() => {
     let total = 0;
@@ -64,7 +72,7 @@ export const OrderCard = ({ isPublic = false }: { isPublic?: boolean }) => {
             <Grid item xs={12} md={6}>
               <Typography sx={{ textTransform: 'Capitalize' }}>
                 Status: {order?.status}{' '}
-                {order?.status !== 'completed' && !isPublic && (
+                {order?.status !== 'completed' && !isCustomer && (
                   <Button
                     onClick={() => {
                       setStatusOpen(true);
@@ -82,7 +90,7 @@ export const OrderCard = ({ isPublic = false }: { isPublic?: boolean }) => {
                       setPaymentOpen(true);
                     }}
                   >
-                    {isPublic ? 'Pay' : 'Bill'}
+                    {isCustomer ? 'Pay' : 'Bill'}
                   </Button>
                 )}
               </Typography>
@@ -110,6 +118,9 @@ export const OrderCard = ({ isPublic = false }: { isPublic?: boolean }) => {
             {
               name: 'price',
               label: 'Unit Price',
+              render: ({ price }) => {
+                return formatCurrency(price);
+              },
             },
             {
               name: 'count',
@@ -119,7 +130,7 @@ export const OrderCard = ({ isPublic = false }: { isPublic?: boolean }) => {
               name: 'totalPrice',
               label: 'Price',
               render: ({ price, count }) => {
-                return price * count;
+                return formatCurrency(price * count);
               },
             },
           ]}
@@ -128,8 +139,10 @@ export const OrderCard = ({ isPublic = false }: { isPublic?: boolean }) => {
 
         <CardActions>
           <Box>
-            <Typography variant="h6">Total Cost: {totalCost}</Typography>
-            {!order.payment && isPublic && (
+            <Typography variant="h6">
+              Total Cost: {formatCurrency(totalCost)}
+            </Typography>
+            {!order.payment && isCustomer && (
               <Typography variant="caption">
                 Please pay to the shop's cashier or using your account wallet.
               </Typography>
@@ -151,14 +164,20 @@ export const OrderCard = ({ isPublic = false }: { isPublic?: boolean }) => {
                 size="small"
               />
             </Typography>
-            <Typography>Amount Paid: {order?.payment.amountPaid}</Typography>
-            <Typography>Total Cost: {order?.payment.totalCost}</Typography>
+            <Typography>
+              Amount Paid: {formatCurrency(order?.payment.amountPaid)}
+            </Typography>
+            <Typography>
+              Total Cost: {formatCurrency(order?.payment.totalCost)}
+            </Typography>
             <Divider sx={{ my: 1 }} />
-            <Typography>Change: {order?.payment.change}</Typography>
+            <Typography>
+              Change: {formatCurrency(order?.payment.change)}
+            </Typography>
           </CardContent>
         </Card>
       )}
-      {isPublic ? (
+      {isCustomer ? (
         <PayDialog
           data={order}
           open={paymentOpen}

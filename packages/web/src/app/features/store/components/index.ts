@@ -5,3 +5,4 @@ export * from './CartDialog';
 export * from './OrdersTable';
 export * from './PaymentsTable';
 export * from './OtherInformation';
+export * from './StoreRatingDialog';

@@ -1,12 +1,22 @@
-import { Breadcrumbs, FormGenerator, Loading, useTsQueryClient } from '@/core';
+import {
+  Breadcrumbs,
+  FormGenerator,
+  Loading,
+  StarRating,
+  Tags,
+  usePagination,
+  useTsQueryClient,
+} from '@/core';
 import { Edit as EditIcon, Store as StoreIcon } from '@mui/icons-material';
-import { Card, CardContent, IconButton, Typography } from '@mui/material';
+import { Box, Card, CardContent, IconButton, Typography } from '@mui/material';
 import {
   UpdateStore,
   Store,
   UpdateStoreSchema,
+  generateColor,
+  Tag,
 } from '@nx-monorepo-template/global';
-import { useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { OtherInformation } from '../components';
@@ -21,6 +31,8 @@ export const StoreViewPage = () => {
   const navigate = useNavigate();
   const [editable, setEditable] = useState(false);
   const id = params.id as string;
+
+  const { search, perPage, page, setSearch } = usePagination();
 
   const {
     data: storeResult,
@@ -38,6 +50,23 @@ export const StoreViewPage = () => {
 
   const data = storeResult?.body;
 
+  const { data: tagsResult } = tsQueryClient.tag.getAll.useQuery(
+    ['getTags', search],
+    {
+      query: {
+        search,
+        type: 'product',
+        perPage,
+        page,
+      },
+    },
+    {
+      cacheTime: 0,
+    }
+  );
+
+  const tags = tagsResult?.body;
+
   const { mutate } = tsQueryClient.store.update.useMutation({
     onSuccess: () => {
       refetch();
@@ -46,7 +75,7 @@ export const StoreViewPage = () => {
   });
 
   if (isFetching) return <Loading />;
-  if (!data) {
+  else if (!data) {
     navigate('/manage/stores');
     return null;
   }
@@ -66,19 +95,20 @@ export const StoreViewPage = () => {
           {editable && data ? (
             <>
               <Typography sx={{ mb: 1 }} variant="h5">
-                Edit Profile
+                Edit Store Profile
               </Typography>
               <FormGenerator<Store, UpdateStore>
                 initialValues={{
                   title: data.title,
                   description: data.description,
                   owner: data.owner.id,
+                  tags: data.tags.map(({ id }: Tag) => id),
                 }}
                 schema={UpdateStoreSchema}
                 onSubmit={(v, options) => {
                   mutate({ params: { id }, body: v }, options);
                 }}
-                successMessage="Profile Updated"
+                successMessage="Store Profile Updated"
                 onCancel={() => setEditable(false)}
                 items={[
                   {
@@ -100,6 +130,22 @@ export const StoreViewPage = () => {
                       rows: 2,
                     },
                   },
+                  {
+                    label: 'Tags',
+                    name: 'tags',
+                    valueKey: 'id',
+                    labelKey: 'title',
+                    component: 'AutoComplete',
+                    props: {
+                      freeSolo: true,
+                      multiple: true,
+                      defaultValue: data?.tags,
+                      options: tags?.list ?? [],
+                      onInputChange: (event: SyntheticEvent, value: string) => {
+                        setSearch(value);
+                      },
+                    },
+                  },
                 ]}
               />
             </>
@@ -114,17 +160,38 @@ export const StoreViewPage = () => {
                 position: 'relative',
               }}
             >
-              {data?.image ? (
-                <img src={data?.image} alt="store" height={150} width={150} />
-              ) : (
-                <StoreIcon
-                  sx={{
-                    height: 150,
-                    width: 150,
-                    mb: 4,
-                  }}
-                />
-              )}
+              <Box
+                sx={{
+                  backgroundColor: generateColor(data.title),
+                  borderRadius: '50%',
+                  color: 'white',
+                  width: 150,
+                  height: 150,
+                  overflow: 'hidden',
+                  mb: 1,
+                }}
+              >
+                {data?.image ? (
+                  <Box
+                    sx={{
+                      width: 150,
+                      height: 150,
+                      backgroundImage: `url('${data.image}')`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }}
+                  />
+                ) : (
+                  <StoreIcon
+                    sx={{
+                      height: 150,
+                      width: 150,
+                      mb: 4,
+                    }}
+                    color="inherit"
+                  />
+                )}
+              </Box>
               <IconButton
                 sx={{
                   position: 'absolute',
@@ -135,7 +202,10 @@ export const StoreViewPage = () => {
               >
                 <EditIcon color="warning" />
               </IconButton>
+              <Tags tags={data?.tags} />
               <Typography variant="h4">{data?.title}</Typography>
+              <StarRating rating={data?.rating ?? 0} />
+              <Typography>{data?.description}</Typography>
             </div>
           )}
         </CardContent>

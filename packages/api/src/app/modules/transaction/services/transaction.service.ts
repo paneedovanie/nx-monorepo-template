@@ -1,10 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   CreateTransaction,
+  NotificationType,
   OrderProduct,
   Pay,
+  PaymentType,
 } from '@nx-monorepo-template/global';
 import {
+  NotificationRepository,
   OrderRepository,
   PaymentRepository,
   TransactionEntity,
@@ -19,53 +22,45 @@ export class TransactionService extends BaseService<TransactionEntity> {
     protected readonly repository: TransactionRepository,
     private readonly userRepository: UserRepository,
     private readonly orderRepository: OrderRepository,
-    private readonly paymentRepository: PaymentRepository
+    private readonly paymentRepository: PaymentRepository,
+    private readonly notificationRepository: NotificationRepository
   ) {
     super(repository);
   }
 
   async balance(userId: string) {
-    const result = await this.repository
-      .createQueryBuilder()
-      .select(
-        `SUM(
-            amount *
-            (
-                CASE
-                    WHEN receiver = :userId
-                    THEN 1
-                    ELSE -1
-                END
-            )
-          )`,
-        'balance'
-      )
-      .where(
-        `(receiver != sender OR receiver IS NULL OR sender IS NULL) AND (receiver = :userId OR sender = :userId)`
-      )
-      .setParameters({ userId })
-      .getRawOne();
+    const balance = await this.repository.balance(userId);
 
-    return { balance: +(result?.balance ?? 0) / 100 };
+    return { balance };
   }
 
   async generate(input: CreateTransaction) {
     const receiverData = await this.userRepository.findOneBy({
-      id: input.receiver,
+      uniqueCode: input.receiver,
     });
     if (!receiverData) throw new BadRequestException("The user doesn't exists");
 
     const transaction = this.repository.create({
-      receiver: { id: input.receiver },
+      receiver: { id: receiverData.id },
       amount: input.amount,
     });
 
-    return this.repository.save(transaction);
+    const createdTransaction = await this.repository.save(transaction);
+
+    await this.notificationRepository.createWithRelations({
+      type: NotificationType.AmountReceived,
+      user: receiverData.id,
+      metadata: {
+        amount: input.amount,
+      },
+    });
+
+    return createdTransaction;
   }
 
   async transfer(input: CreateTransaction, sender: string) {
     const receiverData = await this.userRepository.findOneBy({
-      id: input.receiver,
+      uniqueCode: input.receiver,
     });
     if (!receiverData) throw new BadRequestException("The user doesn't exists");
 
@@ -80,12 +75,32 @@ export class TransactionService extends BaseService<TransactionEntity> {
     }
 
     const transaction = this.repository.create({
-      receiver: { id: input.receiver },
+      receiver: { id: receiverData.id },
       sender: { id: sender },
       amount: input.amount,
     });
 
-    return this.repository.save(transaction);
+    const createdTransaction = await this.repository.save(transaction);
+
+    await this.notificationRepository.createWithRelations({
+      type: NotificationType.AmountReceived,
+      user: receiverData.id,
+      metadata: {
+        amount: input.amount,
+        userId: sender,
+      },
+    });
+
+    await this.notificationRepository.createWithRelations({
+      type: NotificationType.AmountSent,
+      user: sender,
+      metadata: {
+        amount: input.amount,
+        userId: receiverData.id,
+      },
+    });
+
+    return createdTransaction;
   }
 
   async pay(input: Pay, sender: string) {
@@ -121,8 +136,30 @@ export class TransactionService extends BaseService<TransactionEntity> {
       amountPaid: totalCost,
       totalCost,
       change: 0,
+      type: PaymentType.Online,
     });
     await this.paymentRepository.save(payment);
+
+    await this.notificationRepository.createWithRelations({
+      type: NotificationType.AmountReceived,
+      user: transaction.receiver.id,
+      metadata: {
+        orderId: orderData.id,
+        storeId: orderData.store.id,
+        amount: totalCost,
+        userId: sender,
+      },
+    });
+
+    await this.notificationRepository.createWithRelations({
+      type: NotificationType.AmountSent,
+      user: sender,
+      metadata: {
+        orderId: orderData.id,
+        amount: totalCost,
+        userId: transaction.receiver.id,
+      },
+    });
 
     return createdTransaction;
   }

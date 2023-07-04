@@ -60,10 +60,10 @@ export class AuthService {
       { expiresIn: '15m' }
     );
 
-    await this.mailService.sendUserConfirmation(
-      { ...user, credential },
-      accessToken
-    );
+    delete credential.user;
+
+    user.credential = credential;
+    await this.mailService.sendUserConfirmation(user, accessToken);
 
     return user;
   }

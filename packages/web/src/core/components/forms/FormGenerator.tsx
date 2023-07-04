@@ -26,7 +26,7 @@ interface CustomComponentOptions {
   name: string;
   props?: any;
   value?: any;
-  error?: any;
+  error?: string;
   labelKey?: string;
   valueKey?: string;
   onChange?: (e: ChangeEvent) => void;
@@ -35,7 +35,7 @@ interface CustomComponentOptions {
       field: string,
       value: any,
       shouldValidate?: boolean | undefined
-    ) => Promise<any>;
+    ) => Promise<void>;
   };
 }
 
@@ -69,6 +69,7 @@ type FormGeneratorProps<R, I> = {
   items?: FormGeneratorItem[];
   schema?: z.AnyZodObject | z.ZodEffects<z.AnyZodObject>;
   successMessage: string;
+  defaultEnableSubmit?: boolean;
   onCancel?: () => void;
   onChange?: (v: I) => void;
   onSubmit: (
@@ -159,15 +160,30 @@ const FieldProvider = ({
     return (
       <Autocomplete
         defaultValue={props.defaultValue}
-        getOptionLabel={(option: { [key: string]: any }) => option[labelKey]}
+        getOptionLabel={(option: { [key: string]: any }) =>
+          typeof option === 'string' ? option : option[labelKey] ?? 'None'
+        }
         onChange={(_: any, v: any) => {
-          context?.setFieldValue(name, v[valueKey]);
+          const result = Array.isArray(v)
+            ? v.map((item) =>
+                typeof item === 'string' ? item : item[valueKey]
+              )
+            : v[valueKey];
+          context?.setFieldValue(name, result);
         }}
         isOptionEqualToValue={(
           option: { [key: string]: any },
           value: { [key: string]: any }
         ) => {
-          return option[valueKey] === value[valueKey];
+          return (
+            option[valueKey] ===
+            (typeof value === 'string' &&
+            !(_props.options as { [key: string]: any }).find(
+              (item: { [key: string]: any }) => item.id === value
+            )
+              ? value
+              : value[valueKey])
+          );
         }}
         renderInput={(params: TextFieldProps) => (
           <TextField
@@ -225,6 +241,7 @@ export const FormGenerator = <R, I extends FormikValues = any>({
   schema,
   items,
   successMessage,
+  defaultEnableSubmit,
   onCancel,
   onChange,
   onSubmit,
@@ -291,12 +308,15 @@ export const FormGenerator = <R, I extends FormikValues = any>({
             </Box>
           );
         })}
+
         <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
           <>
             <Button
               type="submit"
               variant="contained"
-              disabled={!dirty || !isValid || isSubmitting}
+              disabled={
+                (!dirty && !defaultEnableSubmit) || !isValid || isSubmitting
+              }
             >
               Submit
             </Button>

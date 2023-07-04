@@ -6,7 +6,7 @@ import {
 import { UserSchema } from './user';
 
 const base = {
-  receiver: z.string().uuid(),
+  receiver: z.string().length(13),
   amount: z.number().min(1).multipleOf(0.01, 'Max of 2 decimal places'),
 };
 

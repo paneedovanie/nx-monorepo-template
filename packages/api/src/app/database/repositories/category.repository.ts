@@ -7,19 +7,69 @@ import {
   Not,
 } from 'typeorm';
 import { CategoryEntity } from '../entities';
-import { BaseRepository } from './base.repository';
+import { BaseRepository } from '../../core';
+import { CreateCategory, UpdateCategory } from '@nx-monorepo-template/global';
 
 @Injectable()
-export class CategoryRepository extends BaseRepository<CategoryEntity> {
+export class CategoryRepository extends BaseRepository<
+  CategoryEntity,
+  CreateCategory,
+  UpdateCategory
+> {
   constructor(dataSource: DataSource) {
     super(CategoryEntity, dataSource);
+  }
+
+  getParentsByCategoryId(id: string): Promise<CategoryEntity[]> {
+    return this.query(`
+      WITH RECURSIVE category_tree AS (
+        SELECT
+          id,
+          title,
+          parent_id,
+          description,
+          type,
+          created_at,
+          1 AS level
+        FROM
+          categories
+        WHERE
+          id = '${id}'
+      
+        UNION ALL
+      
+        SELECT
+          c.id,
+          c.title,
+          c.parent_id,
+          c.description,
+          c.type,
+          c.created_at,
+          ct.level + 1 AS level
+        FROM
+          categories c
+        JOIN
+          category_tree ct ON c.id = ct.parent_id
+      )
+      SELECT
+        id,
+        title,
+        level
+        description,
+        type,
+        created_at
+      FROM
+        category_tree
+      ORDER BY
+        level DESC, id;
+    `);
   }
 
   searchFields(): string[] {
     return ['title'];
   }
 
-  protected mapRelations(): Record<string, BaseRepository<any>> {
+  protected mapRelations(): Record<string, BaseRepository<unknown>> {
     return { parent: this };
   }
 

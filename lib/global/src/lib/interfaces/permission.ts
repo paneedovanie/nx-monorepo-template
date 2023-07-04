@@ -36,8 +36,11 @@ export enum RolePermission {
   StoreCreate = 'store.create',
   StoreGet = 'store.get',
   StoreUpdate = 'store.update',
+  StoreUpdateUnrestricted = 'store.update_unrestricted',
   StoreDelete = 'store.delete',
+  StoreDeleteUnrestricted = 'store.delete_unrestricted',
   StoreGetAll = 'store.get_all',
+  StoreGetAllUnrestricted = 'store.get_all_unrestricted',
 
   ProductCreate = 'product.create',
   ProductGet = 'product.get',
@@ -48,8 +51,11 @@ export enum RolePermission {
   OrderCreate = 'order.create',
   OrderGet = 'order.get',
   OrderUpdate = 'order.update',
+  OrderUpdateUnrestricted = 'order.update_unrestricted',
   OrderDelete = 'order.delete',
+  OrderDeleteUnrestricted = 'order.delete_unrestricted',
   OrderGetAll = 'order.get_all',
+  OrderGetAllUnrestricted = 'order.get_all_unrestricted',
 
   PaymentCreate = 'payment.create',
   PaymentGet = 'payment.get',

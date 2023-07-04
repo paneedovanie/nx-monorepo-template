@@ -7,12 +7,17 @@ import {
 } from '@ts-rest/nest';
 import {
   Controller,
+  Request,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { contract, RolePermission } from '@nx-monorepo-template/global';
-import { JwtAuthGuard, PermissionGuard } from '../../auth/guards';
+import { contract, RolePermission, Store } from '@nx-monorepo-template/global';
+import {
+  AllowUnauthorize,
+  JwtAuthGuard,
+  PermissionGuard,
+} from '../../auth/guards';
 import { Permissions } from '../../auth';
 import { StoreService } from '../services';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -22,10 +27,10 @@ import { ParseBodyInterceptor } from '../../../interceptors';
 const c = nestControllerContract(contract.store);
 type RequestShapes = NestRequestShapes<typeof c>;
 
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller()
 export class StoreController implements NestControllerInterface<typeof c> {
   constructor(private readonly storeService: StoreService) {}
-  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(RolePermission.StoreCreate)
   @UseInterceptors(
     FileInterceptor('image', { storage: uploadStorage }),
@@ -44,7 +49,7 @@ export class StoreController implements NestControllerInterface<typeof c> {
     return { status: 201 as const, body: store };
   }
 
-  // @Permissions(RolePermission.StoreGet)
+  @AllowUnauthorize()
   @TsRest(c.get)
   async get(@TsRestRequest() { params }: RequestShapes['get']) {
     const store = await this.storeService.getById(params.id);
@@ -56,15 +61,21 @@ export class StoreController implements NestControllerInterface<typeof c> {
     return { status: 200 as const, body: store };
   }
 
-  // @Permissions(RolePermission.StoreGetAll)
+  @AllowUnauthorize()
   @TsRest(c.getAll)
-  async getAll(@TsRestRequest() { query }: RequestShapes['getAll']) {
-    const users = await this.storeService.getAll(query);
+  async getAll(
+    @TsRestRequest() { query }: RequestShapes['getAll'],
+    @Request() { user }
+  ) {
+    const { unrestricted, ...rest } = query;
+    if (!unrestricted && user) {
+      rest.owner = user.id;
+    }
+    const stores = await this.storeService.getAll(rest);
 
-    return { status: 200 as const, body: users };
+    return { status: 200 as const, body: stores };
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(RolePermission.StoreUpdate)
   @UseInterceptors(
     FileInterceptor('image', { storage: uploadStorage }),
@@ -83,7 +94,6 @@ export class StoreController implements NestControllerInterface<typeof c> {
     return { status: 201 as const, body: updatedUser };
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(RolePermission.StoreDelete)
   @TsRest(c.delete)
   async delete(@TsRestRequest() { params }: RequestShapes['delete']) {

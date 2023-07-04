@@ -4,10 +4,7 @@ import { CategoryEntity, PermissionEntity, RoleEntity } from '../entities';
 import { roles, permissions } from '../../config/roles-permissions';
 
 export default class RoleSeeder implements Seeder {
-  public async run(
-    dataSource: DataSource,
-    factoryManager: SeederFactoryManager
-  ): Promise<any> {
+  public async run(dataSource: DataSource): Promise<void> {
     const categoryRepository = dataSource.getRepository(CategoryEntity);
     const permissionRepository = dataSource.getRepository(PermissionEntity);
     const roleRepository = dataSource.getRepository(RoleEntity);

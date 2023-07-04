@@ -9,6 +9,8 @@ import {
   StoreRoutes,
   OrderRoutes,
   RoleRoutes,
+  NotificationRoutes,
+  TagRoutes,
 } from '@/app/features';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Loading, TopBar, useAuthContext } from '@/core';
@@ -43,6 +45,11 @@ export const Layout = () => {
                   <Route path="/stores/*" element={<StoreRoutes />} />
                   <Route path="/orders/*" element={<OrderRoutes />} />
                   <Route path="/roles/*" element={<RoleRoutes />} />
+                  <Route
+                    path="/notifications/*"
+                    element={<NotificationRoutes />}
+                  />
+                  <Route path="/tags/*" element={<TagRoutes />} />
                   <Route path="/*" element={<DashboardRoutes />} />
                 </Routes>
               </Box>

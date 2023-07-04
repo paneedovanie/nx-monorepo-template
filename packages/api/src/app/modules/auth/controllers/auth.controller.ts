@@ -5,20 +5,12 @@ import {
   TsRest,
   TsRestRequest,
 } from '@ts-rest/nest';
-import {
-  Controller,
-  UseGuards,
-  Request,
-  Post,
-  UseInterceptors,
-  UploadedFile,
-} from '@nestjs/common';
+import { Controller, UseGuards, Request } from '@nestjs/common';
 import { contract, RolePermission } from '@nx-monorepo-template/global';
 import { AuthService } from '../services';
 import { JwtAuthGuard, LocalAuthGuard, PermissionGuard } from '../guards';
 import { MessagePattern } from '@nestjs/microservices';
 import { Permissions } from '../decorators';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 const c = nestControllerContract(contract.auth);
 type RequestShapes = NestRequestShapes<typeof c>;

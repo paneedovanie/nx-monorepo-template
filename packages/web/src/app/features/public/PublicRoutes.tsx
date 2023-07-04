@@ -2,7 +2,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage, LoginPage, RegistrationPage } from './pages';
 import { Checkout, PublicStoreViewPage } from '../store';
 import { CartContextProvider, useAuthContext } from '@/core';
-import { PublicOrderList, PublicOrderView } from '../order';
 
 export const PublicRoutes = () => {
   const { user } = useAuthContext();
@@ -30,8 +29,6 @@ export const PublicRoutes = () => {
           </CartContextProvider>
         }
       />
-      <Route path="/orders/:id" element={<PublicOrderView />} />
-      <Route path="/orders" element={<PublicOrderList />} />
       <Route path="*" element={<HomePage />} />
     </Routes>
   );

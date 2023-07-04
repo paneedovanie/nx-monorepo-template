@@ -9,11 +9,11 @@ import {
 } from '../schemas';
 
 export enum OrderStatus {
-  PENDING = 'pending',
-  CANCELLED = 'cancelled',
-  PREPARING = 'preparing',
-  READY = 'ready',
-  COMPLETED = 'completed',
+  Pending = 'pending',
+  Cancelled = 'cancelled',
+  Preparing = 'preparing',
+  Ready = 'ready',
+  Completed = 'completed',
 }
 
 export type OrderProduct = z.infer<typeof OrderProductSchema>;

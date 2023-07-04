@@ -1,4 +1,10 @@
-import { Card, CardContent, IconButton, Typography } from '@mui/material';
+import {
+  Avatar,
+  Card,
+  CardContent,
+  IconButton,
+  Typography,
+} from '@mui/material';
 import styled from 'styled-components';
 import {
   AccountCircle as AccountCircleIcon,
@@ -71,13 +77,17 @@ export const ProfilePage = () => {
                 position: 'relative',
               }}
             >
-              <AccountCircleIcon
+              <Avatar
                 sx={{
                   height: 150,
                   width: 150,
                   mb: 4,
                 }}
-              />
+              >
+                <Typography variant="h2">
+                  {user?.firstName.charAt(0)}
+                </Typography>
+              </Avatar>
               <IconButton
                 sx={{
                   position: 'absolute',
@@ -90,6 +100,9 @@ export const ProfilePage = () => {
               </IconButton>
               <Typography variant="h4">
                 {user?.firstName + ' ' + user?.lastName}
+              </Typography>
+              <Typography variant="body2">
+                Unique Code: {user?.uniqueCode}
               </Typography>
             </div>
           )}

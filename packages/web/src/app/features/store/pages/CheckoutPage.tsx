@@ -5,6 +5,8 @@ import {
   useAuthContext,
   useCartContext,
   usePagination,
+  formatCurrency,
+  Loading,
 } from '@/core';
 import { Card, CardActions, CardContent, Typography } from '@mui/material';
 import { useEffect, useMemo } from 'react';
@@ -25,7 +27,7 @@ export const Checkout = () => {
   const { cart, length } = useCartContext();
   const { page, perPage } = usePagination();
 
-  const { data } = tsQueryClient.product.getAll.useQuery(
+  const { data, isFetching } = tsQueryClient.product.getAll.useQuery(
     ['getProducts'],
     {
       query: {
@@ -42,7 +44,7 @@ export const Checkout = () => {
 
   const { mutate } = tsQueryClient.order.create.useMutation({
     onSuccess: (v) => {
-      navigate(`/orders/${v.body.id}`);
+      navigate(`/manage/orders/${v.body.id}`);
     },
   });
 
@@ -50,7 +52,7 @@ export const Checkout = () => {
 
   const totalCost = useMemo(() => {
     let total = 0;
-    products?.list.forEach(({ id, price }) => {
+    products?.list.forEach(({ id, price }: Product) => {
       const totalPrice = price * cart[id];
       total += totalPrice;
     });
@@ -66,6 +68,10 @@ export const Checkout = () => {
   if (!user) {
     navigate(`/stores/${params.id}`);
     return null;
+  }
+
+  if (isFetching) {
+    return <Loading />;
   }
 
   return (
@@ -84,6 +90,9 @@ export const Checkout = () => {
             {
               name: 'price',
               label: 'Unit Price',
+              render: ({ price }) => {
+                return formatCurrency(price);
+              },
             },
             {
               name: 'count',
@@ -96,7 +105,7 @@ export const Checkout = () => {
               name: 'totalPrice',
               label: 'Price',
               render: ({ id, price }) => {
-                return price * cart[id];
+                return formatCurrency(price * cart[id]);
               },
             },
           ]}
@@ -104,22 +113,27 @@ export const Checkout = () => {
         />
 
         <CardContent>
-          <Typography variant="h6">Total Cost: {totalCost}</Typography>
+          <Typography variant="h6">
+            Total Cost: {formatCurrency(totalCost)}
+          </Typography>
         </CardContent>
         <CardActions>
           <FormGenerator<Order, CreateOrder>
             initialValues={{
               items:
-                products?.list.map(({ id, title, description, price }) => ({
-                  title,
-                  description,
-                  price,
-                  count: cart[id],
-                })) ?? [],
+                products?.list.map(
+                  ({ id, title, description, price }: Product) => ({
+                    title,
+                    description,
+                    price,
+                    count: cart[id],
+                  })
+                ) ?? [],
               user: user?.id,
               store: params.id as string,
               status: 'pending',
             }}
+            defaultEnableSubmit
             schema={CreateOrderSchema}
             onSubmit={(v, options) => {
               mutate({ body: v }, options);

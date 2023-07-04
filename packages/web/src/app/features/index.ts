@@ -8,3 +8,5 @@ export * from './category';
 export * from './store';
 export * from './order';
 export * from './role';
+export * from './notification';
+export * from './tag';

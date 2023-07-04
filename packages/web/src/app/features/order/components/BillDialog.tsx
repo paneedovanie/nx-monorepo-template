@@ -1,4 +1,4 @@
-import { FormGenerator, useTsQueryClient } from '@/core';
+import { FormGenerator, formatCurrency, useTsQueryClient } from '@/core';
 import {
   Dialog,
   DialogTitle,
@@ -63,7 +63,7 @@ export const BillDialog = ({
               <Typography>Total Cost:</Typography>
             </TableCell>
             <TableCell>
-              <Typography variant="h4">{totalCost}</Typography>
+              <Typography variant="h4">{formatCurrency(totalCost)}</Typography>
             </TableCell>
           </TableRow>
           <TableRow>
@@ -72,7 +72,7 @@ export const BillDialog = ({
             </TableCell>
             <TableCell>
               <Typography color={change < 0 ? 'error' : 'success'} variant="h4">
-                {change}
+                {formatCurrency(change)}
               </Typography>
             </TableCell>
           </TableRow>

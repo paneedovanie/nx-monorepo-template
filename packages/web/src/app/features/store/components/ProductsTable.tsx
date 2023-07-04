@@ -1,6 +1,6 @@
 import { DataTable, useTsQueryClient, usePagination } from '@/core';
 import { Box, Button, IconButton, Typography } from '@mui/material';
-import { Product, Store } from '@nx-monorepo-template/global';
+import { Product, Store, generateColor } from '@nx-monorepo-template/global';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -65,11 +65,32 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
           {
             name: 'image',
             label: 'Image',
-            render: (store) => {
-              return store.image ? (
-                <img src={store.image} alt="product" width={30} height={30} />
-              ) : (
-                <InventoryIcon sx={{ width: 30, height: 30 }} />
+            render: (product) => {
+              return (
+                <Box
+                  sx={{
+                    borderRadius: '50%',
+                    backgroundColor: generateColor(product.title),
+                    color: 'white',
+                    width: 30,
+                    height: 30,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {product.image ? (
+                    <img
+                      src={product.image}
+                      alt="store"
+                      width={30}
+                      height={30}
+                    />
+                  ) : (
+                    <InventoryIcon
+                      sx={{ width: 30, height: 30 }}
+                      color="inherit"
+                    />
+                  )}
+                </Box>
               );
             },
           },

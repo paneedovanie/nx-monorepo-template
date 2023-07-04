@@ -10,11 +10,15 @@ import {
   OrderModule,
   PaymentModule,
   RoleModule,
+  StatisticModule,
+  PermissionModule,
+  NotificationModule,
+  StoreRatingModule,
+  TagModule,
 } from './modules';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { DatabaseModule } from './database';
-import { PermissionModule } from './modules/permission';
 import express from 'express';
 
 @Module({
@@ -35,6 +39,10 @@ import express from 'express';
     PaymentModule,
     RoleModule,
     PermissionModule,
+    StatisticModule,
+    NotificationModule,
+    StoreRatingModule,
+    TagModule,
   ],
   controllers: [],
   providers: [],

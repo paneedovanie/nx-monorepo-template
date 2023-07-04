@@ -11,6 +11,7 @@ export const UserSchema = z.object({
   id: z.string(),
   roles: RoleSchema.array(),
   createdAt: z.date(),
+  uniqueCode: z.string(),
   ...base,
 });
 
@@ -20,6 +21,7 @@ export const TokenUserSchema = z.object({
     z.object({ permissions: z.string().array() })
   ).array(),
   createdAt: z.date(),
+  uniqueCode: z.string(),
   ...base,
 });
 

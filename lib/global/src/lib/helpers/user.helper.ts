@@ -1,6 +1,6 @@
-import { User } from '../interfaces';
+import { TokenUser } from '../interfaces';
 
-export const checkUserPermission = (user: User, permissions: string[]) => {
+export const checkUserPermission = (user: TokenUser, permissions: string[]) => {
   const rolePermissions = user.roles[0]?.permissions;
   if (!rolePermissions) return false;
 

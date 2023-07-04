@@ -5,10 +5,17 @@ import {
   SnackbarContextProvider,
   theme,
   AuthContextProvider,
+  NotificationContextProvider,
 } from '@/core';
 import { Layout } from './Layout';
+import { useEffect } from 'react';
+import { app } from '@nx-monorepo-template/global';
 
 export const App = () => {
+  useEffect(() => {
+    document.title = app.title;
+  }, []);
+
   return (
     <QueryClientProvider
       client={
@@ -27,7 +34,9 @@ export const App = () => {
         <BreadcrumbsContextProvider>
           <SnackbarContextProvider>
             <AuthContextProvider>
-              <Layout />
+              <NotificationContextProvider>
+                <Layout />
+              </NotificationContextProvider>
             </AuthContextProvider>
           </SnackbarContextProvider>
         </BreadcrumbsContextProvider>

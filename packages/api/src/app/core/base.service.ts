@@ -1,28 +1,61 @@
 import { Injectable } from '@nestjs/common';
 import { ObjectLiteral } from 'typeorm';
-import { BaseRepository } from '../database/repositories/base.repository';
+import { BaseRepository } from './base.repository';
+import { PaginationOptions } from '@nx-monorepo-template/global';
 
 @Injectable()
-export class BaseService<Entity extends ObjectLiteral> {
+export class BaseService<
+  Entity extends ObjectLiteral,
+  C = Record<string, any>,
+  U = Record<string, any>,
+  F = PaginationOptions
+> {
   constructor(protected readonly repository: BaseRepository<Entity>) {}
 
-  getById(id: string) {
-    return this.repository.getById(id);
+  getById(id: string): Promise<Entity> {
+    return this.repository.getByIdWithRelations(id);
   }
 
-  create(input: Record<string, any>) {
-    return this.repository.createWithRelations(input);
+  getManyByIds(ids: string[]) {
+    return this.repository.getManyByIdsWithRelations(ids);
   }
 
-  getAll(query: any) {
+  async create(input: C) {
+    const res = await this.repository.createWithRelations(input);
+    this.onCreated(res);
+    return res;
+  }
+
+  getAll(query: F) {
     return this.repository.paginated(query);
   }
 
-  async update(id: string, input: Record<string, any>) {
-    return this.repository.updateWithRelations(id, input);
+  async update(id: string | Record<string, any>, input: U): Promise<Entity> {
+    const prev =
+      typeof id === 'string'
+        ? await this.getById(id)
+        : await this.repository.findOne(id);
+    const res = await this.repository.updateWithRelations(id, input);
+    this.onUpdated(res, prev);
+    return res;
   }
 
   async delete(id: string) {
+    const res = await this.getById(id);
     await this.repository.delete({ id: id as any });
+    this.onDeleted(res);
+    return;
+  }
+
+  protected onCreated(value: Entity) {
+    return;
+  }
+
+  protected onUpdated(value: Entity, prevValue: Entity) {
+    return;
+  }
+
+  protected onDeleted(value: Entity) {
+    return;
   }
 }

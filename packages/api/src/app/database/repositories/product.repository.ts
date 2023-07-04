@@ -5,13 +5,18 @@ import {
   FindOptionsWhere,
   In,
 } from 'typeorm';
-import { ProductEntity } from '../entities';
-import { BaseRepository } from './base.repository';
+import { CategoryEntity, ProductEntity } from '../entities';
+import { BaseRepository } from '../../core';
 import { StoreRepository } from './store.repository';
 import { CategoryRepository } from './category.repository';
+import { CreateProduct, UpdateProduct } from '@nx-monorepo-template/global';
 
 @Injectable()
-export class ProductRepository extends BaseRepository<ProductEntity> {
+export class ProductRepository extends BaseRepository<
+  ProductEntity,
+  CreateProduct,
+  UpdateProduct
+> {
   constructor(
     dataSource: DataSource,
     private readonly storeRepository: StoreRepository,
@@ -20,11 +25,22 @@ export class ProductRepository extends BaseRepository<ProductEntity> {
     super(ProductEntity, dataSource);
   }
 
+  protected async modifyResult(
+    item: ProductEntity
+  ): Promise<ProductEntity & { categories: CategoryEntity[] }> {
+    return {
+      ...item,
+      categories: await this.categoryRepository.getParentsByCategoryId(
+        item.category.id
+      ),
+    };
+  }
+
   protected searchFields(): string[] {
     return ['title'];
   }
 
-  protected mapRelations(): Record<string, BaseRepository<any>> {
+  protected mapRelations(): Record<string, BaseRepository<unknown>> {
     return {
       store: this.storeRepository,
       category: this.categoryRepository,

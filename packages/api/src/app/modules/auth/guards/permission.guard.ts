@@ -1,8 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
-import { UserEntity } from '../../../database';
-import { checkUserPermission } from '@nx-monorepo-template/global';
+import { TokenUser, checkUserPermission } from '@nx-monorepo-template/global';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -17,7 +16,7 @@ export class PermissionGuard implements CanActivate {
     );
     if (!permissions) return true;
     const request = context.switchToHttp().getRequest();
-    const user = request.user as UserEntity;
+    const user = request.user as TokenUser;
 
     return checkUserPermission(user, permissions);
   }

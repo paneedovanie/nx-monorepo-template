@@ -14,13 +14,13 @@ export const usePagination = (
   const [query] = useSearchParams();
   const navigate = useNavigate();
   const [perPage, setPerPage] = useState(
-    options?.query && +(query.get('perPage') ?? initial?.perPage ?? 5)
+    +((options?.query ? query.get('perPage') : initial?.perPage) ?? 5)
   );
   const [page, setPage] = useState(
-    options?.query && +(query.get('page') ?? initial?.page ?? 1)
+    +((options?.query ? query.get('page') : initial?.perPage) ?? 1)
   );
-  const [search, setSearch] = useState<string | null>(
-    options?.query ? query.get('search') : null
+  const [search, setSearch] = useState<string | undefined>(
+    options?.query ? query.get('search') ?? undefined : undefined
   );
   const [order, setOrder] = useState<PaginationOrder | undefined>(
     options?.query && query.get('orderBy')

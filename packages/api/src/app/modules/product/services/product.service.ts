@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CategoryRepository,
-  ProductEntity,
-  ProductRepository,
-  StoreRepository,
-} from '../../../database';
+import { ProductEntity, ProductRepository } from '../../../database';
 import { BaseService } from '../../../core';
 
 @Injectable()

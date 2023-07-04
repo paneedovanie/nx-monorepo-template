@@ -15,11 +15,11 @@ import { PaymentEntity } from './payment.entity';
 import { OrderProduct } from '@nx-monorepo-template/global';
 
 enum OrderStatus {
-  PENDING = 'pending',
-  CANCELLED = 'cancelled',
-  PREPARING = 'preparing',
-  READY = 'ready',
-  COMPLETED = 'completed',
+  Pending = 'pending',
+  Cancelled = 'cancelled',
+  Preparing = 'preparing',
+  Ready = 'ready',
+  Completed = 'completed',
 }
 
 @Entity('orders')
@@ -57,7 +57,7 @@ export class OrderEntity {
   @Column({
     type: 'enum',
     enum: OrderStatus,
-    default: OrderStatus.PENDING,
+    default: OrderStatus.Pending,
   })
   status: OrderStatus;
 

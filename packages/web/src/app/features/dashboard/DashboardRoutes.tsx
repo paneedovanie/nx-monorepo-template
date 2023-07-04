@@ -3,6 +3,6 @@ import { DashboardPage } from './pages';
 
 export const DashboardRoutes = () => (
   <Routes>
-    <Route path="/dashboard" element={<DashboardPage />} />
+    <Route path="/" element={<DashboardPage />} />
   </Routes>
 );

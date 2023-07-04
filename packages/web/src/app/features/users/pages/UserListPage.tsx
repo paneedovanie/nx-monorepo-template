@@ -48,6 +48,10 @@ export const UserListPage = () => {
         <DataTable<User>
           columns={[
             {
+              name: 'uniqueCode',
+              label: 'Unique Code',
+            },
+            {
               name: 'firstName',
               label: 'First Name',
             },

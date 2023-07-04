@@ -3,11 +3,14 @@ import {
   CreateStoreSchema,
   GetStoresResponseSchema,
   UpdateStoreSchema,
-  StoreSchema,
   GetStoresOptionsSchema,
+  StoreSchemaNonCiruclar,
 } from '../schemas';
+import { Product } from './product';
 
-export type Store = z.infer<typeof StoreSchema>;
+export type Store = z.infer<typeof StoreSchemaNonCiruclar> & {
+  products: Product[];
+};
 
 export type CreateStore = z.infer<typeof CreateStoreSchema>;
 

@@ -3,13 +3,28 @@ import {
   useTsQueryClient,
   usePagination,
   Breadcrumbs,
+  Allow,
+  formatCurrency,
 } from '@/core';
-import { Box, Card, CardContent, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Checkbox,
+  IconButton,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { RemoveRedEye as EyeIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Order, OrderProduct } from '@nx-monorepo-template/global';
+import {
+  Order,
+  OrderProduct,
+  RolePermission,
+} from '@nx-monorepo-template/global';
 import { format } from 'date-fns';
+import { BaseSyntheticEvent, useState } from 'react';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
@@ -18,19 +33,35 @@ const Container = styled.div`
 export const OrderList = () => {
   const tsQueryClient = useTsQueryClient();
   const navigate = useNavigate();
+  const [unrestricted, setUnrestricted] = useState(false);
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
+
   const { perPage, page, order, setPage, setPerPage, setOrder } = usePagination(
     {},
     { query: true }
   );
 
   const { data } = tsQueryClient.order.getAll.useQuery(
-    ['getOrders', perPage, page, order?.by, order?.dir],
+    [
+      'getOrders',
+      perPage,
+      page,
+      order?.by,
+      order?.dir,
+      unrestricted,
+      startDate,
+      endDate,
+    ],
     {
       query: {
         perPage,
         page,
         orderBy: order?.by,
         orderDir: order?.dir,
+        unrestricted,
+        startDate,
+        endDate,
       },
     }
   );
@@ -45,9 +76,34 @@ export const OrderList = () => {
       />
       <Card>
         <CardContent>
-          <Typography sx={{ mb: 1 }} variant="h5">
-            Orders
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
+            <Typography variant="h5">Orders</Typography>
+            <Allow permissions={[RolePermission.OrderGetAllUnrestricted]}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Checkbox
+                  value={unrestricted}
+                  onChange={(e) => {
+                    setUnrestricted(e.target.checked);
+                  }}
+                />
+                <Typography>All</Typography>
+              </Box>
+            </Allow>
+            <TextField
+              type="date"
+              label="Start Date"
+              onChange={(e: BaseSyntheticEvent) => setStartDate(e.target.value)}
+              size="small"
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              type="date"
+              label="End Date"
+              onChange={(e: BaseSyntheticEvent) => setEndDate(e.target.value)}
+              size="small"
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
         </CardContent>
         <DataTable<Order>
           columns={[
@@ -79,7 +135,7 @@ export const OrderList = () => {
                 const reducer = (curr: number, item: OrderProduct) => {
                   return curr + item.count * item.price;
                 };
-                return items.reduce(reducer, 0);
+                return formatCurrency(items.reduce(reducer, 0));
               },
             },
             {
@@ -97,6 +153,14 @@ export const OrderList = () => {
               label: 'Paid',
               render: ({ payment }) => {
                 return payment ? 'Paid' : 'No';
+              },
+            },
+            {
+              name: 'user',
+              label: 'User',
+              display: unrestricted,
+              render: (order) => {
+                return order.user.firstName + ' ' + order.user.lastName;
               },
             },
             {
@@ -121,7 +185,7 @@ export const OrderList = () => {
                   <Box sx={{ textAlign: 'right' }}>
                     <IconButton
                       size="small"
-                      onClick={() => navigate(`/orders/${id}`)}
+                      onClick={() => navigate(`/manage/orders/${id}`)}
                     >
                       <EyeIcon />
                     </IconButton>
