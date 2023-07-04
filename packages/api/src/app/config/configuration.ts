@@ -1,5 +1,4 @@
 import entities from '../database/entities';
-// import migrations from '../database/migrations';
 import seeds from '../database/seeds';
 import factories from '../database/factories';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';

@@ -2025,13 +2025,11 @@ exports.AppModule = AppModule;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
 const entities_1 = tslib_1.__importDefault(__webpack_require__("./src/app/database/entities/index.ts"));
-// import migrations from '../database/migrations';
 const seeds_1 = tslib_1.__importDefault(__webpack_require__("./src/app/database/seeds/index.ts"));
 const factories_1 = tslib_1.__importDefault(__webpack_require__("./src/app/database/factories/index.ts"));
 const typeorm_naming_strategies_1 = __webpack_require__("typeorm-naming-strategies");
 const path_1 = __webpack_require__("path");
 const isDevelopment = "development" === 'development';
-console.log((0, path_1.resolve)(__dirname, '../database/migrations'));
 exports["default"] = () => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
     return ({
