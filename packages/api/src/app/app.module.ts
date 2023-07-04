@@ -20,12 +20,23 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { DatabaseModule } from './database';
 import express from 'express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(
+        __dirname,
+        isDevelopment ? '../../../dist/packages' : '../',
+        'web'
+      ),
     }),
     DatabaseModule,
     MailModule,

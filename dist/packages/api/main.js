@@ -1978,6 +1978,9 @@ const config_1 = __webpack_require__(5793);
 const configuration_1 = tslib_1.__importDefault(__webpack_require__(6806));
 const database_1 = __webpack_require__(1309);
 const express_1 = tslib_1.__importDefault(__webpack_require__(6860));
+const serve_static_1 = __webpack_require__(385);
+const path_1 = __webpack_require__(1017);
+const isDevelopment = "production" === 'development';
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -1991,6 +1994,9 @@ AppModule = tslib_1.__decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 load: [configuration_1.default],
+            }),
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(__dirname, isDevelopment ? '../../../dist/packages' : '../', 'web'),
             }),
             database_1.DatabaseModule,
             modules_1.MailModule,
@@ -8060,6 +8066,13 @@ module.exports = require("@nestjs/platform-express");
 
 /***/ }),
 
+/***/ 385:
+/***/ ((module) => {
+
+module.exports = require("@nestjs/serve-static");
+
+/***/ }),
+
 /***/ 3399:
 /***/ ((module) => {
 
@@ -8203,15 +8216,12 @@ const common_1 = __webpack_require__(6481);
 const core_1 = __webpack_require__(143);
 const app_module_1 = __webpack_require__(9397);
 const configuration_1 = tslib_1.__importDefault(__webpack_require__(6806));
-const path_1 = __webpack_require__(1017);
 function bootstrap() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);
-        // const app = await NestFactory.create(AppModule);
         // const globalPrefix = 'api/v1';
         // app.setGlobalPrefix(globalPrefix);
         app.enableCors();
-        app.useStaticAssets((0, path_1.join)(__dirname, '../', 'web'));
         const port = (0, configuration_1.default)().port;
         yield app.listen(port);
         common_1.Logger.log(`🚀 Application is running on: http://localhost:${port}`);
