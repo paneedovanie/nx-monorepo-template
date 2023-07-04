@@ -1,4 +1,4 @@
-import { Seeder, SeederFactoryManager } from 'typeorm-extension';
+import { Seeder } from 'typeorm-extension';
 import { DataSource } from 'typeorm';
 import { CategoryEntity, PermissionEntity, RoleEntity } from '../entities';
 import { roles, permissions } from '../../config/roles-permissions';
