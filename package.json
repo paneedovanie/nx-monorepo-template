@@ -4,6 +4,7 @@
   "license": "MIT",
   "private": true, 
   "scripts": {
+    "build": "nx build api",
     "start": "node dist/packages/api/main.js"
  },
   "devDependencies": {
