@@ -2055,6 +2055,7 @@ exports["default"] = () => {
             synchronize: false,
             namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(),
             logging: true,
+            ssl: { rejectUnauthorized: false },
         },
         jwt: {
             secret: (_g = process.env.JWT_SECRET) !== null && _g !== void 0 ? _g : 'supersecret',
