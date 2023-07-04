@@ -9,7 +9,6 @@ import { Controller, UseGuards, Request } from '@nestjs/common';
 import { contract, RolePermission } from '@nx-monorepo-template/global';
 import { AuthService } from '../services';
 import { JwtAuthGuard, LocalAuthGuard, PermissionGuard } from '../guards';
-import { MessagePattern } from '@nestjs/microservices';
 import { Permissions } from '../decorators';
 
 const c = nestControllerContract(contract.auth);
@@ -66,10 +65,5 @@ export class AuthController implements NestControllerInterface<typeof c> {
   async resendVerifyEmail(@Request() { user }) {
     const result = await this.authService.resendVerifyEmail(user.id);
     return { status: 201 as const, body: result };
-  }
-
-  @MessagePattern({ cmd: 'verify-client-token' })
-  async verifyClientToken(data) {
-    return this.authService.verifyClientToken(data);
   }
 }
