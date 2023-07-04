@@ -4,7 +4,7 @@
   "license": "MIT",
   "private": true, 
   "scripts": {
-    "build": "rm -rf node_modules && npm i --production",
+    "build": "rm -rf build && npm i --production",
     "start": "node dist/packages/api/main.js"
  },
   "devDependencies": {
