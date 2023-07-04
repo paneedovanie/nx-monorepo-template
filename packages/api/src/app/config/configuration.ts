@@ -7,8 +7,6 @@ import { resolve } from 'path';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-console.log(resolve(__dirname, '../database/migrations'));
-
 export default () => ({
   protocol: process.env.PROTOCOL ?? 'http',
   host: process.env.HOST ?? 'localhost',
