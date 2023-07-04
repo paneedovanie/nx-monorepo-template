@@ -86,18 +86,7 @@
     "react-is": "18.2.0",
     "react-query": "^3.39.3",
     "react-router-dom": "6.8.1",
-    "@ts-rest/react-query": "^3.18.1",
-    "aws-sdk": "^2.1375.0",
-    "mock-aws-s3": "^4.0.2",
-    "nock": "^13.3.1",
-    "polished": "^4.2.2",
-    "styled-components": "5.3.6",
-    "reflect-metadata": "^0.1.13",
-    "util": "^0.12.5",
-    "mui-file-input": "^2.0.0",
-    "date-fns": "^2.30.0",
-    "core-js": "^3.6.5",
-    "zod-formik-adapter": "^1.2.0"
+    "@ts-rest/react-query": "^3.18.1"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",
@@ -126,6 +115,17 @@
     "typeorm": "^0.3.12",
     "typeorm-extension": "^2.5.4",
     "typeorm-naming-strategies": "^4.1.0",
-    "zod": "^3.20.6"
+    "zod": "^3.20.6",
+    "aws-sdk": "^2.1375.0",
+    "mock-aws-s3": "^4.0.2",
+    "nock": "^13.3.1",
+    "polished": "^4.2.2",
+    "styled-components": "5.3.6",
+    "reflect-metadata": "^0.1.13",
+    "util": "^0.12.5",
+    "mui-file-input": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "core-js": "^3.6.5",
+    "zod-formik-adapter": "^1.2.0"
   }
 }
