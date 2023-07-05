@@ -71,6 +71,7 @@
     "jest-transform-stub": "^2.0.0",
     "jsdom": "~20.0.3",
     "next": "13.3.0",
+    "nx": "15.9.4",
     "prettier": "^2.6.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -129,7 +130,6 @@
     "typeorm-naming-strategies": "^4.1.0",
     "util": "^0.12.5",
     "zod": "^3.20.6",
-    "zod-formik-adapter": "^1.2.0",
-    "nx": "15.9.4"
+    "zod-formik-adapter": "^1.2.0"
   }
 }

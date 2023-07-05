@@ -1981,7 +1981,6 @@ const express_1 = tslib_1.__importDefault(__webpack_require__("express"));
 const serve_static_1 = __webpack_require__("@nestjs/serve-static");
 const path_1 = __webpack_require__("path");
 const file_1 = __webpack_require__("./src/app/file/index.ts");
-const isDevelopment = "development" === 'development';
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -1996,8 +1995,16 @@ AppModule = tslib_1.__decorate([
                 isGlobal: true,
                 load: [configuration_1.default],
             }),
-            serve_static_1.ServeStaticModule.forRoot({
-                rootPath: (0, path_1.join)(__dirname, isDevelopment ? '../../../dist/packages' : '../', 'web'),
+            serve_static_1.ServeStaticModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: (configService) => [
+                    {
+                        rootPath: (0, path_1.join)(__dirname, configService.get('environment') === 'development'
+                            ? '../../../dist/packages'
+                            : '../', 'web'),
+                    },
+                ],
+                inject: [config_1.ConfigService],
             }),
             database_1.DatabaseModule,
             file_1.FileModule,
@@ -2037,10 +2044,10 @@ const seeds_1 = tslib_1.__importDefault(__webpack_require__("./src/app/database/
 const factories_1 = tslib_1.__importDefault(__webpack_require__("./src/app/database/factories/index.ts"));
 const typeorm_naming_strategies_1 = __webpack_require__("typeorm-naming-strategies");
 const path_1 = __webpack_require__("path");
-const isDevelopment = "development" === 'development';
 exports["default"] = () => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
     return ({
+        environment: "development",
         protocol: (_a = process.env.PROTOCOL) !== null && _a !== void 0 ? _a : 'http',
         host: (_b = process.env.HOST) !== null && _b !== void 0 ? _b : 'localhost',
         port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
@@ -2061,7 +2068,9 @@ exports["default"] = () => {
             synchronize: false,
             namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(),
             logging: true,
-            ssl: isDevelopment ? false : { rejectUnauthorized: false },
+            ssl:  true
+                ? false
+                : 0,
         },
         jwt: {
             secret: (_g = process.env.JWT_SECRET) !== null && _g !== void 0 ? _g : 'supersecret',
@@ -2080,14 +2089,9 @@ exports["default"] = () => {
             from: (_o = process.env.MAIL_FROM) !== null && _o !== void 0 ? _o : 'admin@email.com',
         },
         multer: {
-            dest: (0, path_1.resolve)(__dirname, (isDevelopment ? '../../../packages/api/' : './') + 'storage/uploads'),
-        },
-        s3: {
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-            region: process.env.AWS_REGION,
-            sessionToken: process.env.AWS_SESSION_TOKEN,
-            bucket: process.env.AWS_BUCKET,
+            dest: (0, path_1.resolve)(__dirname, ( true
+                ? '../../../packages/api/'
+                : 0) + 'storage/uploads'),
         },
         cloudinary: {
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

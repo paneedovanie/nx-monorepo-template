@@ -16,7 +16,7 @@ import {
   StoreRatingModule,
   TagModule,
 } from './modules';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { DatabaseModule } from './database';
 import express from 'express';
@@ -24,20 +24,26 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FileModule } from './file';
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(
-        __dirname,
-        isDevelopment ? '../../../dist/packages' : '../',
-        'web'
-      ),
+    ServeStaticModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => [
+        {
+          rootPath: join(
+            __dirname,
+            configService.get<string>('environment') === 'development'
+              ? '../../../dist/packages'
+              : '../',
+            'web'
+          ),
+        },
+      ],
+      inject: [ConfigService],
     }),
     DatabaseModule,
     FileModule,

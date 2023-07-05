@@ -4,9 +4,8 @@ import factories from '../database/factories';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { resolve } from 'path';
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-
 export default () => ({
+  environment: process.env.NODE_ENV,
   protocol: process.env.PROTOCOL ?? 'http',
   host: process.env.HOST ?? 'localhost',
   port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
@@ -27,7 +26,10 @@ export default () => ({
     synchronize: false,
     namingStrategy: new SnakeNamingStrategy(),
     logging: true,
-    ssl: isDevelopment ? false : { rejectUnauthorized: false },
+    ssl:
+      process.env.NODE_ENV === 'development'
+        ? false
+        : { rejectUnauthorized: false },
   },
   jwt: {
     secret: process.env.JWT_SECRET ?? 'supersecret',
@@ -48,15 +50,10 @@ export default () => ({
   multer: {
     dest: resolve(
       __dirname,
-      (isDevelopment ? '../../../packages/api/' : './') + 'storage/uploads'
+      (process.env.NODE_ENV === 'development'
+        ? '../../../packages/api/'
+        : './') + 'storage/uploads'
     ),
-  },
-  s3: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION,
-    sessionToken: process.env.AWS_SESSION_TOKEN,
-    bucket: process.env.AWS_BUCKET,
   },
   cloudinary: {
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
