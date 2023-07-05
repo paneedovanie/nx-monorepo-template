@@ -5,7 +5,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { resolve } from 'path';
 
 export default () => ({
-  environment: process.env.NODE_ENV,
+  environment: process.env.ENVIRONMENT ?? 'development',
   protocol: process.env.PROTOCOL ?? 'http',
   host: process.env.HOST ?? 'localhost',
   port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
@@ -27,7 +27,7 @@ export default () => ({
     namingStrategy: new SnakeNamingStrategy(),
     logging: true,
     ssl:
-      process.env.NODE_ENV === 'development'
+      process.env.ENVIRONMENT !== 'production'
         ? false
         : { rejectUnauthorized: false },
   },
@@ -50,7 +50,7 @@ export default () => ({
   multer: {
     dest: resolve(
       __dirname,
-      (process.env.NODE_ENV === 'development'
+      (process.env.ENVIRONMENT !== 'production'
         ? '../../../packages/api/'
         : './') + 'storage/uploads'
     ),

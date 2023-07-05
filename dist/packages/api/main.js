@@ -2045,21 +2045,21 @@ const factories_1 = tslib_1.__importDefault(__webpack_require__("./src/app/datab
 const typeorm_naming_strategies_1 = __webpack_require__("typeorm-naming-strategies");
 const path_1 = __webpack_require__("path");
 exports["default"] = () => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
     return ({
-        environment: "development",
-        protocol: (_a = process.env.PROTOCOL) !== null && _a !== void 0 ? _a : 'http',
-        host: (_b = process.env.HOST) !== null && _b !== void 0 ? _b : 'localhost',
+        environment: (_a = process.env.ENVIRONMENT) !== null && _a !== void 0 ? _a : 'development',
+        protocol: (_b = process.env.PROTOCOL) !== null && _b !== void 0 ? _b : 'http',
+        host: (_c = process.env.HOST) !== null && _c !== void 0 ? _c : 'localhost',
         port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
         database: {
             type: process.env.DATABASE_TYPE,
-            host: (_c = process.env.DATABASE_HOST) !== null && _c !== void 0 ? _c : 'localhost',
+            host: (_d = process.env.DATABASE_HOST) !== null && _d !== void 0 ? _d : 'localhost',
             port: process.env.DATABASE_PORT
                 ? parseInt(process.env.DATABASE_PORT, 10)
                 : 5432,
-            username: (_d = process.env.DATABASE_USERNAME) !== null && _d !== void 0 ? _d : 'postgres',
-            password: (_e = process.env.DATABASE_PASSWORD) !== null && _e !== void 0 ? _e : 'password',
-            database: (_f = process.env.DATABASE_NAME) !== null && _f !== void 0 ? _f : 'users_ms',
+            username: (_e = process.env.DATABASE_USERNAME) !== null && _e !== void 0 ? _e : 'postgres',
+            password: (_f = process.env.DATABASE_PASSWORD) !== null && _f !== void 0 ? _f : 'password',
+            database: (_g = process.env.DATABASE_NAME) !== null && _g !== void 0 ? _g : 'users_ms',
             entities: entities_1.default,
             migrations: [(0, path_1.resolve)(__dirname, '../database/migrations/*.{ts,js}')],
             seeds: seeds_1.default,
@@ -2068,30 +2068,30 @@ exports["default"] = () => {
             synchronize: false,
             namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(),
             logging: true,
-            ssl:  true
+            ssl: process.env.ENVIRONMENT !== 'production'
                 ? false
-                : 0,
+                : { rejectUnauthorized: false },
         },
         jwt: {
-            secret: (_g = process.env.JWT_SECRET) !== null && _g !== void 0 ? _g : 'supersecret',
-            signOptions: { expiresIn: (_h = process.env.JWT_EXPIRES_IN) !== null && _h !== void 0 ? _h : '60s' },
+            secret: (_h = process.env.JWT_SECRET) !== null && _h !== void 0 ? _h : 'supersecret',
+            signOptions: { expiresIn: (_j = process.env.JWT_EXPIRES_IN) !== null && _j !== void 0 ? _j : '60s' },
         },
         mail: {
             transport: {
-                host: (_j = process.env.MAIL_HOST) !== null && _j !== void 0 ? _j : 'smtp.gmail.com',
-                port: (_k = process.env.MAIL_PORT) !== null && _k !== void 0 ? _k : 465,
+                host: (_k = process.env.MAIL_HOST) !== null && _k !== void 0 ? _k : 'smtp.gmail.com',
+                port: (_l = process.env.MAIL_PORT) !== null && _l !== void 0 ? _l : 465,
                 secure: process.env.MAIL_SECURE === 'true',
                 auth: {
-                    user: (_l = process.env.MAIL_USERNAME) !== null && _l !== void 0 ? _l : '',
-                    pass: (_m = process.env.MAIL_PASSWORD) !== null && _m !== void 0 ? _m : '',
+                    user: (_m = process.env.MAIL_USERNAME) !== null && _m !== void 0 ? _m : '',
+                    pass: (_o = process.env.MAIL_PASSWORD) !== null && _o !== void 0 ? _o : '',
                 },
             },
-            from: (_o = process.env.MAIL_FROM) !== null && _o !== void 0 ? _o : 'admin@email.com',
+            from: (_p = process.env.MAIL_FROM) !== null && _p !== void 0 ? _p : 'admin@email.com',
         },
         multer: {
-            dest: (0, path_1.resolve)(__dirname, ( true
+            dest: (0, path_1.resolve)(__dirname, (process.env.ENVIRONMENT !== 'production'
                 ? '../../../packages/api/'
-                : 0) + 'storage/uploads'),
+                : './') + 'storage/uploads'),
         },
         cloudinary: {
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
