@@ -6,7 +6,12 @@ import {
   usePagination,
 } from '@/core';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { Store, CreateStore, UpdateStore, Tag } from '@nx-monorepo-template/global';
+import {
+  Store,
+  CreateStore,
+  UpdateStore,
+  Tag,
+} from '@nx-monorepo-template/global';
 import {
   CreateStoreSchema,
   UpdateStoreSchema,

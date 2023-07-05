@@ -11,36 +11,48 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { contract, RolePermission } from '@nx-monorepo-template/global';
+import {
+  contract,
+  CreateProduct,
+  RolePermission,
+  UpdateProduct,
+} from '@nx-monorepo-template/global';
 import { JwtAuthGuard, PermissionGuard } from '../../auth/guards';
 import { Permissions } from '../../auth';
 import { ProductService } from '../services';
-import { uploadStorage } from '../../../helpers';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ParseBodyInterceptor } from '../../../interceptors';
+import { FileService } from '../../../file';
 
 const c = nestControllerContract(contract.product);
 type RequestShapes = NestRequestShapes<typeof c>;
 
 @Controller()
 export class ProductController implements NestControllerInterface<typeof c> {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly fileService: FileService
+  ) {}
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(RolePermission.ProductCreate)
-  @UseInterceptors(
-    FileInterceptor('image', { storage: uploadStorage }),
-    ParseBodyInterceptor
-  )
+  @UseInterceptors(FileInterceptor('image'), ParseBodyInterceptor)
   @TsRest(c.create)
   async create(
     @TsRestRequest() { body }: RequestShapes['create'],
     @UploadedFile() image: Express.Multer.File
   ) {
-    const product = await this.productService.create({
-      ...body,
-      image: image?.filename,
-    });
+    const input = body as CreateProduct & { image?: string };
+
+    if (image) {
+      const uploadedFile = await this.fileService.uploadFile(
+        'product',
+        image.buffer
+      );
+      input.image = uploadedFile.secure_url;
+    }
+
+    const product = await this.productService.create(input);
 
     return { status: 201 as const, body: product };
   }
@@ -67,19 +79,23 @@ export class ProductController implements NestControllerInterface<typeof c> {
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(RolePermission.ProductUpdate)
-  @UseInterceptors(
-    FileInterceptor('image', { storage: uploadStorage }),
-    ParseBodyInterceptor
-  )
+  @UseInterceptors(FileInterceptor('image'), ParseBodyInterceptor)
   @TsRest(c.update)
   async update(
     @TsRestRequest() { params, body }: RequestShapes['update'],
     @UploadedFile() image: Express.Multer.File
   ) {
-    const updatedUser = await this.productService.update(params.id, {
-      ...body,
-      image: image?.filename,
-    });
+    const input = body as UpdateProduct & { image?: string };
+
+    if (image) {
+      const uploadedFile = await this.fileService.uploadFile(
+        'product',
+        image.buffer
+      );
+      input.image = uploadedFile.secure_url;
+    }
+
+    const updatedUser = await this.productService.update(params.id, input);
 
     return { status: 201 as const, body: updatedUser };
   }

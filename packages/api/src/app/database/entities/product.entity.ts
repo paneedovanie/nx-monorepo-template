@@ -35,18 +35,7 @@ export class ProductEntity {
   })
   price: number;
 
-  @Column({
-    nullable: true,
-    transformer: {
-      to: (v) => v,
-      from: (v) => {
-        const protocol = process.env.PROTOCOL ?? 'http';
-        const host = process.env.HOST ?? 'localhost';
-        const port = process.env.PORT ?? '3000';
-        return v && `${protocol}://${host}:${port}/files/${v}`;
-      },
-    },
-  })
+  @Column({ nullable: true })
   image: string;
 
   @CreateDateColumn()

@@ -51,4 +51,17 @@ export default () => ({
       (isDevelopment ? '../../../packages/api/' : './') + 'storage/uploads'
     ),
   },
+  s3: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+    sessionToken: process.env.AWS_SESSION_TOKEN,
+    bucket: process.env.AWS_BUCKET,
+  },
+  cloudinary: {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: process.env.CLOUDINARY_SECURE,
+  },
 });

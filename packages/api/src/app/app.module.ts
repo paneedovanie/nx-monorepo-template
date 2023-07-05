@@ -22,6 +22,7 @@ import { DatabaseModule } from './database';
 import express from 'express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { FileModule } from './file';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -39,6 +40,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
       ),
     }),
     DatabaseModule,
+    FileModule,
     MailModule,
     UserModule,
     AuthModule,
