@@ -26,7 +26,6 @@ export class StoreRatingController
   constructor(private readonly storeRatingService: StoreRatingService) {}
   @TsRest(c.create)
   async create(@TsRestRequest() { body }: RequestShapes['create']) {
-    console.log(body);
     const store = await this.storeRatingService.create(body);
 
     return { status: 201 as const, body: store };

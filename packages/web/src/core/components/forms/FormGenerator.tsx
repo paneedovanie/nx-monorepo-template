@@ -3,7 +3,6 @@ import {
   AutocompleteProps,
   Box,
   Button,
-  Input,
   MenuItem,
   Select,
   SelectProps,
@@ -18,8 +17,8 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { useSnackbarContext } from '../contexts';
 import { ChangeEvent, useEffect } from 'react';
 import { Radio, RadioGroup } from '@mui/joy';
-import { ApiRouteResponse } from '@ts-rest/core';
 import { MuiFileInput } from 'mui-file-input';
+import { log } from '@/core/helpers';
 
 interface CustomComponentOptions {
   label?: string;
@@ -63,6 +62,8 @@ export type FormGeneratorItem = {
     ) => Promise<any>;
   };
 };
+
+type ApiRouteResponse<T> = { status: number; body: T };
 
 type FormGeneratorProps<R, I> = {
   initialValues?: I;
@@ -284,8 +285,8 @@ export const FormGenerator = <R, I extends FormikValues = any>({
     },
   });
 
-  console.log('Form Values:', values);
-  console.log('Form Errors:', errors);
+  log('Form Values:', values);
+  log('Form Errors:', errors);
 
   useEffect(() => {
     onChange?.(values);

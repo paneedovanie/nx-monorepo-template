@@ -7046,7 +7046,6 @@ let StoreRatingController = class StoreRatingController {
     }
     create({ body }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            console.log(body);
             const store = yield this.storeRatingService.create(body);
             return { status: 201, body: store };
         });
