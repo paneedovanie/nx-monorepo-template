@@ -12,7 +12,7 @@ export class UserService extends BaseService<UserEntity> {
   }
 
   public async assignRole(id: string, roleId: string) {
-    const user = await this.repository.getById(id);
+    const user = await this.repository.getByIdWithRelations(id);
     const role = await this.roleRepository.findOneBy({ id: roleId });
     user.roles.push(role);
 

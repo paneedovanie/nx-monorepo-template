@@ -15,7 +15,6 @@ import {
   TextField,
   Toolbar,
   Typography,
-  colors,
 } from '@mui/material';
 import { Product, Store, generateColor } from '@nx-monorepo-template/global';
 import { BaseSyntheticEvent, useMemo, useState } from 'react';
@@ -91,9 +90,7 @@ export const HomePage = () => {
         {!!tags?.list.length && (
           <>
             <Typography>Tags</Typography>
-            <Box>
-              <Tags tags={tags?.list} input onChange={setSelectedTags} />
-            </Box>
+            <Tags tags={tags?.list} input onChange={setSelectedTags} />
           </>
         )}
       </Toolbar>
@@ -119,35 +116,43 @@ export const HomePage = () => {
               >
                 <Box
                   sx={{
-                    maxWidth: 350,
-                    minWidth: 350,
-                    maxHeight: 200,
-                    minHeight: 200,
                     display: 'flex',
                     justifyContent: 'center',
-                    backgroundColor: generateColor(item.title),
-                    color: 'white',
+                    pt: [2, 2, 0],
                   }}
                 >
-                  {item.image ? (
-                    <Box
-                      sx={{
-                        width: '100%',
-                        height: 200,
-                        backgroundImage: `url('${item.image}')`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                      }}
-                    />
-                  ) : (
-                    <StoreIcon
-                      sx={{
-                        width: '100%',
-                        height: '100%',
-                      }}
-                      color="inherit"
-                    />
-                  )}
+                  <Box
+                    sx={{
+                      width: [150, 150, 350],
+                      height: [150, 150, 200],
+                      borderRadius: ['50%', null, 'unset'],
+                      display: 'flex',
+                      justifyContent: 'center',
+                      backgroundColor: generateColor(item.title),
+                      color: 'white',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {item.image ? (
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          backgroundImage: `url('${item.image}')`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                        }}
+                      />
+                    ) : (
+                      <StoreIcon
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                        }}
+                        color="inherit"
+                      />
+                    )}
+                  </Box>
                 </Box>
                 <CardContent sx={{ flex: 1 }}>
                   <Grid container>

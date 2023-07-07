@@ -152,7 +152,9 @@ export const OrderView = () => {
 
         <CardActions>
           <Box>
-            <Typography variant="h6">Total Cost: {totalCost}</Typography>
+            <Typography variant="h6">
+              Total Cost: {formatCurrency(totalCost)}
+            </Typography>
             {!order.payment && isCustomer && (
               <Typography variant="caption">
                 Please pay to the shop's cashier or using your account wallet.

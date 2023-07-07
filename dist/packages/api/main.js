@@ -2046,7 +2046,8 @@ const typeorm_naming_strategies_1 = __webpack_require__("typeorm-naming-strategi
 const path_1 = __webpack_require__("path");
 exports["default"] = () => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
-    return ({
+    const isProduction = process.env.ENVIRONMENT === 'production';
+    return {
         environment: (_a = process.env.ENVIRONMENT) !== null && _a !== void 0 ? _a : 'development',
         protocol: (_b = process.env.PROTOCOL) !== null && _b !== void 0 ? _b : 'http',
         host: (_c = process.env.HOST) !== null && _c !== void 0 ? _c : 'localhost',
@@ -2068,9 +2069,7 @@ exports["default"] = () => {
             synchronize: false,
             namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(),
             logging: true,
-            ssl: process.env.ENVIRONMENT !== 'production'
-                ? false
-                : { rejectUnauthorized: false },
+            ssl: isProduction ? { rejectUnauthorized: false } : false,
         },
         jwt: {
             secret: (_h = process.env.JWT_SECRET) !== null && _h !== void 0 ? _h : 'supersecret',
@@ -2089,9 +2088,7 @@ exports["default"] = () => {
             from: (_p = process.env.MAIL_FROM) !== null && _p !== void 0 ? _p : 'admin@email.com',
         },
         multer: {
-            dest: (0, path_1.resolve)(__dirname, (process.env.ENVIRONMENT !== 'production'
-                ? '../../../packages/api/'
-                : './') + 'storage/uploads'),
+            dest: (0, path_1.resolve)(__dirname, (isProduction ? './' : '../../../packages/api/') + 'storage/uploads'),
         },
         cloudinary: {
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -2099,7 +2096,7 @@ exports["default"] = () => {
             api_secret: process.env.CLOUDINARY_API_SECRET,
             secure: process.env.CLOUDINARY_SECURE,
         },
-    });
+    };
 };
 
 
@@ -4323,7 +4320,7 @@ exports.TransactionRepository = TransactionRepository;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a;
+var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UserRepository = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -4331,9 +4328,11 @@ const common_1 = __webpack_require__("@nestjs/common");
 const typeorm_1 = __webpack_require__("typeorm");
 const entities_1 = __webpack_require__("./src/app/database/entities/index.ts");
 const core_1 = __webpack_require__("./src/app/core/index.ts");
+const role_repository_1 = __webpack_require__("./src/app/database/repositories/role.repository.ts");
 let UserRepository = class UserRepository extends core_1.BaseRepository {
-    constructor(dataSource) {
+    constructor(dataSource, roleRepository) {
         super(entities_1.UserEntity, dataSource);
+        this.roleRepository = roleRepository;
     }
     relations() {
         return {
@@ -4343,7 +4342,7 @@ let UserRepository = class UserRepository extends core_1.BaseRepository {
 };
 UserRepository = tslib_1.__decorate([
     (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_1.DataSource !== "undefined" && typeorm_1.DataSource) === "function" ? _a : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_1.DataSource !== "undefined" && typeorm_1.DataSource) === "function" ? _a : Object, typeof (_b = typeof role_repository_1.RoleRepository !== "undefined" && role_repository_1.RoleRepository) === "function" ? _b : Object])
 ], UserRepository);
 exports.UserRepository = UserRepository;
 
@@ -7828,7 +7827,7 @@ let TransactionService = class TransactionService extends core_1.BaseService {
                 throw new common_1.BadRequestException("The order doesn't exists");
             const result = yield this.balance(sender);
             const reducer = (curr, item) => {
-                return curr + item.price * item.count;
+                return curr + Math.floor(item.price * item.count * 100) / 100;
             };
             const totalCost = orderData.items.reduce(reducer, 0);
             if (totalCost > +((_a = result === null || result === void 0 ? void 0 : result.balance) !== null && _a !== void 0 ? _a : 0)) {
@@ -8078,7 +8077,7 @@ let UserService = class UserService extends core_1.BaseService {
     }
     assignRole(id, roleId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const user = yield this.repository.getById(id);
+            const user = yield this.repository.getByIdWithRelations(id);
             const role = yield this.roleRepository.findOneBy({ id: roleId });
             user.roles.push(role);
             return this.repository.save(user);

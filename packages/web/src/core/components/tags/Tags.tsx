@@ -35,7 +35,7 @@ export const Tags = ({
   }, [selectedTags, onChange]);
 
   return (
-    <Box sx={{ display: 'flex', gap: 1 }}>
+    <Box>
       {tags?.map((tag: Tag, i: number) => {
         const color =
           selectedSet.has(tag.id) || !input

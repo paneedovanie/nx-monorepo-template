@@ -115,7 +115,7 @@ export class TransactionService extends BaseService<TransactionEntity> {
     const result = await this.balance(sender);
 
     const reducer = (curr, item: OrderProduct) => {
-      return curr + item.price * item.count;
+      return curr + Math.floor(item.price * item.count * 100) / 100;
     };
 
     const totalCost = orderData.items.reduce(reducer, 0);
