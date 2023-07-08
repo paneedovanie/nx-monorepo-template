@@ -39,7 +39,6 @@ import {
   TextField,
   Toolbar,
   Typography,
-  colors,
 } from '@mui/material';
 import { BaseSyntheticEvent, Fragment, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -85,7 +84,7 @@ export const PublicStoreViewPage = () => {
 
   const { data: productsResult, isFetching: isFetchingProducts } =
     tsQueryClient.product.getAll.useQuery(
-      ['getProducts', store?.id, categoryIds, page],
+      ['getProducts', store?.id, categoryIds, page, store?.id],
       {
         query: {
           store: store?.id,
@@ -100,9 +99,10 @@ export const PublicStoreViewPage = () => {
   const count = Math.floor((products?.count ?? 0) / (products?.perPage ?? 10));
 
   const { data: categoriesResult } = tsQueryClient.category.getAll.useQuery(
-    ['getCategories'],
+    ['getCategories', store?.id],
     {
       query: {
+        store: store?.id,
         perPage: -1,
         type: 'product',
         isRoot: true,
@@ -112,12 +112,14 @@ export const PublicStoreViewPage = () => {
 
   const categories = categoriesResult?.body;
 
-  const { data: ratingsResult, isFetching } =
-    tsQueryClient.storeRating.getAll.useQuery(['getStoreRatings'], {
+  const { data: ratingsResult } = tsQueryClient.storeRating.getAll.useQuery(
+    ['getStoreRatings'],
+    {
       query: {
         store: id,
       },
-    });
+    }
+  );
 
   const ratings = ratingsResult?.body;
 

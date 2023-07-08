@@ -1,39 +1,46 @@
 import { FormGenerator, FormGeneratorItem, useTsQueryClient } from '@/core';
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material';
+import { TreeView, TreeItem } from '@mui/lab';
 import {
   Category,
   CreateCategory,
+  Store,
   UpdateCategory,
 } from '@nx-monorepo-template/global';
 import {
   CreateCategorySchema,
   UpdateCategorySchema,
 } from '@nx-monorepo-template/global';
-import { SyntheticEvent, useState } from 'react';
+import { Fragment, useState } from 'react';
 
 export const CategoryDialog = ({
   data,
+  store,
+  parent,
   open,
   onClose,
   onSuccess,
 }: {
   data?: Category;
+  store: Store;
+  parent?: Category;
   open: boolean;
   onClose: () => void;
   onSuccess?: (data: Category) => void;
 }) => {
   const tsQueryClient = useTsQueryClient();
-  const [search, setSearch] = useState<string>();
-  const { data: categoriesResult } = tsQueryClient.category.getAll.useQuery(
-    ['getParentCategories', search],
-    {
-      query: {
-        search,
-        type: 'product',
-        isRoot: true,
-      },
-    }
-  );
+  const [expanded, setExpanded] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
+
   const { mutate: create } = tsQueryClient.category.create.useMutation({
     onSuccess: (v) => {
       onSuccess?.(v.body);
@@ -44,13 +51,13 @@ export const CategoryDialog = ({
       onSuccess?.(v.body);
     },
   });
-  const categories = categoriesResult?.body;
 
   const initialValues = {
     title: data?.title ?? '',
     type: data?.type ?? 'product',
     description: data?.description ?? '',
-    parent: data?.parent?.id,
+    parent: parent?.id,
+    store: store?.id,
   };
 
   const items: FormGeneratorItem[] = [
@@ -66,20 +73,6 @@ export const CategoryDialog = ({
       props: {
         multiline: true,
         rows: 2,
-      },
-    },
-    {
-      label: 'Parent',
-      name: 'parent',
-      component: 'AutoComplete',
-      valueKey: 'id',
-      labelKey: 'title',
-      props: {
-        defaultValue: data?.parent,
-        options: categories?.list ?? [],
-        onInputChange: (event: SyntheticEvent, value: string) => {
-          setSearch(value);
-        },
       },
     },
   ];

@@ -10,26 +10,28 @@ const base = {
   type: z.string(),
 };
 
-const ParentCategorySchema = z.object({
+export const NonCircularCategorySchema = z.object({
   id: z.string(),
   ...base,
 });
 
 export const CategorySchema = z.object({
   id: z.string(),
-  parent: ParentCategorySchema.optional(),
-  children: ParentCategorySchema.array().optional(),
+  parent: NonCircularCategorySchema.optional(),
+  children: NonCircularCategorySchema.array().optional(),
   ...base,
 });
 
 export const CreateCategorySchema = z.object({
   ...base,
-  parent: z.string().optional(),
+  parent: z.string().uuid().optional(),
+  store: z.string().uuid().optional(),
 });
 
 export const UpdateCategorySchema = z.object({
   ...base,
-  parent: z.string().optional(),
+  parent: z.string().uuid().optional(),
+  store: z.string().uuid().optional(),
 });
 
 export const GetCategoriesResponseSchema = PaginationResponseSchema.merge(
@@ -40,7 +42,8 @@ export const GetCategoriesOptionsSchema = PaginationOptionsSchema.merge(
   z.object({
     search: z.string().optional(),
     type: z.string().optional(),
-    parent: z.string().optional(),
+    parent: z.string().uuid().optional(),
+    store: z.string().uuid().optional(),
     isRoot: z.preprocess((a) => a && a === 'true', z.boolean().optional()),
   })
 );

@@ -1,21 +1,34 @@
 import { FormGenerator, FormGeneratorItem, useTsQueryClient } from '@/core';
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import {
+  ChevronRight as ChevronRightIcon,
+  ExpandMore as ExpandMoreIcon,
+} from '@mui/icons-material';
+import { TreeView, TreeItem } from '@mui/lab';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from '@mui/material';
 import {
   Product,
   CreateProduct,
   UpdateProduct,
   Category,
+  Store,
 } from '@nx-monorepo-template/global';
 import {
   CreateProductSchema,
   UpdateProductSchema,
 } from '@nx-monorepo-template/global';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent } from 'react';
 
 export const ProductDialog = ({
   data,
   open,
   initialValues,
+  store,
   onClose,
   onSuccess,
 }: {
@@ -28,18 +41,20 @@ export const ProductDialog = ({
     price?: number;
     category?: string;
   };
+  store?: Store;
   onClose: () => void;
   onSuccess?: (data: Product) => void;
 }) => {
   const tsQueryClient = useTsQueryClient();
-  const [search, setSearch] = useState<string>();
+
   const { data: categoriesResult } = tsQueryClient.category.getAll.useQuery(
     ['getCategories'],
     {
       query: {
-        isRoot: false,
-        search,
+        store: store?.id,
+        perPage: -1,
         type: 'product',
+        isRoot: true,
       },
     }
   );
@@ -63,6 +78,19 @@ export const ProductDialog = ({
     store: data?.store?.id ?? initialValues?.store ?? '',
     price: data?.price ?? initialValues?.price ?? 0,
     category: data?.category?.id ?? initialValues?.category ?? '',
+  };
+
+  const renderTree = (node: Category, parentActive?: boolean) => {
+    return (
+      <TreeItem
+        key={node.id}
+        sx={{ ml: 2 }}
+        nodeId={node.id}
+        label={node.title}
+      >
+        {node.children?.map((node) => renderTree(node))}
+      </TreeItem>
+    );
   };
 
   const items: FormGeneratorItem[] = [
@@ -89,32 +117,39 @@ export const ProductDialog = ({
       },
     },
     {
-      label: 'Category',
-      name: 'category',
-      component: 'AutoComplete',
-      valueKey: 'id',
-      labelKey: 'title',
-      props: {
-        getOptionLabel: (option: Category) =>
-          `${option.title} (Parent: ${option.parent?.title ?? 'None'})`,
-        defaultValue: data?.category,
-        options: categories?.list ?? [],
-        onInputChange: (event: SyntheticEvent, value: string) => {
-          setSearch(value);
-        },
-      },
-    },
-    {
       label: 'Image',
       name: 'image',
       component: 'FileField',
+    },
+    {
+      label: 'Category',
+      name: 'category',
+      component: (options) => {
+        return (
+          <>
+            <Box sx={{ p: 1 }}>
+              <Typography variant="h6">Category</Typography>
+            </Box>
+            <TreeView
+              selected={options.value}
+              onNodeSelect={(e: SyntheticEvent, id: string) =>
+                options.context?.setFieldValue(options.name, id)
+              }
+              aria-label="category navigator"
+              defaultCollapseIcon={<ExpandMoreIcon />}
+              defaultExpandIcon={<ChevronRightIcon />}
+            >
+              {categories?.list.map((node) => renderTree(node))}
+            </TreeView>
+          </>
+        );
+      },
     },
   ];
 
   return (
     <Dialog
       onClose={() => {
-        setSearch(undefined);
         onClose();
       }}
       open={open}

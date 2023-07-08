@@ -13,7 +13,7 @@ const base = {
   price: z.number().min(0.01, 'Price must be greater than 0.01'),
 };
 
-export const ProductSchemaNonCircular = z.object({
+export const NonCircularProductSchema = z.object({
   id: z.string(),
   category: CategorySchema,
   categories: CategorySchema.array(),

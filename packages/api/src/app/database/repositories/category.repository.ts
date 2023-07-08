@@ -9,6 +9,7 @@ import {
 import { CategoryEntity } from '../entities';
 import { BaseRepository } from '../../core';
 import { CreateCategory, UpdateCategory } from '@nx-monorepo-template/global';
+import { StoreRepository } from './store.repository';
 
 @Injectable()
 export class CategoryRepository extends BaseRepository<
@@ -16,7 +17,10 @@ export class CategoryRepository extends BaseRepository<
   CreateCategory,
   UpdateCategory
 > {
-  constructor(dataSource: DataSource) {
+  constructor(
+    dataSource: DataSource,
+    private readonly storeRepository: StoreRepository
+  ) {
     super(CategoryEntity, dataSource);
   }
 
@@ -70,11 +74,11 @@ export class CategoryRepository extends BaseRepository<
   }
 
   protected mapRelations(): Record<string, BaseRepository<unknown>> {
-    return { parent: this };
+    return { parent: this, store: this.storeRepository };
   }
 
   protected relations(): FindOptionsRelations<CategoryEntity> {
-    return { parent: true, children: true };
+    return { parent: true, children: true, store: true };
   }
 
   protected modifyWhere({
@@ -86,6 +90,7 @@ export class CategoryRepository extends BaseRepository<
     if (isRoot !== undefined) {
       conditions.parent = isRoot ? IsNull() : Not(IsNull());
     }
+    console.log(conditions);
     return conditions;
   }
 }

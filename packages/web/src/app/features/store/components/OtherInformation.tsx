@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ProductsTable } from './ProductsTable';
 import { OrdersTable } from './OrdersTable';
 import { PaymentsTable } from './PaymentsTable';
+import { CategoriesTable } from './CategoriesTable';
 
 export const OtherInformation = ({ store }: { store: Store }) => {
   const [value, setValue] = useState(0);
@@ -19,18 +20,22 @@ export const OtherInformation = ({ store }: { store: Store }) => {
         onChange={handleChange}
         aria-label="basic tabs example"
       >
+        <Tab label="Categories" />
         <Tab label="Products" />
         <Tab label="Orders" />
         <Tab label="Payments" />
       </Tabs>
 
       <div role="tabpanel" hidden={value !== 0}>
-        <ProductsTable {...{ store }} />
+        <CategoriesTable {...{ store }} />
       </div>
       <div role="tabpanel" hidden={value !== 1}>
-        <OrdersTable {...{ store }} />
+        <ProductsTable {...{ store }} />
       </div>
       <div role="tabpanel" hidden={value !== 2}>
+        <OrdersTable {...{ store }} />
+      </div>
+      <div role="tabpanel" hidden={value !== 3}>
         <PaymentsTable {...{ store }} />
       </div>
     </Card>

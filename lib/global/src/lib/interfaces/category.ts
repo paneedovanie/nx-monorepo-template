@@ -16,3 +16,7 @@ export type UpdateCategory = z.infer<typeof UpdateCategorySchema>;
 export type GetCategoriesResponse = z.infer<typeof GetCategoriesResponseSchema>;
 
 export type GetCategoriesOptions = z.infer<typeof GetCategoriesOptionsSchema>;
+
+export interface ICategoryMetadata {
+  storeId?: string;
+}

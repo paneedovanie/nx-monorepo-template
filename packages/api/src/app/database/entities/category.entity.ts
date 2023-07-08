@@ -7,6 +7,7 @@ import {
   OneToMany,
   Index,
 } from 'typeorm';
+import { StoreEntity } from './store.entity';
 
 @Entity('categories')
 @Index(['parent', 'title', 'type'], { unique: true })
@@ -28,6 +29,12 @@ export class CategoryEntity {
 
   @Column()
   type: string;
+
+  @Column()
+  storeId: string;
+
+  @ManyToOne(() => StoreEntity, (store) => store.categories, { nullable: true })
+  store?: StoreEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -7,7 +7,7 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { NotificationMetadata } from '@nx-monorepo-template/global';
+import { INotificationMetadata } from '@nx-monorepo-template/global';
 
 export enum NotificationType {
   StoreOrderCreated = 'store-order-created',
@@ -42,7 +42,7 @@ export class NotificationEntity {
   @Column({
     type: 'jsonb',
   })
-  metadata: NotificationMetadata;
+  metadata: INotificationMetadata;
 
   @CreateDateColumn()
   createdAt: Date;

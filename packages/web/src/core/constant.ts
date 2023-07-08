@@ -29,7 +29,7 @@ export const theme = {
   padding: defaultSize,
   radius: defaultSize,
 };
-console.log(import.meta.env.VITE_ENVIRONMENT);
+
 export const isProduction = import.meta.env.VITE_ENVIRONMENT === 'production';
 
 // export const apiBaseUrl = 'http://localhost:3000';

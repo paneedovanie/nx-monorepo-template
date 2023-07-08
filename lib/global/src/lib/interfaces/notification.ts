@@ -20,7 +20,7 @@ export enum NotificationType {
   AmountReceived = 'amount-received',
 }
 
-export interface NotificationMetadata {
+export interface INotificationMetadata {
   orderId?: string;
   storeId?: string;
   status?: string;

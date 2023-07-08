@@ -6,7 +6,7 @@ import {
 } from '../../../database';
 import { BaseService } from '../../../core';
 import {
-  NotificationMetadata,
+  INotificationMetadata,
   NotificationType,
 } from '@nx-monorepo-template/global';
 
@@ -42,7 +42,7 @@ export class OrderService extends BaseService<OrderEntity> {
     order: OrderEntity,
     prev: OrderEntity
   ): Promise<void> {
-    const baseMetadata: NotificationMetadata = {
+    const baseMetadata: INotificationMetadata = {
       orderId: order.id,
     };
     if (prev.status !== order.status) {

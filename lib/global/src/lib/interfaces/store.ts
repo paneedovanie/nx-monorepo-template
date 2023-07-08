@@ -4,11 +4,11 @@ import {
   GetStoresResponseSchema,
   UpdateStoreSchema,
   GetStoresOptionsSchema,
-  StoreSchemaNonCiruclar,
+  NonCircularStoreSchema,
 } from '../schemas';
 import { Product } from './product';
 
-export type Store = z.infer<typeof StoreSchemaNonCiruclar> & {
+export type Store = z.infer<typeof NonCircularStoreSchema> & {
   products: Product[];
 };
 

@@ -14,7 +14,7 @@ const base = {
   description: z.string(),
 };
 
-export const StoreSchemaNonCiruclar = z.object({
+export const NonCircularStoreSchema = z.object({
   id: z.string(),
   owner: UserSchema,
   image: z.string().optional(),

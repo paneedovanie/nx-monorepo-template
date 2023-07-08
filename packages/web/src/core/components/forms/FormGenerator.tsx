@@ -78,7 +78,7 @@ type FormGeneratorProps<R, I> = {
     options: MutationOptions<
       ApiRouteResponse<R>,
       { status: number; body: unknown },
-      { body?: I }
+      { body?: I | FormData }
     >
   ) => void;
 };
@@ -265,7 +265,7 @@ export const FormGenerator = <R, I extends FormikValues = any>({
     onSubmit: async (v, { resetForm }) => {
       await new Promise((res) =>
         onSubmit(v, {
-          onSuccess: (v) => {
+          onSuccess: () => {
             resetForm();
             setAlertSnackbar({
               content: <span>{successMessage}</span>,

@@ -12,6 +12,7 @@ import {
 import { UserEntity } from './user.entity';
 import { ProductEntity } from './product.entity';
 import { TagEntity } from './tag.entity';
+import { CategoryEntity } from './category.entity';
 
 @Entity('stores')
 @Index(['title', 'owner'], { unique: true })
@@ -37,6 +38,10 @@ export class StoreEntity {
   @ManyToMany(() => TagEntity, (tag) => tag.stores)
   @JoinTable({ name: 'store_tags' })
   tags: TagEntity[];
+
+  @OneToMany(() => CategoryEntity, (category) => category.store)
+  @JoinTable({ name: 'store_categories' })
+  categories: CategoryEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

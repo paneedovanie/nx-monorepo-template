@@ -145,6 +145,7 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
         onPerPage={setPerPage}
       />
       <ProductDialog
+        store={store}
         data={selectedItem}
         initialValues={{ store: store?.id }}
         open={dialogOpen}

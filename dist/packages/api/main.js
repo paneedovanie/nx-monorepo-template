@@ -1483,7 +1483,7 @@ exports.ChangePasswordSchema = zod_1.z
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetCategoriesOptionsSchema = exports.GetCategoriesResponseSchema = exports.UpdateCategorySchema = exports.CreateCategorySchema = exports.CategorySchema = void 0;
+exports.GetCategoriesOptionsSchema = exports.GetCategoriesResponseSchema = exports.UpdateCategorySchema = exports.CreateCategorySchema = exports.CategorySchema = exports.NonCircularCategorySchema = void 0;
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const base = {
@@ -1491,15 +1491,16 @@ const base = {
     description: zod_1.z.string(),
     type: zod_1.z.string(),
 };
-const ParentCategorySchema = zod_1.z.object(Object.assign({ id: zod_1.z.string() }, base));
-exports.CategorySchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), parent: ParentCategorySchema.optional(), children: ParentCategorySchema.array().optional() }, base));
-exports.CreateCategorySchema = zod_1.z.object(Object.assign(Object.assign({}, base), { parent: zod_1.z.string().optional() }));
-exports.UpdateCategorySchema = zod_1.z.object(Object.assign(Object.assign({}, base), { parent: zod_1.z.string().optional() }));
+exports.NonCircularCategorySchema = zod_1.z.object(Object.assign({ id: zod_1.z.string() }, base));
+exports.CategorySchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), parent: exports.NonCircularCategorySchema.optional(), children: exports.NonCircularCategorySchema.array().optional() }, base));
+exports.CreateCategorySchema = zod_1.z.object(Object.assign(Object.assign({}, base), { parent: zod_1.z.string().uuid().optional(), store: zod_1.z.string().uuid().optional() }));
+exports.UpdateCategorySchema = zod_1.z.object(Object.assign(Object.assign({}, base), { parent: zod_1.z.string().uuid().optional(), store: zod_1.z.string().uuid().optional() }));
 exports.GetCategoriesResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.CategorySchema.array() }));
 exports.GetCategoriesOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_1.z.object({
     search: zod_1.z.string().optional(),
     type: zod_1.z.string().optional(),
-    parent: zod_1.z.string().optional(),
+    parent: zod_1.z.string().uuid().optional(),
+    store: zod_1.z.string().uuid().optional(),
     isRoot: zod_1.z.preprocess((a) => a && a === 'true', zod_1.z.boolean().optional()),
 }));
 
@@ -1733,7 +1734,7 @@ exports.GetPermissionsOptionsSchema = pagination_1.PaginationOptionsSchema.merge
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetProductsOptionsSchema = exports.GetProductsResponseSchema = exports.UpdateProductSchema = exports.CreateProductSchema = exports.ProductSchema = exports.ProductSchemaNonCircular = void 0;
+exports.GetProductsOptionsSchema = exports.GetProductsResponseSchema = exports.UpdateProductSchema = exports.CreateProductSchema = exports.ProductSchema = exports.NonCircularProductSchema = void 0;
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const category_1 = __webpack_require__("../../lib/global/src/lib/schemas/category.ts");
@@ -1744,7 +1745,7 @@ const base = {
     description: zod_1.z.string(),
     price: zod_1.z.number().min(0.01, 'Price must be greater than 0.01'),
 };
-exports.ProductSchemaNonCircular = zod_1.z.object(Object.assign({ id: zod_1.z.string(), category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base));
+exports.NonCircularProductSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base));
 exports.ProductSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), store: zod_1.z.lazy(() => store_1.StoreSchema), category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base));
 exports.CreateProductSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { store: zod_1.z.string(), category: zod_1.z.string(), image: file_1.FileSchema.optional() }));
 exports.UpdateProductSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { store: zod_1.z.string(), category: zod_1.z.string(), image: file_1.FileSchema.optional() }));
@@ -1839,7 +1840,7 @@ exports.GetStoreRatingsOptionsSchema = pagination_1.PaginationOptionsSchema.merg
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetStoresOptionsSchema = exports.GetStoresResponseSchema = exports.UpdateStoreSchema = exports.CreateStoreSchema = exports.StoreSchema = exports.StoreSchemaNonCiruclar = void 0;
+exports.GetStoresOptionsSchema = exports.GetStoresResponseSchema = exports.UpdateStoreSchema = exports.CreateStoreSchema = exports.StoreSchema = exports.NonCircularStoreSchema = void 0;
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const user_1 = __webpack_require__("../../lib/global/src/lib/schemas/user.ts");
@@ -1851,7 +1852,7 @@ const base = {
     title: zod_1.z.string(),
     description: zod_1.z.string(),
 };
-exports.StoreSchemaNonCiruclar = zod_1.z.object(Object.assign({ id: zod_1.z.string(), owner: user_1.UserSchema, image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array() }, base));
+exports.NonCircularStoreSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), owner: user_1.UserSchema, image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array() }, base));
 exports.StoreSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), owner: user_1.UserSchema, image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array(), products: product_1.ProductSchema.array() }, base));
 exports.CreateStoreSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { owner: zod_1.z.string(), image: file_1.FileSchema.optional(), tags: zod_1.z.string().array() }));
 exports.UpdateStoreSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { owner: zod_1.z.string(), image: file_1.FileSchema.optional(), tags: zod_1.z.string().array() }));
@@ -2210,31 +2211,31 @@ const CategoryPermissions = {
             code: 'category.create',
             title: 'Create Category',
             description: 'Allow to create category',
-            roles: ['Superadmin'],
+            roles: ['Superadmin', 'User'],
         },
         {
             code: 'category.get',
             title: 'Get Category',
             description: 'Allow to get category',
-            roles: ['Superadmin'],
+            roles: ['Superadmin', 'User'],
         },
         {
             code: 'category.get_all',
             title: 'Get All Categories',
             description: 'Allow to get all categories',
-            roles: ['Superadmin'],
+            roles: ['Superadmin', 'User'],
         },
         {
             code: 'category.update',
             title: 'Update Category',
             description: 'Allow to update category',
-            roles: ['Superadmin'],
+            roles: ['Superadmin', 'User'],
         },
         {
             code: 'category.delete',
             title: 'Delete Category',
             description: 'Allow to delete category',
-            roles: ['Superadmin'],
+            roles: ['Superadmin', 'User'],
         },
     ],
 };
@@ -2759,6 +2760,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CategoryEntity = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const typeorm_1 = __webpack_require__("typeorm");
+const store_entity_1 = __webpack_require__("./src/app/database/entities/store.entity.ts");
 let CategoryEntity = CategoryEntity_1 = class CategoryEntity {
 };
 tslib_1.__decorate([
@@ -2785,6 +2787,14 @@ tslib_1.__decorate([
     (0, typeorm_1.Column)(),
     tslib_1.__metadata("design:type", String)
 ], CategoryEntity.prototype, "type", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.Column)(),
+    tslib_1.__metadata("design:type", String)
+], CategoryEntity.prototype, "storeId", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.ManyToOne)(() => store_entity_1.StoreEntity, (store) => store.categories, { nullable: true }),
+    tslib_1.__metadata("design:type", Array)
+], CategoryEntity.prototype, "store", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     tslib_1.__metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
@@ -2949,7 +2959,7 @@ tslib_1.__decorate([
     (0, typeorm_1.Column)({
         type: 'jsonb',
     }),
-    tslib_1.__metadata("design:type", typeof (_b = typeof global_1.NotificationMetadata !== "undefined" && global_1.NotificationMetadata) === "function" ? _b : Object)
+    tslib_1.__metadata("design:type", typeof (_b = typeof global_1.INotificationMetadata !== "undefined" && global_1.INotificationMetadata) === "function" ? _b : Object)
 ], NotificationEntity.prototype, "metadata", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.CreateDateColumn)(),
@@ -3343,6 +3353,7 @@ const typeorm_1 = __webpack_require__("typeorm");
 const user_entity_1 = __webpack_require__("./src/app/database/entities/user.entity.ts");
 const product_entity_1 = __webpack_require__("./src/app/database/entities/product.entity.ts");
 const tag_entity_1 = __webpack_require__("./src/app/database/entities/tag.entity.ts");
+const category_entity_1 = __webpack_require__("./src/app/database/entities/category.entity.ts");
 let StoreEntity = class StoreEntity {
 };
 tslib_1.__decorate([
@@ -3374,6 +3385,11 @@ tslib_1.__decorate([
     (0, typeorm_1.JoinTable)({ name: 'store_tags' }),
     tslib_1.__metadata("design:type", Array)
 ], StoreEntity.prototype, "tags", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.OneToMany)(() => category_entity_1.CategoryEntity, (category) => category.store),
+    (0, typeorm_1.JoinTable)({ name: 'store_categories' }),
+    tslib_1.__metadata("design:type", Array)
+], StoreEntity.prototype, "categories", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     tslib_1.__metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
@@ -3611,7 +3627,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/database/database.module.ts"
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a;
+var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CategoryRepository = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -3619,9 +3635,11 @@ const common_1 = __webpack_require__("@nestjs/common");
 const typeorm_1 = __webpack_require__("typeorm");
 const entities_1 = __webpack_require__("./src/app/database/entities/index.ts");
 const core_1 = __webpack_require__("./src/app/core/index.ts");
+const store_repository_1 = __webpack_require__("./src/app/database/repositories/store.repository.ts");
 let CategoryRepository = class CategoryRepository extends core_1.BaseRepository {
-    constructor(dataSource) {
+    constructor(dataSource, storeRepository) {
         super(entities_1.CategoryEntity, dataSource);
+        this.storeRepository = storeRepository;
     }
     getParentsByCategoryId(id) {
         return this.query(`
@@ -3671,22 +3689,23 @@ let CategoryRepository = class CategoryRepository extends core_1.BaseRepository 
         return ['title'];
     }
     mapRelations() {
-        return { parent: this };
+        return { parent: this, store: this.storeRepository };
     }
     relations() {
-        return { parent: true, children: true };
+        return { parent: true, children: true, store: true };
     }
     modifyWhere(_a) {
         var { isRoot } = _a, conditions = tslib_1.__rest(_a, ["isRoot"]);
         if (isRoot !== undefined) {
             conditions.parent = isRoot ? (0, typeorm_1.IsNull)() : (0, typeorm_1.Not)((0, typeorm_1.IsNull)());
         }
+        console.log(conditions);
         return conditions;
     }
 };
 CategoryRepository = tslib_1.__decorate([
     (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_1.DataSource !== "undefined" && typeorm_1.DataSource) === "function" ? _a : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_1.DataSource !== "undefined" && typeorm_1.DataSource) === "function" ? _a : Object, typeof (_b = typeof store_repository_1.StoreRepository !== "undefined" && store_repository_1.StoreRepository) === "function" ? _b : Object])
 ], CategoryRepository);
 exports.CategoryRepository = CategoryRepository;
 

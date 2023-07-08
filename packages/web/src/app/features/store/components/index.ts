@@ -6,3 +6,4 @@ export * from './OrdersTable';
 export * from './PaymentsTable';
 export * from './OtherInformation';
 export * from './StoreRatingDialog';
+export * from './CategoriesTable';
