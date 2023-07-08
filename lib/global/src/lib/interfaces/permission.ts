@@ -27,6 +27,12 @@ export enum RolePermission {
   TransactionTransfer = 'transaction.transfer',
   TransactionGetTransactions = 'transaction.get_transactions',
 
+  TagCreate = 'tag.create',
+  TagGet = 'tag.get',
+  TagUpdate = 'tag.update',
+  TagDelete = 'tag.delete',
+  TagGetAll = 'tag.get_all',
+
   CategoryCreate = 'category.create',
   CategoryGet = 'category.get',
   CategoryUpdate = 'category.update',

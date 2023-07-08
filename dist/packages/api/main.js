@@ -1328,6 +1328,11 @@ var RolePermission;
     RolePermission["TransactionGenerate"] = "transaction.generate";
     RolePermission["TransactionTransfer"] = "transaction.transfer";
     RolePermission["TransactionGetTransactions"] = "transaction.get_transactions";
+    RolePermission["TagCreate"] = "tag.create";
+    RolePermission["TagGet"] = "tag.get";
+    RolePermission["TagUpdate"] = "tag.update";
+    RolePermission["TagDelete"] = "tag.delete";
+    RolePermission["TagGetAll"] = "tag.get_all";
     RolePermission["CategoryCreate"] = "category.create";
     RolePermission["CategoryGet"] = "category.get";
     RolePermission["CategoryUpdate"] = "category.update";
@@ -2239,6 +2244,42 @@ const CategoryPermissions = {
         },
     ],
 };
+const TagPermissions = {
+    title: 'Tag',
+    description: 'Tag related permissions',
+    permissions: [
+        {
+            code: 'tag.create',
+            title: 'Create Tag',
+            description: 'Allow to create tag',
+            roles: ['Superadmin'],
+        },
+        {
+            code: 'tag.get',
+            title: 'Get Tag',
+            description: 'Allow to get tag',
+            roles: ['Superadmin'],
+        },
+        {
+            code: 'tag.get_all',
+            title: 'Get All Tags',
+            description: 'Allow to get all tags',
+            roles: ['Superadmin'],
+        },
+        {
+            code: 'tag.update',
+            title: 'Update Tag',
+            description: 'Allow to update tag',
+            roles: ['Superadmin'],
+        },
+        {
+            code: 'tag.delete',
+            title: 'Delete Tag',
+            description: 'Allow to delete tag',
+            roles: ['Superadmin'],
+        },
+    ],
+};
 const StorePermissions = {
     title: 'Store',
     description: 'Store related permissions',
@@ -2460,6 +2501,7 @@ exports.permissions = [
     UserPermissions,
     TransactionPermissions,
     CategoryPermissions,
+    TagPermissions,
     StorePermissions,
     ProductPermissions,
     OrderPermissions,

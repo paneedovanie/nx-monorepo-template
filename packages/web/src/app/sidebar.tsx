@@ -29,16 +29,17 @@ export const sidebarItems = [
     to: '/manage/users',
     permissions: [RolePermission.UserGetAll],
   },
-  {
-    icon: <CategoryIcon />,
-    label: 'Categories',
-    to: '/manage/categories',
-    permissions: [RolePermission.CategoryGetAll],
-  },
+  // {
+  //   icon: <CategoryIcon />,
+  //   label: 'Categories',
+  //   to: '/manage/categories',
+  //   permissions: [RolePermission.CategoryGetAll],
+  // },
   {
     icon: <LocalOfferIcon />,
     label: 'Tags',
     to: '/manage/tags',
+    permissions: [RolePermission.TagGetAll],
   },
   {
     icon: <StoreIcon />,
