@@ -34,7 +34,7 @@ export class OrderEntity {
   @ManyToOne(() => StoreEntity)
   store: StoreEntity;
 
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity, undefined, { nullable: true })
   user: UserEntity;
 
   @Column({

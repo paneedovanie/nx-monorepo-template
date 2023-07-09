@@ -90,7 +90,6 @@ export class CategoryRepository extends BaseRepository<
     if (isRoot !== undefined) {
       conditions.parent = isRoot ? IsNull() : Not(IsNull());
     }
-    console.log(conditions);
     return conditions;
   }
 }

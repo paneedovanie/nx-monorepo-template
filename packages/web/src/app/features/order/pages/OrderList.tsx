@@ -160,7 +160,9 @@ export const OrderList = () => {
               label: 'User',
               display: unrestricted,
               render: (order) => {
-                return order.user.firstName + ' ' + order.user.lastName;
+                return order.user?.firstName
+                  ? order.user?.firstName + ' ' + order.user?.lastName
+                  : 'Unauthenticated';
               },
             },
             {

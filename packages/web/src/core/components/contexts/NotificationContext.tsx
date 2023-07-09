@@ -1,6 +1,7 @@
 import { useTsQueryClient } from '@/core/plugins';
 import { NotificationsCount } from '@nx-monorepo-template/global';
 import { ReactNode, createContext, useContext } from 'react';
+import { useAuthContext } from './AuthContext';
 
 const defaultValue = {
   all: 0,
@@ -24,12 +25,14 @@ export const NotificationContextProvider = ({
   children: ReactNode;
 }) => {
   const tsQueryClient = useTsQueryClient();
+  const { user } = useAuthContext();
 
   const { data, refetch } = tsQueryClient.notification.count.useQuery(
     ['notificationCount'],
     {},
     {
       refetchInterval: 5000,
+      enabled: !!user,
     }
   );
 

@@ -44,7 +44,11 @@ export const Checkout = () => {
 
   const { mutate } = tsQueryClient.order.create.useMutation({
     onSuccess: (v) => {
-      navigate(`/manage/orders/${v.body.id}`);
+      if (user) {
+        navigate(`/manage/orders/${v.body.id}`);
+      } else {
+        navigate(`/stores/${params.id}/orders/${v.body.id}`);
+      }
     },
   });
 
@@ -64,11 +68,6 @@ export const Checkout = () => {
       navigate(`/stores/${params.id}`);
     }
   }, [params.id, length, navigate]);
-
-  if (!user) {
-    navigate(`/stores/${params.id}`);
-    return null;
-  }
 
   if (isFetching) {
     return <Loading />;

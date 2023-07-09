@@ -1641,9 +1641,9 @@ const OrderPaymentSchema = zod_1.z.object({
     totalCost: zod_1.z.number(),
     change: zod_1.z.number(),
 });
-exports.OrderSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), ref: zod_1.z.number(), store: store_1.StoreSchema, user: user_1.UserSchema, payment: OrderPaymentSchema, createdAt: zod_1.z.date() }, base));
-exports.CreateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string() }, base));
-exports.UpdateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string() }, base));
+exports.OrderSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), ref: zod_1.z.number(), store: store_1.StoreSchema, user: user_1.UserSchema.optional(), payment: OrderPaymentSchema, createdAt: zod_1.z.date() }, base));
+exports.CreateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string().optional() }, base));
+exports.UpdateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string().optional() }, base));
 exports.GetOrdersResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.OrderSchema.array() }));
 exports.GetOrdersOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_1.z
     .object({
@@ -2074,7 +2074,7 @@ exports["default"] = () => {
             autoLoadEntities: true,
             synchronize: false,
             namingStrategy: new typeorm_naming_strategies_1.SnakeNamingStrategy(),
-            logging: true,
+            // logging: true,
             ssl: isProduction ? { rejectUnauthorized: false } : false,
         },
         jwt: {
@@ -2830,11 +2830,11 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:type", String)
 ], CategoryEntity.prototype, "type", void 0);
 tslib_1.__decorate([
-    (0, typeorm_1.Column)(),
-    tslib_1.__metadata("design:type", String)
-], CategoryEntity.prototype, "storeId", void 0);
-tslib_1.__decorate([
     (0, typeorm_1.ManyToOne)(() => store_entity_1.StoreEntity, (store) => store.categories, { nullable: true }),
+    (0, typeorm_1.JoinColumn)({
+        name: 'store_id',
+        foreignKeyConstraintName: 'id',
+    }),
     tslib_1.__metadata("design:type", Array)
 ], CategoryEntity.prototype, "store", void 0);
 tslib_1.__decorate([
@@ -3055,7 +3055,7 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:type", typeof (_a = typeof store_entity_1.StoreEntity !== "undefined" && store_entity_1.StoreEntity) === "function" ? _a : Object)
 ], OrderEntity.prototype, "store", void 0);
 tslib_1.__decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.UserEntity),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.UserEntity, undefined, { nullable: true }),
     tslib_1.__metadata("design:type", typeof (_b = typeof user_entity_1.UserEntity !== "undefined" && user_entity_1.UserEntity) === "function" ? _b : Object)
 ], OrderEntity.prototype, "user", void 0);
 tslib_1.__decorate([
@@ -3741,7 +3741,6 @@ let CategoryRepository = class CategoryRepository extends core_1.BaseRepository 
         if (isRoot !== undefined) {
             conditions.parent = isRoot ? (0, typeorm_1.IsNull)() : (0, typeorm_1.Not)((0, typeorm_1.IsNull)());
         }
-        console.log(conditions);
         return conditions;
     }
 };
@@ -5925,7 +5924,7 @@ let OrderController = class OrderController {
     }
 };
 tslib_1.__decorate([
-    (0, auth_1.Permissions)(global_1.RolePermission.OrderCreate),
+    (0, guards_1.AllowUnauthorize)(),
     (0, nest_1.TsRest)(c.create),
     tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
     tslib_1.__metadata("design:type", Function),
@@ -5933,7 +5932,7 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", Promise)
 ], OrderController.prototype, "create", null);
 tslib_1.__decorate([
-    (0, auth_1.Permissions)(global_1.RolePermission.OrderGet),
+    (0, guards_1.AllowUnauthorize)(),
     (0, nest_1.TsRest)(c.get),
     tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
     tslib_1.__metadata("design:type", Function),
@@ -6004,7 +6003,7 @@ let OrderModule = class OrderModule {
 OrderModule = tslib_1.__decorate([
     (0, common_1.Module)({
         controllers: [controllers_1.OrderController],
-        providers: [services_1.OrderService, store_1.StoreService],
+        providers: [services_1.OrderService, store_1.StoreService, store_1.StoreGateway],
     })
 ], OrderModule);
 exports.OrderModule = OrderModule;
@@ -6027,7 +6026,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/order/services/order
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OrderService = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -6035,21 +6034,26 @@ const common_1 = __webpack_require__("@nestjs/common");
 const database_1 = __webpack_require__("./src/app/database/index.ts");
 const core_1 = __webpack_require__("./src/app/core/index.ts");
 const global_1 = __webpack_require__("../../lib/global/src/index.ts");
+const store_1 = __webpack_require__("./src/app/modules/store/index.ts");
 let OrderService = class OrderService extends core_1.BaseService {
-    constructor(repository, notificationRepository) {
+    constructor(repository, notificationRepository, storeService, storeGateway) {
         super(repository);
         this.repository = repository;
         this.notificationRepository = notificationRepository;
+        this.storeService = storeService;
+        this.storeGateway = storeGateway;
     }
     onCreated(order) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield this.notificationRepository.createWithRelations({
-                user: order.user.id,
-                type: global_1.NotificationType.OrderCreated,
-                metadata: {
-                    orderId: order.id,
-                },
-            });
+            if (order.user) {
+                yield this.notificationRepository.createWithRelations({
+                    user: order.user.id,
+                    type: global_1.NotificationType.OrderCreated,
+                    metadata: {
+                        orderId: order.id,
+                    },
+                });
+            }
             yield this.notificationRepository.createWithRelations({
                 user: order.store.owner.id,
                 type: global_1.NotificationType.StoreOrderCreated,
@@ -6069,15 +6073,26 @@ let OrderService = class OrderService extends core_1.BaseService {
             };
             if (prev.status !== order.status) {
                 baseMetadata.status = order.status;
+                if ([global_1.OrderStatus.Preparing, global_1.OrderStatus.Ready].includes(order.status)) {
+                    this.storeGateway.server.sockets.forEach((socket) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                        const storeId = socket.handshake.query.storeId;
+                        if (storeId !== order.store.id) {
+                            return;
+                        }
+                        socket.emit('status', yield this.storeService.getStatus(storeId));
+                    }));
+                }
             }
             if (((_a = prev.payment) === null || _a === void 0 ? void 0 : _a.id) !== ((_b = order.payment) === null || _b === void 0 ? void 0 : _b.id)) {
                 baseMetadata.amount = order.payment.totalCost;
             }
-            yield this.notificationRepository.createWithRelations({
-                user: order.user.id,
-                type: global_1.NotificationType.OrderUpdated,
-                metadata: Object.assign({}, baseMetadata),
-            });
+            if (order.user) {
+                yield this.notificationRepository.createWithRelations({
+                    user: order.user.id,
+                    type: global_1.NotificationType.OrderUpdated,
+                    metadata: Object.assign({}, baseMetadata),
+                });
+            }
             yield this.notificationRepository.createWithRelations({
                 user: order.store.owner.id,
                 type: global_1.NotificationType.StoreOrderUpdated,
@@ -6088,13 +6103,15 @@ let OrderService = class OrderService extends core_1.BaseService {
     }
     onDeleted(order) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield this.notificationRepository.createWithRelations({
-                user: order.user.id,
-                type: global_1.NotificationType.OrderDeleted,
-                metadata: {
-                    orderId: order.id,
-                },
-            });
+            if (order.user) {
+                yield this.notificationRepository.createWithRelations({
+                    user: order.user.id,
+                    type: global_1.NotificationType.OrderDeleted,
+                    metadata: {
+                        orderId: order.id,
+                    },
+                });
+            }
             yield this.notificationRepository.createWithRelations({
                 user: order.store.owner.id,
                 type: global_1.NotificationType.StoreOrderDeleted,
@@ -6109,7 +6126,7 @@ let OrderService = class OrderService extends core_1.BaseService {
 };
 OrderService = tslib_1.__decorate([
     (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof database_1.OrderRepository !== "undefined" && database_1.OrderRepository) === "function" ? _a : Object, typeof (_b = typeof database_1.NotificationRepository !== "undefined" && database_1.NotificationRepository) === "function" ? _b : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof database_1.OrderRepository !== "undefined" && database_1.OrderRepository) === "function" ? _a : Object, typeof (_b = typeof database_1.NotificationRepository !== "undefined" && database_1.NotificationRepository) === "function" ? _b : Object, typeof (_c = typeof store_1.StoreService !== "undefined" && store_1.StoreService) === "function" ? _c : Object, typeof (_d = typeof store_1.StoreGateway !== "undefined" && store_1.StoreGateway) === "function" ? _d : Object])
 ], OrderService);
 exports.OrderService = OrderService;
 
@@ -6261,12 +6278,13 @@ const common_1 = __webpack_require__("@nestjs/common");
 const controllers_1 = __webpack_require__("./src/app/modules/payment/controllers/index.ts");
 const services_1 = __webpack_require__("./src/app/modules/payment/services/index.ts");
 const order_1 = __webpack_require__("./src/app/modules/order/index.ts");
+const store_1 = __webpack_require__("./src/app/modules/store/index.ts");
 let PaymentModule = class PaymentModule {
 };
 PaymentModule = tslib_1.__decorate([
     (0, common_1.Module)({
         controllers: [controllers_1.PaymentController],
-        providers: [services_1.PaymentService, order_1.OrderService],
+        providers: [services_1.PaymentService, order_1.OrderService, store_1.StoreService, store_1.StoreGateway],
     })
 ], PaymentModule);
 exports.PaymentModule = PaymentModule;
@@ -7398,6 +7416,65 @@ exports.StoreController = StoreController;
 
 /***/ }),
 
+/***/ "./src/app/modules/store/gateways/index.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/store/gateways/store.gateway.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/app/modules/store/gateways/store.gateway.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StoreGateway = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const websockets_1 = __webpack_require__("@nestjs/websockets");
+const services_1 = __webpack_require__("./src/app/modules/store/services/index.ts");
+const socket_io_1 = __webpack_require__("socket.io");
+let StoreGateway = class StoreGateway {
+    constructor(storeService) {
+        this.storeService = storeService;
+    }
+    handleConnection(e) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const storeId = e.handshake.query.storeId;
+            e.emit('status', yield this.storeService.getStatus(storeId));
+        });
+    }
+    handleEvent(data) {
+        return data;
+    }
+};
+tslib_1.__decorate([
+    (0, websockets_1.WebSocketServer)(),
+    tslib_1.__metadata("design:type", typeof (_b = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _b : Object)
+], StoreGateway.prototype, "server", void 0);
+tslib_1.__decorate([
+    (0, websockets_1.SubscribeMessage)('status'),
+    tslib_1.__param(0, (0, websockets_1.MessageBody)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", String)
+], StoreGateway.prototype, "handleEvent", null);
+StoreGateway = tslib_1.__decorate([
+    (0, websockets_1.WebSocketGateway)({
+        cors: '*',
+        namespace: 'stores',
+    }),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.StoreService !== "undefined" && services_1.StoreService) === "function" ? _a : Object])
+], StoreGateway);
+exports.StoreGateway = StoreGateway;
+
+
+/***/ }),
+
 /***/ "./src/app/modules/store/index.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -7406,6 +7483,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/store/store.module.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/store/services/index.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/store/gateways/index.ts"), exports);
 
 
 /***/ }),
@@ -7425,22 +7503,46 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/store/services/store
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a;
+var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StoreService = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const common_1 = __webpack_require__("@nestjs/common");
 const database_1 = __webpack_require__("./src/app/database/index.ts");
 const core_1 = __webpack_require__("./src/app/core/index.ts");
+const global_1 = __webpack_require__("../../lib/global/src/index.ts");
 let StoreService = class StoreService extends core_1.BaseService {
-    constructor(repository) {
+    constructor(repository, orderRepository) {
         super(repository);
         this.repository = repository;
+        this.orderRepository = orderRepository;
+    }
+    getStatus(storeId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return {
+                preparing: yield this.orderRepository.find({
+                    where: {
+                        status: global_1.OrderStatus.Preparing,
+                        store: {
+                            id: storeId,
+                        },
+                    },
+                }),
+                ready: yield this.orderRepository.find({
+                    where: {
+                        status: global_1.OrderStatus.Ready,
+                        store: {
+                            id: storeId,
+                        },
+                    },
+                }),
+            };
+        });
     }
 };
 StoreService = tslib_1.__decorate([
     (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof database_1.StoreRepository !== "undefined" && database_1.StoreRepository) === "function" ? _a : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof database_1.StoreRepository !== "undefined" && database_1.StoreRepository) === "function" ? _a : Object, typeof (_b = typeof database_1.OrderRepository !== "undefined" && database_1.OrderRepository) === "function" ? _b : Object])
 ], StoreService);
 exports.StoreService = StoreService;
 
@@ -7457,12 +7559,13 @@ const tslib_1 = __webpack_require__("tslib");
 const common_1 = __webpack_require__("@nestjs/common");
 const controllers_1 = __webpack_require__("./src/app/modules/store/controllers/index.ts");
 const services_1 = __webpack_require__("./src/app/modules/store/services/index.ts");
+const gateways_1 = __webpack_require__("./src/app/modules/store/gateways/index.ts");
 let StoreModule = class StoreModule {
 };
 StoreModule = tslib_1.__decorate([
     (0, common_1.Module)({
         controllers: [controllers_1.StoreController],
-        providers: [services_1.StoreService],
+        providers: [services_1.StoreService, gateways_1.StoreGateway],
     })
 ], StoreModule);
 exports.StoreModule = StoreModule;
@@ -8253,6 +8356,13 @@ module.exports = require("@nestjs/typeorm");
 
 /***/ }),
 
+/***/ "@nestjs/websockets":
+/***/ ((module) => {
+
+module.exports = require("@nestjs/websockets");
+
+/***/ }),
+
 /***/ "@ts-rest/core":
 /***/ ((module) => {
 
@@ -8313,6 +8423,13 @@ module.exports = require("passport-local");
 /***/ ((module) => {
 
 module.exports = require("rxjs/operators");
+
+/***/ }),
+
+/***/ "socket.io":
+/***/ ((module) => {
+
+module.exports = require("socket.io");
 
 /***/ }),
 

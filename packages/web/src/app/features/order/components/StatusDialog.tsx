@@ -36,7 +36,7 @@ export const StatusDialog = ({
         <FormGenerator<Order, UpdateOrder>
           initialValues={{
             status: data.status,
-            user: data.user.id,
+            user: data.user?.id,
             store: data.store.id,
             items: data.items,
           }}

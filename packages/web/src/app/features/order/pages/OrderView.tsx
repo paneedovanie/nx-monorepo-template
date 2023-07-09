@@ -45,7 +45,8 @@ export const OrderView = () => {
   );
 
   const order = data?.body;
-  const isCustomer = order?.user.id === user?.id;
+  const isCustomer = order?.user?.id === user?.id;
+  const isStoreOwner = order?.store?.owner?.id === user?.id;
 
   const totalCost = useMemo(() => {
     let total = 0;
@@ -97,13 +98,22 @@ export const OrderView = () => {
               </Typography>
               <Typography>
                 Paid: {order?.payment ? 'Yes' : 'No'}
-                {!order.payment && (
+                {!order.payment && isCustomer && !!order.user && (
                   <Button
                     onClick={() => {
                       setPaymentOpen(true);
                     }}
                   >
-                    {isCustomer ? 'Pay' : 'Bill'}
+                    Pay
+                  </Button>
+                )}
+                {!order.payment && isStoreOwner && (
+                  <Button
+                    onClick={() => {
+                      setPaymentOpen(true);
+                    }}
+                  >
+                    Bill
                   </Button>
                 )}
               </Typography>

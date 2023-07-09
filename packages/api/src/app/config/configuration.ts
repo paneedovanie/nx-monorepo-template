@@ -28,7 +28,7 @@ export default () => {
       autoLoadEntities: true,
       synchronize: false,
       namingStrategy: new SnakeNamingStrategy(),
-      logging: true,
+      // logging: true,
       ssl: isProduction ? { rejectUnauthorized: false } : false,
     },
     jwt: {

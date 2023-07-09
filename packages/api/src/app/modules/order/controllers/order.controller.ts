@@ -16,7 +16,11 @@ import {
   contract,
   RolePermission,
 } from '@nx-monorepo-template/global';
-import { JwtAuthGuard, PermissionGuard } from '../../auth/guards';
+import {
+  AllowUnauthorize,
+  JwtAuthGuard,
+  PermissionGuard,
+} from '../../auth/guards';
 import { Permissions } from '../../auth';
 import { OrderService } from '../services';
 import { StoreService } from '../../store/services';
@@ -32,7 +36,7 @@ export class OrderController implements NestControllerInterface<typeof c> {
     private readonly storeService: StoreService
   ) {}
 
-  @Permissions(RolePermission.OrderCreate)
+  @AllowUnauthorize()
   @TsRest(c.create)
   async create(@TsRestRequest() { body }: RequestShapes['create']) {
     const order = await this.orderService.create(body);
@@ -40,7 +44,7 @@ export class OrderController implements NestControllerInterface<typeof c> {
     return { status: 201 as const, body: order };
   }
 
-  @Permissions(RolePermission.OrderGet)
+  @AllowUnauthorize()
   @TsRest(c.get)
   async get(@TsRestRequest() { params }: RequestShapes['get']) {
     const order = await this.orderService.getById(params.id);

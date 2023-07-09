@@ -33,7 +33,7 @@ export const OrderSchema = z.object({
   id: z.string(),
   ref: z.number(),
   store: StoreSchema,
-  user: UserSchema,
+  user: UserSchema.optional(),
   payment: OrderPaymentSchema,
   createdAt: z.date(),
   ...base,
@@ -41,13 +41,13 @@ export const OrderSchema = z.object({
 
 export const CreateOrderSchema = z.object({
   store: z.string(),
-  user: z.string(),
+  user: z.string().optional(),
   ...base,
 });
 
 export const UpdateOrderSchema = z.object({
   store: z.string(),
-  user: z.string(),
+  user: z.string().optional(),
   ...base,
 });
 

@@ -170,7 +170,7 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
             variant="contained"
             onClick={() => navigate(`/stores/${id}/checkout`)}
             autoFocus
-            disabled={!length || !user}
+            disabled={!length}
           >
             Checkout
           </Button>

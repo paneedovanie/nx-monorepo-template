@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   Index,
+  JoinColumn,
 } from 'typeorm';
 import { StoreEntity } from './store.entity';
 
@@ -30,10 +31,11 @@ export class CategoryEntity {
   @Column()
   type: string;
 
-  @Column()
-  storeId: string;
-
   @ManyToOne(() => StoreEntity, (store) => store.categories, { nullable: true })
+  @JoinColumn({
+    name: 'store_id',
+    foreignKeyConstraintName: 'id',
+  })
   store?: StoreEntity[];
 
   @CreateDateColumn()

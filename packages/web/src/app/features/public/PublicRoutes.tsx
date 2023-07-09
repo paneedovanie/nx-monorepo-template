@@ -1,7 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage, LoginPage, RegistrationPage } from './pages';
-import { Checkout, PublicStoreViewPage } from '../store';
+import { Checkout, PublicStoreViewPage, StoreStatusPage } from '../store';
 import { CartContextProvider, useAuthContext } from '@/core';
+import { OrderView } from '../order';
 
 export const PublicRoutes = () => {
   const { user } = useAuthContext();
@@ -21,10 +22,9 @@ export const PublicRoutes = () => {
           <CartContextProvider>
             <Routes>
               <Route path="/" element={<PublicStoreViewPage />} />
-              <Route
-                path="/checkout"
-                element={user ? <Checkout /> : <Navigate to="/" />}
-              />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/orders/:id" element={<OrderView />} />
+              <Route path="/status" element={<StoreStatusPage />} />
             </Routes>
           </CartContextProvider>
         }
