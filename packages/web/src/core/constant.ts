@@ -33,4 +33,4 @@ export const theme = {
 export const isProduction = import.meta.env.VITE_ENVIRONMENT === 'production';
 
 // export const apiBaseUrl = 'http://localhost:3000';
-export const apiBaseUrl = '';
+export const apiBaseUrl = isProduction ? '' : 'http://localhost:3000';

@@ -52,16 +52,14 @@ export class OrderService extends BaseService<OrderEntity> {
       orderId: order.id,
     };
     if (prev.status !== order.status) {
+      (this.storeGateway.server.sockets as any).forEach(async (socket) => {
+        const storeId = socket.handshake.query.storeId;
+        if (storeId !== order.store.id) {
+          return;
+        }
+        socket.emit('status', await this.storeService.getStatus(storeId));
+      });
       baseMetadata.status = order.status;
-      if ([OrderStatus.Preparing, OrderStatus.Ready].includes(order.status)) {
-        (this.storeGateway.server.sockets as any).forEach(async (socket) => {
-          const storeId = socket.handshake.query.storeId;
-          if (storeId !== order.store.id) {
-            return;
-          }
-          socket.emit('status', await this.storeService.getStatus(storeId));
-        });
-      }
     }
     if (prev.payment?.id !== order.payment?.id) {
       baseMetadata.amount = order.payment.totalCost;

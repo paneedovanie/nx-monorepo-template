@@ -4,6 +4,7 @@ import { Socket, io } from 'socket.io-client';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Order } from '@nx-monorepo-template/global';
+import { apiBaseUrl } from '@/core';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
@@ -17,7 +18,7 @@ export const StoreStatusPage = () => {
   const [ready, setReady] = useState<Order[]>([]);
 
   useEffect(() => {
-    socketRef.current = io({
+    socketRef.current = io(apiBaseUrl + '/stores', {
       query: { storeId },
     });
     const onConnect = () => {
@@ -52,7 +53,9 @@ export const StoreStatusPage = () => {
             Preparing
           </Typography>
           {preparing.map(({ ref }) => (
-            <Typography>{ref}</Typography>
+            <Typography variant="h6" key={ref}>
+              {ref}
+            </Typography>
           ))}
         </Grid>
         <Grid item xs={6}>
@@ -60,7 +63,9 @@ export const StoreStatusPage = () => {
             Ready
           </Typography>
           {ready.map(({ ref }) => (
-            <Typography>{ref}</Typography>
+            <Typography variant="h6" key={ref}>
+              {ref}
+            </Typography>
           ))}
         </Grid>
       </Grid>

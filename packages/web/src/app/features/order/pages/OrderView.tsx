@@ -85,8 +85,8 @@ export const OrderView = () => {
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography sx={{ textTransform: 'Capitalize' }}>
-                Status: {order?.status}{' '}
-                {order?.status !== 'completed' && !isCustomer && (
+                Status: {order?.status}
+                {order?.status !== 'completed' && isStoreOwner && (
                   <Button
                     onClick={() => {
                       setStatusOpen(true);

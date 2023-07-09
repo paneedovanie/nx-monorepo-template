@@ -6072,16 +6072,14 @@ let OrderService = class OrderService extends core_1.BaseService {
                 orderId: order.id,
             };
             if (prev.status !== order.status) {
+                this.storeGateway.server.sockets.forEach((socket) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                    const storeId = socket.handshake.query.storeId;
+                    if (storeId !== order.store.id) {
+                        return;
+                    }
+                    socket.emit('status', yield this.storeService.getStatus(storeId));
+                }));
                 baseMetadata.status = order.status;
-                if ([global_1.OrderStatus.Preparing, global_1.OrderStatus.Ready].includes(order.status)) {
-                    this.storeGateway.server.sockets.forEach((socket) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-                        const storeId = socket.handshake.query.storeId;
-                        if (storeId !== order.store.id) {
-                            return;
-                        }
-                        socket.emit('status', yield this.storeService.getStatus(storeId));
-                    }));
-                }
             }
             if (((_a = prev.payment) === null || _a === void 0 ? void 0 : _a.id) !== ((_b = order.payment) === null || _b === void 0 ? void 0 : _b.id)) {
                 baseMetadata.amount = order.payment.totalCost;
@@ -7445,7 +7443,8 @@ let StoreGateway = class StoreGateway {
     handleConnection(e) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const storeId = e.handshake.query.storeId;
-            e.emit('status', yield this.storeService.getStatus(storeId));
+            const status = yield this.storeService.getStatus(storeId);
+            e.emit('status', status);
         });
     }
     handleEvent(data) {

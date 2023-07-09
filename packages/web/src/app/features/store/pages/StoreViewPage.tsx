@@ -8,7 +8,14 @@ import {
   useTsQueryClient,
 } from '@/core';
 import { Edit as EditIcon, Store as StoreIcon } from '@mui/icons-material';
-import { Box, Card, CardContent, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  IconButton,
+  Link,
+  Typography,
+} from '@mui/material';
 import {
   UpdateStore,
   Store,
@@ -20,6 +27,7 @@ import { SyntheticEvent, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { OtherInformation } from '../components';
+import { Link as RouterLink } from 'react-router-dom';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
@@ -206,6 +214,13 @@ export const StoreViewPage = () => {
               <Typography variant="h4">{data?.title}</Typography>
               <StarRating rating={data?.rating ?? 0} />
               <Typography>{data?.description}</Typography>
+              <Link
+                component={RouterLink}
+                target="__blank"
+                to={`/stores/${id}/status`}
+              >
+                Status Page
+              </Link>
             </div>
           )}
         </CardContent>

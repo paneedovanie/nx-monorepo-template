@@ -29,7 +29,8 @@ export class StoreGateway implements OnGatewayConnection {
     }
   ) {
     const storeId = e.handshake.query.storeId;
-    e.emit('status', await this.storeService.getStatus(storeId));
+    const status = await this.storeService.getStatus(storeId);
+    e.emit('status', status);
   }
 
   @SubscribeMessage('status')
