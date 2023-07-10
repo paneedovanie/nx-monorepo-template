@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, Link } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, Link } from '@mui/material';
 import { generateQrcode } from '@nx-monorepo-template/global';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -35,14 +35,20 @@ export const QrcodeDialog = ({
         onClose={() => setQrcodeOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        fullWidth
       >
-        <img
-          src={qrcode}
-          alt="qrcode"
-          width={400}
-          height={400}
-          onClick={() => setQrcodeOpen(true)}
-        />
+        <Box
+          sx={{
+            maxWidth: '100%',
+          }}
+        >
+          <img
+            src={qrcode}
+            alt="qrcode"
+            width="100%"
+            onClick={() => setQrcodeOpen(true)}
+          />
+        </Box>
         <DialogActions>
           <Link
             ref={linkRef}
