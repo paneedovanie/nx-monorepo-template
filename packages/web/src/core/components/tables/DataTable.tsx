@@ -75,7 +75,7 @@ export const DataTable = <T,>({
     display === undefined ? true : display;
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+    <Paper elevation={0} sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader {...tableProps}>
           <TableHead>
@@ -131,14 +131,16 @@ export const DataTable = <T,>({
                 {data?.map((row: T, i: number) => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={i}>
-                      {columns?.filter(handleFilterDisplay).map(({display, ...column}, j) => {
-                        return (
-                          <TableCell key={j}>
-                            {column.render?.(row) ??
-                              row[column.name as keyof unknown]}
-                          </TableCell>
-                        );
-                      })}
+                      {columns
+                        ?.filter(handleFilterDisplay)
+                        .map(({ display, ...column }, j) => {
+                          return (
+                            <TableCell key={j}>
+                              {column.render?.(row) ??
+                                row[column.name as keyof unknown]}
+                            </TableCell>
+                          );
+                        })}
                     </TableRow>
                   );
                 })}

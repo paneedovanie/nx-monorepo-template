@@ -1,5 +1,10 @@
-import { DataTable, useTsQueryClient, usePagination } from '@/core';
-import { Box, IconButton, TextField, Toolbar, Typography } from '@mui/material';
+import {
+  DataTable,
+  useTsQueryClient,
+  usePagination,
+  formatCurrency,
+} from '@/core';
+import { Box, IconButton, TextField, Toolbar } from '@mui/material';
 import { Order, Store } from '@nx-monorepo-template/global';
 import { useNavigate } from 'react-router-dom';
 import { RemoveRedEye as EyeIcon } from '@mui/icons-material';
@@ -56,21 +61,21 @@ export const PaymentsTable = ({ store }: { store: Store }) => {
             name: 'amountPaid',
             label: 'Amount Paid',
             render: ({ payment }) => {
-              return payment.amountPaid;
+              return formatCurrency(payment.amountPaid);
             },
           },
           {
             name: 'totalCost',
             label: 'Total Cost',
             render: ({ payment }) => {
-              return payment.totalCost;
+              return formatCurrency(payment.totalCost);
             },
           },
           {
             name: 'change',
             label: 'Change',
             render: ({ payment }) => {
-              return payment.change;
+              return formatCurrency(payment.change);
             },
           },
           {

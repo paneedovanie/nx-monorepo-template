@@ -973,6 +973,7 @@ tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/curre
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/form.helper.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/notification.helper.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/string.helper.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/qrcode.helper.ts"), exports);
 
 
 /***/ }),
@@ -1051,6 +1052,22 @@ const getNotificationMessages = (notification) => {
     return messages;
 };
 exports.getNotificationMessages = getNotificationMessages;
+
+
+/***/ }),
+
+/***/ "../../lib/global/src/lib/helpers/qrcode.helper.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateQrcode = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const QRCode = tslib_1.__importStar(__webpack_require__("qrcode"));
+const generateQrcode = (text) => {
+    return QRCode.toDataURL(text);
+};
+exports.generateQrcode = generateQrcode;
 
 
 /***/ }),
@@ -8415,6 +8432,13 @@ module.exports = require("passport-jwt");
 /***/ ((module) => {
 
 module.exports = require("passport-local");
+
+/***/ }),
+
+/***/ "qrcode":
+/***/ ((module) => {
+
+module.exports = require("qrcode");
 
 /***/ }),
 

@@ -109,6 +109,7 @@ export const Checkout = () => {
             },
           ]}
           data={products?.list}
+          pagination={false}
         />
 
         <CardContent>

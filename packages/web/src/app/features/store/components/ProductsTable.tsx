@@ -1,4 +1,9 @@
-import { DataTable, useTsQueryClient, usePagination } from '@/core';
+import {
+  DataTable,
+  useTsQueryClient,
+  usePagination,
+  formatCurrency,
+} from '@/core';
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import { Product, Store, generateColor } from '@nx-monorepo-template/global';
 import {
@@ -105,6 +110,9 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
           {
             name: 'price',
             label: 'Price',
+            render: ({ price }) => {
+              return formatCurrency(price);
+            },
           },
           {
             name: 'actions',

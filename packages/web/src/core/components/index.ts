@@ -7,3 +7,4 @@ export * from './breadcrumbs';
 export * from './allow';
 export * from './ratings';
 export * from './tags';
+export * from './qrcodes';

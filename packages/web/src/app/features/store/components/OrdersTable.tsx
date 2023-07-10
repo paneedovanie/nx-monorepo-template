@@ -1,5 +1,9 @@
-
-import { DataTable, useTsQueryClient, usePagination } from '@/core';
+import {
+  DataTable,
+  useTsQueryClient,
+  usePagination,
+  formatCurrency,
+} from '@/core';
 import { RemoveRedEye as EyeIcon } from '@mui/icons-material';
 import { Box, IconButton, TextField, Toolbar, Typography } from '@mui/material';
 import { Store, Order, OrderProduct } from '@nx-monorepo-template/global';
@@ -73,7 +77,7 @@ export const OrdersTable = ({ store }: { store: Store }) => {
               const reducer = (curr: number, item: OrderProduct) => {
                 return curr + item.count;
               };
-              return items.reduce(reducer, 0);
+              return formatCurrency(items.reduce(reducer, 0));
             },
           },
           {
@@ -83,7 +87,7 @@ export const OrdersTable = ({ store }: { store: Store }) => {
               const reducer = (curr: number, item: OrderProduct) => {
                 return curr + item.count * item.price;
               };
-              return items.reduce(reducer, 0);
+              return formatCurrency(items.reduce(reducer, 0));
             },
           },
           {

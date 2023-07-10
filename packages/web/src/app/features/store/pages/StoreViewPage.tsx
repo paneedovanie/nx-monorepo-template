@@ -2,6 +2,7 @@ import {
   Breadcrumbs,
   FormGenerator,
   Loading,
+  QrcodeDialog,
   StarRating,
   Tags,
   usePagination,
@@ -221,6 +222,10 @@ export const StoreViewPage = () => {
               >
                 Status Page
               </Link>
+              <QrcodeDialog
+                filename={data?.title + '-qrcode'}
+                text={`${window.location.href.replace('/manage', '')}`}
+              />
             </div>
           )}
         </CardContent>
