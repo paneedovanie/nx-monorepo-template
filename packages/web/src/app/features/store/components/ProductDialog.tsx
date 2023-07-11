@@ -1,28 +1,20 @@
-import { FormGenerator, FormGeneratorItem, useTsQueryClient } from '@/core';
 import {
-  ChevronRight as ChevronRightIcon,
-  ExpandMore as ExpandMoreIcon,
-} from '@mui/icons-material';
-import { TreeView, TreeItem } from '@mui/lab';
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Typography,
-} from '@mui/material';
+  CategoryField,
+  FormGenerator,
+  FormGeneratorItem,
+  useTsQueryClient,
+} from '@/core';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import {
   Product,
   CreateProduct,
   UpdateProduct,
-  Category,
   Store,
 } from '@nx-monorepo-template/global';
 import {
   CreateProductSchema,
   UpdateProductSchema,
 } from '@nx-monorepo-template/global';
-import { SyntheticEvent } from 'react';
 
 export const ProductDialog = ({
   data,
@@ -47,20 +39,6 @@ export const ProductDialog = ({
 }) => {
   const tsQueryClient = useTsQueryClient();
 
-  const { data: categoriesResult } = tsQueryClient.category.getAll.useQuery(
-    ['getCategories'],
-    {
-      query: {
-        store: store?.id,
-        perPage: -1,
-        type: 'product',
-        isRoot: true,
-      },
-    }
-  );
-
-  const categories = categoriesResult?.body;
-
   const { mutate: create } = tsQueryClient.product.create.useMutation({
     onSuccess: (v) => {
       onSuccess?.(v.body);
@@ -78,19 +56,6 @@ export const ProductDialog = ({
     store: data?.store?.id ?? initialValues?.store ?? '',
     price: data?.price ?? initialValues?.price ?? 0,
     category: data?.category?.id ?? initialValues?.category ?? '',
-  };
-
-  const renderTree = (node: Category, parentActive?: boolean) => {
-    return (
-      <TreeItem
-        key={node.id}
-        sx={{ ml: 2 }}
-        nodeId={node.id}
-        label={node.title}
-      >
-        {node.children?.map((node) => renderTree(node))}
-      </TreeItem>
-    );
   };
 
   const items: FormGeneratorItem[] = [
@@ -126,22 +91,19 @@ export const ProductDialog = ({
       name: 'category',
       component: (options) => {
         return (
-          <>
-            <Box sx={{ p: 1 }}>
-              <Typography variant="h6">Category</Typography>
-            </Box>
-            <TreeView
-              selected={options.value}
-              onNodeSelect={(e: SyntheticEvent, id: string) =>
-                options.context?.setFieldValue(options.name, id)
-              }
-              aria-label="category navigator"
-              defaultCollapseIcon={<ExpandMoreIcon />}
-              defaultExpandIcon={<ChevronRightIcon />}
-            >
-              {categories?.list.map((node) => renderTree(node))}
-            </TreeView>
-          </>
+          <CategoryField
+            store={store}
+            label="Category"
+            size="small"
+            onSelect={(v) => {
+              options.context?.setFieldValue(options.name, v.id);
+            }}
+            value={data?.category}
+            name={options.name}
+            error={!!options.error}
+            helperText={options.error}
+            sx={{ width: '100%' }}
+          />
         );
       },
     },

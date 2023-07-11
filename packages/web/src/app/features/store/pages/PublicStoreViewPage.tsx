@@ -44,7 +44,12 @@ import { BaseSyntheticEvent, Fragment, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { CartDialog, StoreRatingDialog } from '../components';
-import { Category, Product, generateColor } from '@nx-monorepo-template/global';
+import {
+  Category,
+  Product,
+  Store,
+  generateColor,
+} from '@nx-monorepo-template/global';
 import { format } from 'date-fns';
 
 const Container = styled.div`
@@ -60,6 +65,84 @@ const NumberField = styled(TextField)`
   max-width: 100px;
   text-align: center;
 `;
+
+const RenderTree = ({
+  store,
+  node,
+  parentActive,
+  categoryIds,
+  onSelect,
+}: {
+  store?: Store;
+  node: Category;
+  parentActive?: boolean;
+  categoryIds?: string[];
+  onSelect?: (v: string[]) => void;
+}) => {
+  const tsQueryClient = useTsQueryClient();
+  const active =
+    (categoryIds?.some((id) => [node.id, node.parent].includes(id)) ||
+      parentActive) ??
+    false;
+
+  const hasChildren = !!node.children?.length;
+
+  const { data: categoriesResult } = tsQueryClient.category.getAll.useQuery(
+    [`getProductsCategories${node.id}`, store?.id],
+    {
+      query: {
+        store: store?.id,
+        perPage: -1,
+        type: 'product',
+        parent: node.id,
+      },
+    },
+    {
+      enabled: hasChildren,
+    }
+  );
+
+  const categories = categoriesResult?.body;
+
+  return (
+    <Fragment key={node.id}>
+      <ListItem
+        secondaryAction={
+          <Checkbox
+            disabled={parentActive}
+            checked={active}
+            onChange={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const catSet = new Set<string>(categoryIds);
+              if (e.target.checked) {
+                catSet.add(node.id);
+              } else {
+                catSet.delete(node.id);
+              }
+              onSelect?.(Array.from(catSet));
+            }}
+          />
+        }
+      >
+        <ListItemText primary={node.title} />
+      </ListItem>
+      {hasChildren && (
+        <List dense sx={{ ml: 2 }} disablePadding>
+          {categories?.list.map((node) => (
+            <RenderTree
+              store={store}
+              node={node}
+              parentActive={active}
+              categoryIds={categoryIds}
+              onSelect={onSelect}
+            />
+          ))}
+        </List>
+      )}
+    </Fragment>
+  );
+};
 
 export const PublicStoreViewPage = () => {
   const tsQueryClient = useTsQueryClient();
@@ -129,44 +212,6 @@ export const PublicStoreViewPage = () => {
     return Math.ceil(count / perPage);
   }, [products]);
 
-  const renderTree = (node: Category, parentActive?: boolean) => {
-    const active =
-      (categoryIds?.some((id) => [node.id, node.parent].includes(id)) ||
-        parentActive) ??
-      false;
-
-    return (
-      <Fragment key={node.id}>
-        <ListItem
-          secondaryAction={
-            <Checkbox
-              disabled={parentActive}
-              checked={active}
-              onChange={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const catSet = new Set<string>(categoryIds);
-                if (e.target.checked) {
-                  catSet.add(node.id);
-                } else {
-                  catSet.delete(node.id);
-                }
-                setCategoryIds(Array.from(catSet));
-              }}
-            />
-          }
-        >
-          <ListItemText primary={node.title} />
-        </ListItem>
-        {!!node.children?.length && (
-          <List dense sx={{ ml: 2 }} disablePadding>
-            {node.children.map((node) => renderTree(node, active))}
-          </List>
-        )}
-      </Fragment>
-    );
-  };
-
   if (isFetchingStore) {
     return <Loading />;
   } else if (!store) {
@@ -194,7 +239,16 @@ export const PublicStoreViewPage = () => {
         <Box sx={{ p: 1 }}>
           <Typography variant="h6">Category</Typography>
         </Box>
-        <List dense>{categories?.list.map((node) => renderTree(node))}</List>
+        <List dense>
+          {categories?.list.map((node) => (
+            <RenderTree
+              store={store}
+              node={node}
+              categoryIds={categoryIds}
+              onSelect={(v) => setCategoryIds(v)}
+            />
+          ))}
+        </List>
       </Drawer>
       <Grid container spacing={1} mb={1}>
         <Grid item xs={12}>
