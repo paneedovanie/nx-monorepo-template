@@ -84,7 +84,7 @@ export const BillDialog = ({
             order: data.id,
             type: 'cash',
             amountPaid: 0,
-            totalCost,
+            totalCost: parseFloat(totalCost.toFixed(2)),
           }}
           schema={CreatePaymentSchema}
           successMessage={'Payment created'}
