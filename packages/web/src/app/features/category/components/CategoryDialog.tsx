@@ -1,15 +1,5 @@
 import { FormGenerator, FormGeneratorItem, useTsQueryClient } from '@/core';
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from '@mui/material';
-import { TreeView, TreeItem } from '@mui/lab';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import {
   Category,
   CreateCategory,
@@ -20,7 +10,6 @@ import {
   CreateCategorySchema,
   UpdateCategorySchema,
 } from '@nx-monorepo-template/global';
-import { Fragment, useState } from 'react';
 
 export const CategoryDialog = ({
   data,
@@ -37,9 +26,8 @@ export const CategoryDialog = ({
   onClose: () => void;
   onSuccess?: (data: Category) => void;
 }) => {
+  console.log('open', open);
   const tsQueryClient = useTsQueryClient();
-  const [expanded, setExpanded] = useState<string[]>([]);
-  const [selected, setSelected] = useState<string[]>([]);
 
   const { mutate: create } = tsQueryClient.category.create.useMutation({
     onSuccess: (v) => {
@@ -79,7 +67,7 @@ export const CategoryDialog = ({
 
   return (
     <Dialog onClose={onClose} open={open}>
-      <DialogTitle>{data?.id ? 'Update' : 'Create'} Category</DialogTitle>
+      <DialogTitle>{data?.id ? 'Update' : 'Create'} aCategory</DialogTitle>
       <DialogContent>
         {data?.id ? (
           <FormGenerator<Category, UpdateCategory>

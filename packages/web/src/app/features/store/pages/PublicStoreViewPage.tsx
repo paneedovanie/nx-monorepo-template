@@ -40,7 +40,13 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { BaseSyntheticEvent, Fragment, useMemo, useState } from 'react';
+import {
+  BaseSyntheticEvent,
+  Fragment,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { CartDialog, StoreRatingDialog } from '../components';
@@ -105,7 +111,7 @@ const RenderTree = ({
   const categories = categoriesResult?.body;
 
   return (
-    <Fragment key={node.id}>
+    <Fragment>
       <ListItem
         secondaryAction={
           <Checkbox
@@ -131,6 +137,7 @@ const RenderTree = ({
         <List dense sx={{ ml: 2 }} disablePadding>
           {categories?.list.map((node) => (
             <RenderTree
+              key={node.id}
               store={store}
               node={node}
               parentActive={active}
@@ -212,6 +219,10 @@ export const PublicStoreViewPage = () => {
     return Math.ceil(count / perPage);
   }, [products]);
 
+  useEffect(() => {
+    localStorage.setItem('storeId', id);
+  }, [id]);
+
   if (isFetchingStore) {
     return <Loading />;
   } else if (!store) {
@@ -242,6 +253,7 @@ export const PublicStoreViewPage = () => {
         <List dense>
           {categories?.list.map((node) => (
             <RenderTree
+              key={node.id}
               store={store}
               node={node}
               categoryIds={categoryIds}
@@ -252,7 +264,7 @@ export const PublicStoreViewPage = () => {
       </Drawer>
       <Grid container spacing={1} mb={1}>
         <Grid item xs={12}>
-          <Card>
+          <Card elevation={0}>
             <CardContent>
               <Box
                 sx={{
@@ -402,7 +414,7 @@ export const PublicStoreViewPage = () => {
             {products?.list?.map((item: Product, i: number) => {
               return (
                 <Grid item xs={12} md={6} xl={3} key={i}>
-                  <Card>
+                  <Card elevation={0}>
                     {item.image ? (
                       <CardMedia
                         sx={{ height: 140 }}

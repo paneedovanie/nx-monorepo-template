@@ -11,10 +11,20 @@ const base = {
   totalCost: z.number(),
 };
 
+export const NonCircularPaymentSchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  amountPaid: z.number(),
+  totalCost: z.number(),
+  change: z.number(),
+  createdAt: z.date(),
+});
+
 export const PaymentSchema = z.object({
   id: z.string(),
   order: z.lazy(() => OrderSchema),
   change: z.number(),
+  createdAt: z.date(),
   ...base,
 });
 

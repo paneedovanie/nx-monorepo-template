@@ -28,6 +28,9 @@ export class ProductRepository extends BaseRepository<
   protected async modifyResult(
     item: ProductEntity
   ): Promise<ProductEntity & { categories: CategoryEntity[] }> {
+    if (!item) {
+      return null;
+    }
     return {
       ...item,
       categories: await this.categoryRepository.getParentsByCategoryId(

@@ -42,7 +42,7 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
       query: {
         ids: Object.keys(cart) ?? [],
         store: storeId,
-        perPage,
+        perPage: -1,
         page,
       },
     },
@@ -155,12 +155,8 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
           data={products?.list}
           onPage={setPage}
           onPerPage={setPerPage}
+          pagination={false}
         />
-        {!user && (
-          <CardContent>
-            <Typography variant="caption">Please login to checkout</Typography>
-          </CardContent>
-        )}
 
         <DialogActions>
           <Button onClick={handleClose} autoFocus color="error">

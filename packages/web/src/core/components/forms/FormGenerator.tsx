@@ -19,6 +19,7 @@ import { ChangeEvent, useEffect } from 'react';
 import { Radio, RadioGroup } from '@mui/joy';
 import { MuiFileInput } from 'mui-file-input';
 import { log } from '@/core/helpers';
+import { ApiRouteResponse } from '@nx-monorepo-template/global';
 
 interface CustomComponentOptions {
   label?: string;
@@ -62,8 +63,6 @@ export type FormGeneratorItem = {
     ) => Promise<any>;
   };
 };
-
-type ApiRouteResponse<T> = { status: number; body: T };
 
 type FormGeneratorProps<R, I> = {
   initialValues?: I;

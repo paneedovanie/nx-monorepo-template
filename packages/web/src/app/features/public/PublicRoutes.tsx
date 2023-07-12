@@ -6,6 +6,8 @@ import { PublicOrderView } from '../order';
 
 export const PublicRoutes = () => {
   const { user } = useAuthContext();
+  const storeId = localStorage.getItem('storeId');
+
   return (
     <Routes>
       <Route
@@ -29,7 +31,16 @@ export const PublicRoutes = () => {
           </CartContextProvider>
         }
       />
-      <Route path="*" element={<HomePage />} />
+      <Route
+        path="*"
+        element={
+          !user && !!storeId ? (
+            <Navigate to={`/stores/${storeId}`} />
+          ) : (
+            <HomePage />
+          )
+        }
+      />
     </Routes>
   );
 };

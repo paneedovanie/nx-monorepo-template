@@ -1237,6 +1237,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
+/***/ "../../lib/global/src/lib/interfaces/common.ts":
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
 /***/ "../../lib/global/src/lib/interfaces/index.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -1258,6 +1267,7 @@ tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/st
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/notification.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/store-rating.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/tag.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/common.ts"), exports);
 
 
 /***/ }),
@@ -1639,6 +1649,7 @@ const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagin
 const store_1 = __webpack_require__("../../lib/global/src/lib/schemas/store.ts");
 const user_1 = __webpack_require__("../../lib/global/src/lib/schemas/user.ts");
 const unrestricted_1 = __webpack_require__("../../lib/global/src/lib/schemas/unrestricted.ts");
+const payment_1 = __webpack_require__("../../lib/global/src/lib/schemas/payment.ts");
 exports.OrderProductSchema = zod_1.z.object({
     title: zod_1.z.string(),
     description: zod_1.z.string(),
@@ -1650,15 +1661,7 @@ const base = {
     items: exports.OrderProductSchema.array(),
     status: zod_1.z.string(),
 };
-const OrderPaymentSchema = zod_1.z.object({
-    id: zod_1.z.string(),
-    // order: z.lazy(() => OrderSchema),
-    type: zod_1.z.string(),
-    amountPaid: zod_1.z.number(),
-    totalCost: zod_1.z.number(),
-    change: zod_1.z.number(),
-});
-exports.OrderSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), ref: zod_1.z.number(), store: store_1.StoreSchema, user: user_1.UserSchema.optional(), payment: OrderPaymentSchema, createdAt: zod_1.z.date() }, base));
+exports.OrderSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), ref: zod_1.z.number(), store: store_1.StoreSchema, user: user_1.UserSchema.optional(), payment: payment_1.NonCircularPaymentSchema, createdAt: zod_1.z.date() }, base));
 exports.CreateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string().optional() }, base));
 exports.UpdateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string().optional() }, base));
 exports.GetOrdersResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.OrderSchema.array() }));
@@ -1704,7 +1707,7 @@ exports.PaginationResponseSchema = zod_1.z.object({
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetPaymentsOptionsSchema = exports.GetPaymentsResponseSchema = exports.UpdatePaymentSchema = exports.CreatePaymentSchema = exports.PaymentSchema = void 0;
+exports.GetPaymentsOptionsSchema = exports.GetPaymentsResponseSchema = exports.UpdatePaymentSchema = exports.CreatePaymentSchema = exports.PaymentSchema = exports.NonCircularPaymentSchema = void 0;
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const order_1 = __webpack_require__("../../lib/global/src/lib/schemas/order.ts");
@@ -1713,7 +1716,15 @@ const base = {
     amountPaid: zod_1.z.number(),
     totalCost: zod_1.z.number(),
 };
-exports.PaymentSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), order: zod_1.z.lazy(() => order_1.OrderSchema), change: zod_1.z.number() }, base));
+exports.NonCircularPaymentSchema = zod_1.z.object({
+    id: zod_1.z.string(),
+    type: zod_1.z.string(),
+    amountPaid: zod_1.z.number(),
+    totalCost: zod_1.z.number(),
+    change: zod_1.z.number(),
+    createdAt: zod_1.z.date(),
+});
+exports.PaymentSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), order: zod_1.z.lazy(() => order_1.OrderSchema), change: zod_1.z.number(), createdAt: zod_1.z.date() }, base));
 exports.CreatePaymentSchema = zod_1.z
     .object(Object.assign({ order: zod_1.z.string() }, base))
     .refine((obj) => obj.amountPaid >= obj.totalCost, {
@@ -2606,6 +2617,21 @@ let BaseRepository = class BaseRepository extends typeorm_1.Repository {
             };
         });
     }
+    get(where) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return this.modifyResult(yield this.findOne({
+                where,
+            }));
+        });
+    }
+    getWithRelations(where) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return this.modifyResult(yield this.findOne({
+                where,
+                relations: this.relations(),
+            }));
+        });
+    }
     getById(id) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return this.modifyResult(yield this.findOne({
@@ -2710,6 +2736,9 @@ const base_repository_1 = __webpack_require__("./src/app/core/base.repository.ts
 let BaseService = class BaseService {
     constructor(repository) {
         this.repository = repository;
+    }
+    get(where) {
+        return this.repository.getWithRelations(where);
     }
     getById(id) {
         return this.repository.getByIdWithRelations(id);
@@ -4075,6 +4104,9 @@ let ProductRepository = class ProductRepository extends core_1.BaseRepository {
     }
     modifyResult(item) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            if (!item) {
+                return null;
+            }
             return Object.assign(Object.assign({}, item), { categories: yield this.categoryRepository.getParentsByCategoryId(item.category.id) });
         });
     }
@@ -4217,6 +4249,9 @@ let StoreRepository = class StoreRepository extends core_1.BaseRepository {
     }
     modifyResult(item) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            if (!item) {
+                return null;
+            }
             const rating = yield this.storeRatingRepository.average('rating', {
                 storeId: item.id,
             });
@@ -4288,6 +4323,11 @@ const core_1 = __webpack_require__("./src/app/core/index.ts");
 let TagRepository = class TagRepository extends core_1.BaseRepository {
     constructor(dataSource) {
         super(entities_1.TagEntity, dataSource);
+    }
+    relations() {
+        return {
+            stores: true,
+        };
     }
     searchFields() {
         return ['title'];
@@ -5263,12 +5303,13 @@ const tslib_1 = __webpack_require__("tslib");
 const common_1 = __webpack_require__("@nestjs/common");
 const controllers_1 = __webpack_require__("./src/app/modules/category/controllers/index.ts");
 const services_1 = __webpack_require__("./src/app/modules/category/services/index.ts");
+const product_1 = __webpack_require__("./src/app/modules/product/index.ts");
 let CategoryModule = class CategoryModule {
 };
 CategoryModule = tslib_1.__decorate([
     (0, common_1.Module)({
         controllers: [controllers_1.CategoryController],
-        providers: [services_1.CategoryService],
+        providers: [services_1.CategoryService, product_1.ProductService],
     })
 ], CategoryModule);
 exports.CategoryModule = CategoryModule;
@@ -5280,7 +5321,7 @@ exports.CategoryModule = CategoryModule;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a;
+var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CategoryController = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -5290,10 +5331,12 @@ const global_1 = __webpack_require__("../../lib/global/src/index.ts");
 const guards_1 = __webpack_require__("./src/app/modules/auth/guards/index.ts");
 const auth_1 = __webpack_require__("./src/app/modules/auth/index.ts");
 const services_1 = __webpack_require__("./src/app/modules/category/services/index.ts");
+const product_1 = __webpack_require__("./src/app/modules/product/index.ts");
 const c = (0, nest_1.nestControllerContract)(global_1.contract.category);
 let CategoryController = class CategoryController {
-    constructor(categoryService) {
+    constructor(categoryService, productService) {
         this.categoryService = categoryService;
+        this.productService = productService;
     }
     create({ body }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -5325,6 +5368,18 @@ let CategoryController = class CategoryController {
     }
     delete({ params }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const subCategory = yield this.categoryService.get({
+                parent: { id: params.id },
+            });
+            if (subCategory) {
+                throw new common_1.ConflictException(`Category still has sub-category`);
+            }
+            const product = yield this.productService.get({
+                category: { id: params.id },
+            });
+            if (product) {
+                throw new common_1.ConflictException(`Category still linked to a product`);
+            }
             yield this.categoryService.delete(params.id);
             return { status: 204, body: '' };
         });
@@ -5375,7 +5430,7 @@ tslib_1.__decorate([
 ], CategoryController.prototype, "delete", null);
 CategoryController = tslib_1.__decorate([
     (0, common_1.Controller)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.CategoryService !== "undefined" && services_1.CategoryService) === "function" ? _a : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.CategoryService !== "undefined" && services_1.CategoryService) === "function" ? _a : Object, typeof (_b = typeof product_1.ProductService !== "undefined" && product_1.ProductService) === "function" ? _b : Object])
 ], CategoryController);
 exports.CategoryController = CategoryController;
 
@@ -5400,6 +5455,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/category/controllers
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/category/category.module.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/category/services/index.ts"), exports);
 
 
 /***/ }),
@@ -6625,6 +6681,7 @@ exports.ProductController = ProductController;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/product/product.module.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/product/services/index.ts"), exports);
 
 
 /***/ }),
@@ -7309,7 +7366,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/store/controllers/st
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f;
+var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StoreController = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -7322,11 +7379,13 @@ const services_1 = __webpack_require__("./src/app/modules/store/services/index.t
 const platform_express_1 = __webpack_require__("@nestjs/platform-express");
 const interceptors_1 = __webpack_require__("./src/app/interceptors/index.ts");
 const file_1 = __webpack_require__("./src/app/file/index.ts");
+const category_1 = __webpack_require__("./src/app/modules/category/index.ts");
 const c = (0, nest_1.nestControllerContract)(global_1.contract.store);
 let StoreController = class StoreController {
-    constructor(storeService, fileService) {
+    constructor(storeService, fileService, categoryService) {
         this.storeService = storeService;
         this.fileService = fileService;
+        this.categoryService = categoryService;
     }
     create({ body }, image) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -7371,6 +7430,12 @@ let StoreController = class StoreController {
     }
     delete({ params }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const category = yield this.categoryService.get({
+                store: { id: params.id },
+            });
+            if (category) {
+                throw new common_1.ConflictException(`Store still linked to a category`);
+            }
             yield this.storeService.delete(params.id);
             return { status: 204, body: '' };
         });
@@ -7383,7 +7448,7 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
     tslib_1.__param(1, (0, common_1.UploadedFile)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [Object, typeof (_d = typeof Express !== "undefined" && (_c = Express.Multer) !== void 0 && _c.File) === "function" ? _d : Object]),
+    tslib_1.__metadata("design:paramtypes", [Object, typeof (_e = typeof Express !== "undefined" && (_d = Express.Multer) !== void 0 && _d.File) === "function" ? _e : Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], StoreController.prototype, "create", null);
 tslib_1.__decorate([
@@ -7410,7 +7475,7 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
     tslib_1.__param(1, (0, common_1.UploadedFile)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [Object, typeof (_f = typeof Express !== "undefined" && (_e = Express.Multer) !== void 0 && _e.File) === "function" ? _f : Object]),
+    tslib_1.__metadata("design:paramtypes", [Object, typeof (_g = typeof Express !== "undefined" && (_f = Express.Multer) !== void 0 && _f.File) === "function" ? _g : Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], StoreController.prototype, "update", null);
 tslib_1.__decorate([
@@ -7424,7 +7489,7 @@ tslib_1.__decorate([
 StoreController = tslib_1.__decorate([
     (0, common_1.UseGuards)(guards_1.JwtAuthGuard, guards_1.PermissionGuard),
     (0, common_1.Controller)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.StoreService !== "undefined" && services_1.StoreService) === "function" ? _a : Object, typeof (_b = typeof file_1.FileService !== "undefined" && file_1.FileService) === "function" ? _b : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.StoreService !== "undefined" && services_1.StoreService) === "function" ? _a : Object, typeof (_b = typeof file_1.FileService !== "undefined" && file_1.FileService) === "function" ? _b : Object, typeof (_c = typeof category_1.CategoryService !== "undefined" && category_1.CategoryService) === "function" ? _c : Object])
 ], StoreController);
 exports.StoreController = StoreController;
 
@@ -7576,12 +7641,13 @@ const common_1 = __webpack_require__("@nestjs/common");
 const controllers_1 = __webpack_require__("./src/app/modules/store/controllers/index.ts");
 const services_1 = __webpack_require__("./src/app/modules/store/services/index.ts");
 const gateways_1 = __webpack_require__("./src/app/modules/store/gateways/index.ts");
+const category_1 = __webpack_require__("./src/app/modules/category/index.ts");
 let StoreModule = class StoreModule {
 };
 StoreModule = tslib_1.__decorate([
     (0, common_1.Module)({
         controllers: [controllers_1.StoreController],
-        providers: [services_1.StoreService, gateways_1.StoreGateway],
+        providers: [services_1.StoreService, gateways_1.StoreGateway, category_1.CategoryService],
     })
 ], StoreModule);
 exports.StoreModule = StoreModule;
@@ -7604,7 +7670,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/tag/controllers/tag.
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a;
+var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TagController = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -7613,10 +7679,12 @@ const common_1 = __webpack_require__("@nestjs/common");
 const global_1 = __webpack_require__("../../lib/global/src/index.ts");
 const guards_1 = __webpack_require__("./src/app/modules/auth/guards/index.ts");
 const services_1 = __webpack_require__("./src/app/modules/tag/services/index.ts");
+const store_1 = __webpack_require__("./src/app/modules/store/index.ts");
 const c = (0, nest_1.nestControllerContract)(global_1.contract.tag);
 let TagController = class TagController {
-    constructor(tagService) {
+    constructor(tagService, storeService) {
         this.tagService = tagService;
+        this.storeService = storeService;
     }
     create({ body }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -7647,6 +7715,10 @@ let TagController = class TagController {
     }
     delete({ params }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const store = yield this.storeService.get({ tags: { id: params.id } });
+            if (store) {
+                throw new common_1.ConflictException(`Tag still linked to a store`);
+            }
             yield this.tagService.delete(params.id);
             return { status: 204, body: '' };
         });
@@ -7691,7 +7763,7 @@ tslib_1.__decorate([
 TagController = tslib_1.__decorate([
     (0, common_1.UseGuards)(guards_1.JwtAuthGuard, guards_1.PermissionGuard),
     (0, common_1.Controller)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.TagService !== "undefined" && services_1.TagService) === "function" ? _a : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.TagService !== "undefined" && services_1.TagService) === "function" ? _a : Object, typeof (_b = typeof store_1.StoreService !== "undefined" && store_1.StoreService) === "function" ? _b : Object])
 ], TagController);
 exports.TagController = TagController;
 
@@ -7709,7 +7781,18 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/tag/tag.module.ts"),
 
 /***/ }),
 
-/***/ "./src/app/modules/tag/services/category.service.ts":
+/***/ "./src/app/modules/tag/services/index.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/tag/services/tag.service.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/app/modules/tag/services/tag.service.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -7735,17 +7818,6 @@ exports.TagService = TagService;
 
 /***/ }),
 
-/***/ "./src/app/modules/tag/services/index.ts":
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const tslib_1 = __webpack_require__("tslib");
-tslib_1.__exportStar(__webpack_require__("./src/app/modules/tag/services/category.service.ts"), exports);
-
-
-/***/ }),
-
 /***/ "./src/app/modules/tag/tag.module.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -7756,12 +7828,13 @@ const tslib_1 = __webpack_require__("tslib");
 const common_1 = __webpack_require__("@nestjs/common");
 const controllers_1 = __webpack_require__("./src/app/modules/tag/controllers/index.ts");
 const services_1 = __webpack_require__("./src/app/modules/tag/services/index.ts");
+const store_1 = __webpack_require__("./src/app/modules/store/index.ts");
 let TagModule = class TagModule {
 };
 TagModule = tslib_1.__decorate([
     (0, common_1.Module)({
         controllers: [controllers_1.TagController],
-        providers: [services_1.TagService],
+        providers: [services_1.TagService, store_1.StoreService],
     })
 ], TagModule);
 exports.TagModule = TagModule;

@@ -3,6 +3,7 @@ import {
   useTsQueryClient,
   usePagination,
   Breadcrumbs,
+  ConfirmDialog,
 } from '@/core';
 import { Box, Button, IconButton, Toolbar, Typography } from '@mui/material';
 import { Category, Store } from '@nx-monorepo-template/global';
@@ -16,7 +17,7 @@ export const CategoriesTablePartial = ({
   setBreadcrumbs,
   showChildren,
 }: {
-  store: Store;
+  store?: Store;
   breadcrumbs: Category[];
   setBreadcrumbs: Dispatch<SetStateAction<Category[]>>;
   showChildren?: (parent: Category) => void;
@@ -24,6 +25,7 @@ export const CategoriesTablePartial = ({
   const tsQueryClient = useTsQueryClient();
   const { page, perPage, setPage, setPerPage } = usePagination();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Category>();
   const parent = breadcrumbs?.[breadcrumbs.length - 1];
 
@@ -32,7 +34,8 @@ export const CategoriesTablePartial = ({
       ['getCategories', perPage, page, parent?.id],
       {
         query: {
-          store: store.id,
+          store: store?.id,
+          type: 'product',
           parent: parent?.id,
           isRoot: parent?.id ? undefined : true,
           perPage,
@@ -56,6 +59,7 @@ export const CategoriesTablePartial = ({
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 1,
+          backgroundColor: 'white',
         }}
       >
         <Breadcrumbs
@@ -101,15 +105,24 @@ export const CategoriesTablePartial = ({
             label: 'Description',
           },
           {
+            name: 'store',
+            label: 'Store',
+            display: !store,
+            render: (category) => {
+              return category.store?.title ?? 'None';
+            },
+          },
+          {
             name: 'children',
-            label: 'Children',
+            label: 'Sub Categories',
             render: (category) => {
               return (
                 <Typography
+                  color="primary"
                   onClick={() => showChildren?.(category)}
-                  sx={{ cursor: 'pointer' }}
+                  sx={{ cursor: 'pointer', textDecoration: 'underline' }}
                 >
-                  {category.children?.length ?? 0}
+                  {category.children?.length ?? 0}{' '}
                 </Typography>
               );
             },
@@ -134,12 +147,10 @@ export const CategoriesTablePartial = ({
                   </IconButton>
                   <IconButton
                     size="small"
-                    onClick={() =>
-                      deleteCategory({
-                        params: { id: category.id },
-                        body: {},
-                      })
-                    }
+                    onClick={() => {
+                      setSelectedItem(category);
+                      setConfirmDialogOpen(true);
+                    }}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -163,13 +174,37 @@ export const CategoriesTablePartial = ({
         onClose={() => setDialogOpen(false)}
         onSuccess={() => {
           refetchCategories();
+          setDialogOpen(false);
+        }}
+      />
+      <ConfirmDialog
+        title="Delete Category"
+        content="Are you sure to delete this category?"
+        successMessage="Category successfully deleted"
+        open={confirmDialogOpen}
+        onClose={() => {
+          setConfirmDialogOpen(false);
+        }}
+        onSubmit={(options) => {
+          if (selectedItem) {
+            deleteCategory(
+              {
+                params: { id: selectedItem.id },
+                body: {},
+              },
+              options
+            );
+          }
+        }}
+        onSuccess={() => {
+          setConfirmDialogOpen(false);
         }}
       />
     </>
   );
 };
 
-export const CategoriesTable = ({ store }: { store: Store }) => {
+export const CategoriesTable = ({ store }: { store?: Store }) => {
   const [breadcrumbs, setBreadcrumbs] = useState<Category[]>([]);
 
   return (

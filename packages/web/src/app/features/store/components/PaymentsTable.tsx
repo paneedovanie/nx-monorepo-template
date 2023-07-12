@@ -4,21 +4,23 @@ import {
   usePagination,
   formatCurrency,
 } from '@/core';
-import { Box, IconButton, TextField, Toolbar } from '@mui/material';
+import { Box, IconButton, TextField, Toolbar, Typography } from '@mui/material';
 import { Order, Store } from '@nx-monorepo-template/global';
 import { useNavigate } from 'react-router-dom';
 import { RemoveRedEye as EyeIcon } from '@mui/icons-material';
 import { BaseSyntheticEvent, useState } from 'react';
+import { format } from 'date-fns';
 
 export const PaymentsTable = ({ store }: { store: Store }) => {
   const tsQueryClient = useTsQueryClient();
   const navigate = useNavigate();
-  const { page, perPage, setPage, setPerPage } = usePagination();
+  const { page, perPage, order, setPage, setPerPage, setOrder } =
+    usePagination();
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
   const { data } = tsQueryClient.order.getAll.useQuery(
-    ['getPayments', perPage, page, startDate, endDate],
+    ['getPayments', perPage, page, startDate, endDate, order?.by, order?.dir],
     {
       query: {
         storeIds: [store.id],
@@ -27,6 +29,8 @@ export const PaymentsTable = ({ store }: { store: Store }) => {
         page,
         startDate,
         endDate,
+        orderBy: order?.by,
+        orderDir: order?.dir,
       },
     }
   );
@@ -79,6 +83,18 @@ export const PaymentsTable = ({ store }: { store: Store }) => {
             },
           },
           {
+            name: 'payment.createdAt',
+            label: 'Created At',
+            sortable: true,
+            render: ({ payment }) => {
+              return (
+                <Typography variant="caption">
+                  {format(new Date(payment.createdAt), 'MM-dd-Y hh:mm a')}
+                </Typography>
+              );
+            },
+          },
+          {
             name: 'actions',
             label: 'Actions',
             sx: {
@@ -104,6 +120,7 @@ export const PaymentsTable = ({ store }: { store: Store }) => {
         data={orders?.list}
         onPage={setPage}
         onPerPage={setPerPage}
+        onSort={setOrder}
       />
     </>
   );

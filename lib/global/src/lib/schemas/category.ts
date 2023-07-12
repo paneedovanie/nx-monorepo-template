@@ -3,6 +3,7 @@ import {
   PaginationOptionsSchema,
   PaginationResponseSchema,
 } from './pagination';
+import { NonCircularStoreSchema, StoreSchema } from './store';
 
 const base = {
   title: z.string(),

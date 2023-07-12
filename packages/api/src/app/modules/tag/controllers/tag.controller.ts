@@ -5,7 +5,7 @@ import {
   TsRest,
   TsRestRequest,
 } from '@ts-rest/nest';
-import { Controller, UseGuards } from '@nestjs/common';
+import { ConflictException, Controller, UseGuards } from '@nestjs/common';
 import { contract } from '@nx-monorepo-template/global';
 import {
   AllowUnauthorize,
@@ -13,6 +13,7 @@ import {
   PermissionGuard,
 } from '../../auth/guards';
 import { TagService } from '../services';
+import { StoreService } from '../../store';
 
 const c = nestControllerContract(contract.tag);
 type RequestShapes = NestRequestShapes<typeof c>;
@@ -20,7 +21,10 @@ type RequestShapes = NestRequestShapes<typeof c>;
 @UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller()
 export class TagController implements NestControllerInterface<typeof c> {
-  constructor(private readonly tagService: TagService) {}
+  constructor(
+    private readonly tagService: TagService,
+    private readonly storeService: StoreService
+  ) {}
 
   @TsRest(c.create)
   async create(@TsRestRequest() { body }: RequestShapes['create']) {
@@ -57,6 +61,12 @@ export class TagController implements NestControllerInterface<typeof c> {
 
   @TsRest(c.delete)
   async delete(@TsRestRequest() { params }: RequestShapes['delete']) {
+    const store = await this.storeService.get({ tags: { id: params.id } });
+
+    if (store) {
+      throw new ConflictException(`Tag still linked to a store`);
+    }
+
     await this.tagService.delete(params.id);
 
     return { status: 204 as const, body: '' };

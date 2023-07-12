@@ -6,6 +6,7 @@ import {
 import { StoreSchema } from './store';
 import { UserSchema } from './user';
 import { UnrestrictedSchema } from './unrestricted';
+import { NonCircularPaymentSchema } from './payment';
 
 export const OrderProductSchema = z.object({
   title: z.string(),
@@ -20,21 +21,12 @@ const base = {
   status: z.string(),
 };
 
-const OrderPaymentSchema = z.object({
-  id: z.string(),
-  // order: z.lazy(() => OrderSchema),
-  type: z.string(),
-  amountPaid: z.number(),
-  totalCost: z.number(),
-  change: z.number(),
-});
-
 export const OrderSchema = z.object({
   id: z.string(),
   ref: z.number(),
   store: StoreSchema,
   user: UserSchema.optional(),
-  payment: OrderPaymentSchema,
+  payment: NonCircularPaymentSchema,
   createdAt: z.date(),
   ...base,
 });

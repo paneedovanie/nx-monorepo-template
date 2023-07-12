@@ -6,8 +6,11 @@ import {
   CategorySchema,
   GetCategoriesOptionsSchema,
 } from '../schemas';
+import { Store } from './store';
 
-export type Category = z.infer<typeof CategorySchema>;
+export type Category = z.infer<typeof CategorySchema> & {
+  store?: Store;
+};
 
 export type CreateCategory = z.infer<typeof CreateCategorySchema>;
 

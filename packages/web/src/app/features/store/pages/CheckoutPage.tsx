@@ -139,6 +139,9 @@ export const Checkout = () => {
               mutate({ body: v }, options);
             }}
             successMessage="Order Created"
+            onCancel={() => {
+              navigate(`/stores/${params.id}`);
+            }}
           />
         </CardActions>
       </Card>

@@ -32,6 +32,9 @@ export class StoreRepository extends BaseRepository<
   }
 
   protected async modifyResult(item: StoreEntity): Promise<StoreEntity> {
+    if (!item) {
+      return null;
+    }
     const rating = await this.storeRatingRepository.average('rating', {
       storeId: item.id,
     });

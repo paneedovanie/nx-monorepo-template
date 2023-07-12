@@ -3,6 +3,7 @@ import {
   DataTable,
   useTsQueryClient,
   usePagination,
+  ConfirmDialog,
 } from '@/core';
 import {
   Box,
@@ -36,6 +37,7 @@ export const TagListPage = () => {
     }
   );
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Tag>();
 
   const { data, refetch: refetchTags } = tsQueryClient.tag.getAll.useQuery(
@@ -124,12 +126,10 @@ export const TagListPage = () => {
                     </IconButton>
                     <IconButton
                       size="small"
-                      onClick={() =>
-                        deleteTag({
-                          params: { id: tag.id },
-                          body: {},
-                        })
-                      }
+                      onClick={() => {
+                        setSelectedItem(tag);
+                        setConfirmDialogOpen(true);
+                      }}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -153,6 +153,29 @@ export const TagListPage = () => {
         onSuccess={() => {
           refetchTags();
           setSelectedItem(undefined);
+        }}
+      />
+      <ConfirmDialog
+        title="Delete Tag"
+        content="Are you sure to delete this tag?"
+        successMessage="Tag successfully deleted"
+        open={confirmDialogOpen}
+        onClose={() => {
+          setConfirmDialogOpen(false);
+        }}
+        onSubmit={(options) => {
+          if (selectedItem) {
+            deleteTag(
+              {
+                params: { id: selectedItem.id },
+                body: {},
+              },
+              options
+            );
+          }
+        }}
+        onSuccess={() => {
+          setConfirmDialogOpen(false);
         }}
       />
     </Container>

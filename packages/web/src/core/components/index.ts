@@ -8,3 +8,4 @@ export * from './allow';
 export * from './ratings';
 export * from './tags';
 export * from './qrcodes';
+export * from './dialogs';

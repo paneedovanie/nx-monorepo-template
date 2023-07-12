@@ -5,18 +5,22 @@ import {
   TsRest,
   TsRestRequest,
 } from '@ts-rest/nest';
-import { Controller, UseGuards } from '@nestjs/common';
+import { ConflictException, Controller, UseGuards } from '@nestjs/common';
 import { contract, RolePermission } from '@nx-monorepo-template/global';
 import { JwtAuthGuard, PermissionGuard } from '../../auth/guards';
 import { Permissions } from '../../auth';
 import { CategoryService } from '../services';
+import { ProductService } from '../../product';
 
 const c = nestControllerContract(contract.category);
 type RequestShapes = NestRequestShapes<typeof c>;
 
 @Controller()
 export class CategoryController implements NestControllerInterface<typeof c> {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+    private readonly productService: ProductService
+  ) {}
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(RolePermission.CategoryCreate)
@@ -61,6 +65,22 @@ export class CategoryController implements NestControllerInterface<typeof c> {
   @Permissions(RolePermission.CategoryDelete)
   @TsRest(c.delete)
   async delete(@TsRestRequest() { params }: RequestShapes['delete']) {
+    const subCategory = await this.categoryService.get({
+      parent: { id: params.id },
+    });
+
+    if (subCategory) {
+      throw new ConflictException(`Category still has sub-category`);
+    }
+
+    const product = await this.productService.get({
+      category: { id: params.id },
+    });
+
+    if (product) {
+      throw new ConflictException(`Category still linked to a product`);
+    }
+
     await this.categoryService.delete(params.id);
 
     return { status: 204 as const, body: '' };

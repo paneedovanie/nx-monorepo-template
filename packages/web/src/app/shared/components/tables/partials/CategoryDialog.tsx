@@ -20,7 +20,7 @@ export const CategoryDialog = ({
   onSuccess,
 }: {
   data?: Category;
-  store: Store;
+  store?: Store;
   parent?: Category;
   open: boolean;
   onClose: () => void;

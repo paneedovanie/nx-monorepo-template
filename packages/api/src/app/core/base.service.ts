@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectLiteral } from 'typeorm';
+import { FindOptionsWhere, ObjectLiteral } from 'typeorm';
 import { BaseRepository } from './base.repository';
 import { PaginationOptions } from '@nx-monorepo-template/global';
 
@@ -11,6 +11,12 @@ export class BaseService<
   F = PaginationOptions
 > {
   constructor(protected readonly repository: BaseRepository<Entity>) {}
+
+  get(
+    where: FindOptionsWhere<Entity> | FindOptionsWhere<Entity>[]
+  ): Promise<Entity> {
+    return this.repository.getWithRelations(where);
+  }
 
   getById(id: string): Promise<Entity> {
     return this.repository.getByIdWithRelations(id);

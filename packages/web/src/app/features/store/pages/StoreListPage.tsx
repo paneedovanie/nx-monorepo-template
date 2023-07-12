@@ -4,6 +4,7 @@ import {
   useTsQueryClient,
   usePagination,
   Allow,
+  ConfirmDialog,
 } from '@/core';
 import {
   Box,
@@ -13,7 +14,6 @@ import {
   Checkbox,
   IconButton,
   Typography,
-  colors,
 } from '@mui/material';
 import {
   RemoveRedEye as EyeIcon,
@@ -44,7 +44,8 @@ export const StoreListPage = () => {
     }
   );
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedItem] = useState<Store>();
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<Store>();
   const [unrestricted, setUnrestricted] = useState(false);
 
   const { data, refetch: refetchStores } = tsQueryClient.store.getAll.useQuery(
@@ -168,9 +169,10 @@ export const StoreListPage = () => {
                     </IconButton>
                     <IconButton
                       size="small"
-                      onClick={() =>
-                        deleteStore({ params: { id: store.id }, body: {} })
-                      }
+                      onClick={() => {
+                        setSelectedItem(store);
+                        setConfirmDialogOpen(true);
+                      }}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -193,6 +195,29 @@ export const StoreListPage = () => {
         onClose={() => setDialogOpen(false)}
         onSuccess={() => {
           refetchStores();
+        }}
+      />
+      <ConfirmDialog
+        title="Delete Store"
+        content="Are you sure to delete this store?"
+        successMessage="Store successfully deleted"
+        open={confirmDialogOpen}
+        onClose={() => {
+          setConfirmDialogOpen(false);
+        }}
+        onSubmit={(options) => {
+          if (selectedItem) {
+            deleteStore(
+              {
+                params: { id: selectedItem.id },
+                body: {},
+              },
+              options
+            );
+          }
+        }}
+        onSuccess={() => {
+          setConfirmDialogOpen(false);
         }}
       />
     </Container>

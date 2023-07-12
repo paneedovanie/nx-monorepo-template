@@ -3,6 +3,7 @@ import {
   useTsQueryClient,
   usePagination,
   formatCurrency,
+  ConfirmDialog,
 } from '@/core';
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import { Product, Store, generateColor } from '@nx-monorepo-template/global';
@@ -18,6 +19,7 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
   const tsQueryClient = useTsQueryClient();
   const { page, perPage, setPage, setPerPage } = usePagination();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Product>();
 
   const { data, refetch: refetchProducts } =
@@ -134,9 +136,10 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
                   </IconButton>
                   <IconButton
                     size="small"
-                    onClick={() =>
-                      deleteProduct({ params: { id: product.id }, body: {} })
-                    }
+                    onClick={() => {
+                      setSelectedItem(product);
+                      setConfirmDialogOpen(true);
+                    }}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -160,6 +163,29 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
         onClose={() => setDialogOpen(false)}
         onSuccess={() => {
           refetchProducts();
+        }}
+      />
+      <ConfirmDialog
+        title="Delete Product"
+        content="Are you sure to delete this product?"
+        successMessage="Product successfully deleted"
+        open={confirmDialogOpen}
+        onClose={() => {
+          setConfirmDialogOpen(false);
+        }}
+        onSubmit={(options) => {
+          if (selectedItem) {
+            deleteProduct(
+              {
+                params: { id: selectedItem.id },
+                body: {},
+              },
+              options
+            );
+          }
+        }}
+        onSuccess={() => {
+          setConfirmDialogOpen(false);
         }}
       />
     </>

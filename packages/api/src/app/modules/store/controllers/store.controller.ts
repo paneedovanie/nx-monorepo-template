@@ -6,6 +6,7 @@ import {
   TsRestRequest,
 } from '@ts-rest/nest';
 import {
+  ConflictException,
   Controller,
   Request,
   UploadedFile,
@@ -28,6 +29,7 @@ import { StoreService } from '../services';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ParseBodyInterceptor } from '../../../interceptors';
 import { FileService } from '../../../file';
+import { CategoryService } from '../../category';
 
 const c = nestControllerContract(contract.store);
 type RequestShapes = NestRequestShapes<typeof c>;
@@ -37,7 +39,8 @@ type RequestShapes = NestRequestShapes<typeof c>;
 export class StoreController implements NestControllerInterface<typeof c> {
   constructor(
     private readonly storeService: StoreService,
-    private readonly fileService: FileService
+    private readonly fileService: FileService,
+    private readonly categoryService: CategoryService
   ) {}
   @Permissions(RolePermission.StoreCreate)
   @UseInterceptors(FileInterceptor('image'), ParseBodyInterceptor)
@@ -112,6 +115,14 @@ export class StoreController implements NestControllerInterface<typeof c> {
   @Permissions(RolePermission.StoreDelete)
   @TsRest(c.delete)
   async delete(@TsRestRequest() { params }: RequestShapes['delete']) {
+    const category = await this.categoryService.get({
+      store: { id: params.id },
+    });
+
+    if (category) {
+      throw new ConflictException(`Store still linked to a category`);
+    }
+
     await this.storeService.delete(params.id);
 
     return { status: 204 as const, body: '' };

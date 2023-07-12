@@ -127,6 +127,27 @@ export class BaseRepository<
     };
   }
 
+  async get(
+    where: FindOptionsWhere<Entity> | FindOptionsWhere<Entity>[]
+  ): Promise<Entity> {
+    return this.modifyResult(
+      await this.findOne({
+        where,
+      })
+    );
+  }
+
+  async getWithRelations(
+    where: FindOptionsWhere<Entity> | FindOptionsWhere<Entity>[]
+  ): Promise<Entity> {
+    return this.modifyResult(
+      await this.findOne({
+        where,
+        relations: this.relations(),
+      })
+    );
+  }
+
   async getById(id: string): Promise<Entity> {
     return this.modifyResult(
       await this.findOne({

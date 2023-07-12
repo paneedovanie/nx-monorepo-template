@@ -38,6 +38,7 @@ export const TopBar = ({
   const location = useLocation();
   const [openSidebar, setOpenSidebar] = useState(true);
   const { checkPermission } = useAuthContext();
+  const storeId = localStorage.getItem('storeId');
 
   const toggleSidebar = () => {
     setOpenSidebar(!openSidebar);
@@ -45,7 +46,7 @@ export const TopBar = ({
 
   return (
     <>
-      <AppBar position="sticky" sx={{ zIndex: 1300 }}>
+      <AppBar position="sticky" sx={{ zIndex: 1300 }} elevation={0}>
         <Toolbar>
           {location.pathname.substring(0, 7) === '/manage' && (
             <IconButton
@@ -71,7 +72,11 @@ export const TopBar = ({
                 width: [150, 'auto'],
               }}
               onClick={() => {
-                navigate('/');
+                if (!user && !!storeId) {
+                  navigate(`/stores/${storeId}`);
+                } else {
+                  navigate('/');
+                }
               }}
             >
               {app.title}
@@ -101,7 +106,11 @@ export const TopBar = ({
               component="div"
               sx={{ flexGrow: 1, cursor: 'pointer' }}
               onClick={() => {
-                navigate('/');
+                if (!user && !!storeId) {
+                  navigate(`/stores/${storeId}`);
+                } else {
+                  navigate('/');
+                }
               }}
             >
               {app.title}
