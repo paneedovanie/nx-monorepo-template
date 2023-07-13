@@ -7,24 +7,25 @@ import {
   usePagination,
   formatCurrency,
   Loading,
+  TopBar,
 } from '@/core';
-import { Card, CardActions, CardContent, Typography } from '@mui/material';
+import { Box, Card, CardActions, CardContent, Typography } from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { CreateOrder, Order, Product } from '@nx-monorepo-template/global';
 import { CreateOrderSchema } from '@nx-monorepo-template/global';
 
-const Container = styled.div`
+const Container = styled(Box)`
   padding: ${({ theme }) => theme.padding.md};
 `;
 
-export const Checkout = () => {
+export const CheckoutPage = () => {
   const tsQueryClient = useTsQueryClient();
   const { user } = useAuthContext();
   const params = useParams();
   const navigate = useNavigate();
-  const { cart, length } = useCartContext();
+  const { store, cart, length } = useCartContext();
   const { page, perPage } = usePagination();
 
   const { data, isFetching } = tsQueryClient.product.getAll.useQuery(
@@ -32,7 +33,7 @@ export const Checkout = () => {
     {
       query: {
         ids: Object.keys(cart) ?? [],
-        store: params.id,
+        store: store?.id,
         perPage,
         page,
       },
@@ -47,7 +48,7 @@ export const Checkout = () => {
       if (user) {
         navigate(`/manage/orders/${v.body.id}`);
       } else {
-        navigate(`/stores/${params.id}/orders/${v.body.id}`);
+        navigate(`/stores/${store?.id}/orders/${v.body.id}`);
       }
     },
   });
@@ -65,86 +66,94 @@ export const Checkout = () => {
 
   useEffect(() => {
     if (!length) {
-      navigate(`/stores/${params.id}`);
+      navigate(`/stores/${params.storeId}`);
     }
-  }, [params.id, length, navigate]);
+  }, [params.storeId, length, navigate]);
 
   if (isFetching) {
     return <Loading />;
   }
 
+  if (!store) {
+    navigate(`/stores/${params.storeId}`);
+    return null;
+  }
+
   return (
-    <Container>
-      <Card sx={{ mb: 1 }}>
-        <CardContent>
-          <Typography variant="h4">Checkout</Typography>
-        </CardContent>
+    <>
+      <TopBar store={store} />
+      <Container component="main">
+        <Card sx={{ mb: 1 }}>
+          <CardContent>
+            <Typography variant="h4">Checkout</Typography>
+          </CardContent>
 
-        <DataTable<Product>
-          columns={[
-            {
-              name: 'title',
-              label: 'Title',
-            },
-            {
-              name: 'price',
-              label: 'Unit Price',
-              render: ({ price }) => {
-                return formatCurrency(price);
+          <DataTable<Product>
+            columns={[
+              {
+                name: 'title',
+                label: 'Title',
               },
-            },
-            {
-              name: 'count',
-              label: 'Quantity',
-              render: ({ id }) => {
-                return cart[id];
+              {
+                name: 'price',
+                label: 'Unit Price',
+                render: ({ price }) => {
+                  return formatCurrency(price);
+                },
               },
-            },
-            {
-              name: 'totalPrice',
-              label: 'Price',
-              render: ({ id, price }) => {
-                return formatCurrency(price * cart[id]);
+              {
+                name: 'count',
+                label: 'Quantity',
+                render: ({ id }) => {
+                  return cart[id];
+                },
               },
-            },
-          ]}
-          data={products?.list}
-          pagination={false}
-        />
-
-        <CardContent>
-          <Typography variant="h6">
-            Total Cost: {formatCurrency(totalCost)}
-          </Typography>
-        </CardContent>
-        <CardActions>
-          <FormGenerator<Order, CreateOrder>
-            initialValues={{
-              items:
-                products?.list.map(
-                  ({ id, title, description, price }: Product) => ({
-                    title,
-                    description,
-                    price,
-                    count: cart[id],
-                  })
-                ) ?? [],
-              user: user?.id,
-              store: params.id as string,
-              status: 'pending',
-            }}
-            defaultEnableSubmit
-            schema={CreateOrderSchema}
-            onSubmit={(v, options) => {
-              mutate({ body: v }, options);
-            }}
-            successMessage="Order Created"
-            onCancel={() => {
-              navigate(`/stores/${params.id}`);
-            }}
+              {
+                name: 'totalPrice',
+                label: 'Price',
+                render: ({ id, price }) => {
+                  return formatCurrency(price * cart[id]);
+                },
+              },
+            ]}
+            data={products?.list}
+            pagination={false}
           />
-        </CardActions>
-      </Card>
-    </Container>
+
+          <CardContent>
+            <Typography variant="h6">
+              Total Cost: {formatCurrency(totalCost)}
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <FormGenerator<Order, CreateOrder>
+              initialValues={{
+                items:
+                  products?.list.map(
+                    ({ id, title, description, price }: Product) => ({
+                      title,
+                      description,
+                      price,
+                      count: cart[id],
+                    })
+                  ) ?? [],
+                user: user?.id,
+                store: store.id,
+                status: 'pending',
+              }}
+              defaultEnableSubmit
+              schema={CreateOrderSchema}
+              onSubmit={(v, options) => {
+                mutate({ body: v }, options);
+              }}
+              successMessage="Order Created"
+              onCancel={() => {
+                navigate(`/stores/${store.id}`);
+              }}
+            />
+          </CardActions>
+        </Card>
+      </Container>
+    </>
   );
 };

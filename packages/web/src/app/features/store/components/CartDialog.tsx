@@ -1,7 +1,6 @@
 import {
   DataTable,
   useTsQueryClient,
-  useAuthContext,
   useCartContext,
   usePagination,
   formatCurrency,
@@ -10,7 +9,6 @@ import {
   Badge,
   Box,
   Button,
-  CardContent,
   Dialog,
   DialogActions,
   DialogTitle,
@@ -25,14 +23,12 @@ import {
   ShoppingCart as ShoppingCartIcon,
 } from '@mui/icons-material';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-export const CartDialog = ({ storeId }: { storeId: string }) => {
+export const CartDialog = () => {
   const tsQueryClient = useTsQueryClient();
-  const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuthContext();
-  const { cart, length, add, minus, remove, clear } = useCartContext();
+  const { store, cart, length, add, minus, remove, clear } = useCartContext();
   const { page, perPage, setPerPage, setPage } = usePagination();
   const [open, setOpen] = useState(false);
 
@@ -41,7 +37,7 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
     {
       query: {
         ids: Object.keys(cart) ?? [],
-        store: storeId,
+        store: store?.id,
         perPage: -1,
         page,
       },
@@ -69,18 +65,16 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
       <Dialog
         open={open}
         onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        PaperProps={{ sx: { borderRadius: 4, maxWidth: 750, width: '100%' } }}
       >
         <DialogTitle
-          id="alert-dialog-title"
           sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}
         >
-          <Typography>Shopping Cart</Typography>
+          <Typography variant="h5">Shopping Cart</Typography>
           <Button color="warning" onClick={clear}>
             Clear
           </Button>
@@ -91,10 +85,6 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
             {
               name: 'title',
               label: 'Title',
-            },
-            {
-              name: 'description',
-              label: 'Description',
             },
             {
               name: 'count',
@@ -164,7 +154,7 @@ export const CartDialog = ({ storeId }: { storeId: string }) => {
           </Button>
           <Button
             variant="contained"
-            onClick={() => navigate(`/stores/${id}/checkout`)}
+            onClick={() => navigate(`/stores/${store?.id}/checkout`)}
             autoFocus
             disabled={!length}
           >

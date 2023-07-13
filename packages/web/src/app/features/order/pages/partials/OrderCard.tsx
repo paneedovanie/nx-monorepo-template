@@ -13,14 +13,12 @@ import {
   CardActions,
   CardContent,
   Chip,
-  Dialog,
-  DialogActions,
   Divider,
   Grid,
   Typography,
 } from '@mui/material';
-import { OrderProduct, generateQrcode } from '@nx-monorepo-template/global';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { OrderProduct } from '@nx-monorepo-template/global';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Inventory as InventoryIcon } from '@mui/icons-material';
 import { BillDialog, PayDialog, StatusDialog } from '../../components';
@@ -34,9 +32,9 @@ export const OrderCard = () => {
   const { user } = useAuthContext();
 
   const { data, isFetching, refetch } = tsQueryClient.order.get.useQuery(
-    ['getOrder', params.id],
+    ['getOrder', params.orderId],
     {
-      params: { id: params.id as string },
+      params: { id: params.orderId as string },
     }
   );
 

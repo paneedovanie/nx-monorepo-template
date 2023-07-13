@@ -1,6 +1,11 @@
+import { useTsQueryClient } from '@/core/plugins';
+import { Store } from '@nx-monorepo-template/global';
 import { ReactNode, createContext, useContext, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 export const CartContext = createContext<{
+  store?: Store;
+  isFetchingStore: boolean;
   cart: Record<string, number>;
   length: number;
   add: (id: string) => void;
@@ -9,6 +14,7 @@ export const CartContext = createContext<{
   remove: (id: string) => void;
   clear: () => void;
 }>({
+  isFetchingStore: false,
   cart: {},
   length: 0,
   add: (id: string) => {
@@ -29,7 +35,24 @@ export const CartContext = createContext<{
 });
 
 export const CartContextProvider = ({ children }: { children: ReactNode }) => {
+  const tsQueryClient = useTsQueryClient();
+  const { storeId } = useParams();
+  const [store, setStore] = useState<Store>();
   const [cart, setCart] = useState<Record<string, number>>({});
+
+  const { isFetching: isFetchingStore } = tsQueryClient.store.get.useQuery(
+    ['getStore', storeId],
+    {
+      params: { id: storeId ?? '' },
+    },
+    {
+      enabled: !!storeId,
+      onSuccess: (data) => {
+        setStore(data.body);
+      },
+    }
+  );
+
   const add = (id: string) => {
     let count = 1;
     if (cart[id] !== undefined) {
@@ -73,6 +96,8 @@ export const CartContextProvider = ({ children }: { children: ReactNode }) => {
   return (
     <CartContext.Provider
       value={{
+        store,
+        isFetchingStore,
         cart,
         length: Object.keys(cart).length,
         add,

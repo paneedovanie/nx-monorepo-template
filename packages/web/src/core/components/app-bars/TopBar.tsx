@@ -17,14 +17,16 @@ import { Menu as MenuIcon } from '@mui/icons-material';
 import { ReactNode, useState } from 'react';
 import { useMedia } from '@/core';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { RolePermission, app } from '@nx-monorepo-template/global';
+import { RolePermission, Store, app } from '@nx-monorepo-template/global';
 import { AccountSettings, Notifications } from './partials';
 
 export const TopBar = ({
-  drawerWidth,
+  store,
+  drawerWidth = 250,
   items,
 }: {
-  drawerWidth: number;
+  store?: Store;
+  drawerWidth?: number;
   items?: {
     icon: ReactNode;
     label: string;
@@ -38,7 +40,6 @@ export const TopBar = ({
   const location = useLocation();
   const [openSidebar, setOpenSidebar] = useState(true);
   const { checkPermission } = useAuthContext();
-  const storeId = localStorage.getItem('storeId');
 
   const toggleSidebar = () => {
     setOpenSidebar(!openSidebar);
@@ -72,14 +73,14 @@ export const TopBar = ({
                 width: [150, 'auto'],
               }}
               onClick={() => {
-                if (!user && !!storeId) {
-                  navigate(`/stores/${storeId}`);
+                if (!user && !!store) {
+                  navigate(`/stores/${store.id}`);
                 } else {
                   navigate('/');
                 }
               }}
             >
-              {app.title}
+              {store ? store.title : app.title}
             </Typography>
           </Box>
           <div>
@@ -106,8 +107,8 @@ export const TopBar = ({
               component="div"
               sx={{ flexGrow: 1, cursor: 'pointer' }}
               onClick={() => {
-                if (!user && !!storeId) {
-                  navigate(`/stores/${storeId}`);
+                if (!user && !!store) {
+                  navigate(`/stores/${store.id}`);
                 } else {
                   navigate('/');
                 }

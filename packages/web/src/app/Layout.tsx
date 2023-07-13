@@ -11,6 +11,7 @@ import {
   RoleRoutes,
   NotificationRoutes,
   TagRoutes,
+  StorePublicRoutes,
 } from '@/app/features';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Loading, TopBar, useAuthContext } from '@/core';
@@ -59,6 +60,7 @@ export const Layout = () => {
           )
         }
       />
+      <Route path="/stores/:storeId/*" element={<StorePublicRoutes />} />
       <Route
         path="/*"
         element={
