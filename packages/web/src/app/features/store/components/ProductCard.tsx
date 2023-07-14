@@ -242,7 +242,7 @@ export const ProductCard = ({ data }: { data: Product }) => {
               setCount(0);
             }}
           >
-            Add to cart
+            Add to Cart
           </Button>
         </DialogActions>
       </Dialog>
