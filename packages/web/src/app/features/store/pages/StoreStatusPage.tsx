@@ -13,7 +13,7 @@ const Container = styled.div`
 export const StoreStatusPage = () => {
   const socketRef = useRef<Socket>();
   const params = useParams();
-  const storeId = params.id as string;
+  const storeId = params.storeId as string;
   const [preparing, setPreparing] = useState<Order[]>([]);
   const [ready, setReady] = useState<Order[]>([]);
 
