@@ -19,6 +19,8 @@ import {
   Typography,
   Dialog,
   DialogContent,
+  DialogActions,
+  Button,
 } from '@mui/material';
 import { Category, Product, generateColor } from '@nx-monorepo-template/global';
 import { ChangeEvent, useState } from 'react';
@@ -37,6 +39,7 @@ const NumberField = styled(TextField)`
 export const ProductCard = ({ data }: { data: Product }) => {
   const [open, setOpen] = useState(false);
   const { cart, add, minus, set, remove } = useCartContext();
+  const [count, setCount] = useState(0);
 
   const handleOpen = () => {
     setOpen(true);
@@ -183,20 +186,20 @@ export const ProductCard = ({ data }: { data: Product }) => {
             <Box>
               <Typography variant="caption">Count:</Typography>
               <Typography fontWeight={600} fontSize={18}>
-                {cart[data.id] ?? 0}
+                {count}
               </Typography>
             </Box>
             <Box>
               <Typography variant="caption">Total Price:</Typography>
               <Typography fontWeight={600} fontSize={18}>
-                {formatCurrency((cart[data.id] ?? 0) * data.price)}
+                {formatCurrency(count * data.price)}
               </Typography>
             </Box>
           </Box>
           <Box>
             <IconButton
               onClick={() => {
-                add(data.id);
+                setCount(count + 1);
               }}
             >
               <AddIcon />
@@ -204,33 +207,43 @@ export const ProductCard = ({ data }: { data: Product }) => {
             <NumberField
               type="number"
               size="small"
-              value={cart[data.id] ?? 0}
+              value={count}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                if (+e.target.value === 0) {
-                  remove(data.id);
-                  return;
-                }
-                set(data.id, +e.target.value);
+                setCount(+e.target.value);
               }}
             />
             <IconButton
-              disabled={!cart[data.id]}
+              disabled={!count}
               onClick={() => {
-                minus(data.id);
+                setCount(count - 1);
               }}
             >
               <RemoveIcon />
             </IconButton>
             <IconButton
-              disabled={!cart[data.id]}
+              disabled={!count}
               onClick={() => {
-                remove(data.id);
+                setCount(0);
               }}
             >
               <DeleteIcon />
             </IconButton>
           </Box>
         </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ width: 150, mx: ['auto', 'unset'] }}
+            onClick={() => {
+              set(data.id, (cart[data.id] ?? 0) + count);
+              setOpen(false);
+              setCount(0);
+            }}
+          >
+            Add to cart
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );

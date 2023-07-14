@@ -151,19 +151,19 @@ export const CartDialog = () => {
 
         <DialogActions
           sx={{
-            display: ['flex', 'block'],
+            display: 'flex',
           }}
         >
           <Button
             variant="contained"
-            sx={{ flex: 1 }}
+            sx={{ flex: [1, 'unset'], minWidth: 120 }}
             onClick={handleClose}
             color="secondary"
           >
             Close
           </Button>
           <Button
-            sx={{ flex: 1 }}
+            sx={{ flex: [1, 'unset'], minWidth: 120 }}
             variant="contained"
             onClick={() => navigate(`/stores/${store?.id}/checkout`)}
             disabled={!length}
