@@ -292,8 +292,11 @@ export const FormGenerator = <R, I extends FormikValues = any>({
   }, [values, onChange]);
 
   return (
-    <form onSubmit={handleSubmit}>
-      <fieldset style={{ border: 0, padding: 0 }} disabled={isSubmitting}>
+    <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+      <fieldset
+        style={{ border: 0, padding: 0, width: '100%' }}
+        disabled={isSubmitting}
+      >
         {items?.map((item, i) => {
           const key = item.name as keyof FormikErrors<I>;
           return (
@@ -310,30 +313,30 @@ export const FormGenerator = <R, I extends FormikValues = any>({
         })}
 
         <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
-          <>
-            {onCancel ? (
-              <Button
-                color="secondary"
-                variant="contained"
-                onClick={() => {
-                  resetForm();
-                  onCancel?.();
-                }}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-            ) : null}
+          {onCancel ? (
             <Button
-              type="submit"
+              sx={{ flex: [1, 'unset'] }}
+              color="secondary"
               variant="contained"
-              disabled={
-                (!dirty && !defaultEnableSubmit) || !isValid || isSubmitting
-              }
+              onClick={() => {
+                resetForm();
+                onCancel?.();
+              }}
+              disabled={isSubmitting}
             >
-              Submit
+              Cancel
             </Button>
-          </>
+          ) : null}
+          <Button
+            sx={{ flex: [1, 'unset'] }}
+            type="submit"
+            variant="contained"
+            disabled={
+              (!dirty && !defaultEnableSubmit) || !isValid || isSubmitting
+            }
+          >
+            Submit
+          </Button>
         </Box>
       </fieldset>
     </form>
