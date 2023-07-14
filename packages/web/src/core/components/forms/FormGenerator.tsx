@@ -312,10 +312,10 @@ export const FormGenerator = <R, I extends FormikValues = any>({
           );
         })}
 
-        <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
+        <Box sx={{ mb: 1, display: 'flex', gap: 1, justifyContent: 'end' }}>
           {onCancel ? (
             <Button
-              sx={{ flex: [1, 'unset'] }}
+              sx={{ flex: [1, 'unset'], minWidth: 120 }}
               color="secondary"
               variant="contained"
               onClick={() => {
@@ -328,7 +328,7 @@ export const FormGenerator = <R, I extends FormikValues = any>({
             </Button>
           ) : null}
           <Button
-            sx={{ flex: [1, 'unset'] }}
+            sx={{ flex: [1, 'unset'], minWidth: 120 }}
             type="submit"
             variant="contained"
             disabled={

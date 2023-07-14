@@ -232,6 +232,7 @@ export const ProductCard = ({ data }: { data: Product }) => {
         </DialogContent>
         <DialogActions>
           <Button
+            disabled={!count}
             variant="contained"
             color="primary"
             sx={{ width: 150, mx: ['auto', 'unset'] }}
