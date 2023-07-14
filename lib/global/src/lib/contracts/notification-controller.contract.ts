@@ -21,6 +21,9 @@ export const notification = initContract().router({
   get: {
     method: 'GET',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     responses: {
       200: NotificationSchema,
     },
@@ -38,6 +41,9 @@ export const notification = initContract().router({
   delete: {
     method: 'DELETE',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: z.any().optional(),
     responses: {
       204: z.any().optional(),
@@ -47,6 +53,9 @@ export const notification = initContract().router({
   read: {
     method: 'PATCH',
     path: `${prefix}/:id/read`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: z.any().optional(),
     responses: {
       201: z.any().optional(),

@@ -33,14 +33,14 @@ export const OrderCard = () => {
   const { user } = useAuthContext();
 
   const { data, isFetching, refetch } = tsQueryClient.order.get.useQuery(
-    ['getOrder', params.id],
+    ['getOrder', params.orderId],
     {
-      params: { id: params.id as string },
+      params: { id: params.orderId as string },
     }
   );
 
   const order = data?.body;
-  const isCustomer = order?.user.id === user?.id;
+  const isCustomer = order?.user?.id === user?.id;
 
   const totalCost = useMemo(() => {
     let total = 0;

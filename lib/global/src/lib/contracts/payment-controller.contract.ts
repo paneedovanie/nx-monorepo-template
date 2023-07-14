@@ -4,7 +4,6 @@ import {
   CreatePaymentSchema,
   GetPaymentsOptionsSchema,
   GetPaymentsResponseSchema,
-  PaginationOptionsSchema,
   UpdatePaymentSchema,
 } from '../schemas';
 import { z } from 'zod';
@@ -24,6 +23,9 @@ export const payment = initContract().router({
   get: {
     method: 'GET',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     responses: {
       200: PaymentSchema,
     },
@@ -41,6 +43,9 @@ export const payment = initContract().router({
   update: {
     method: 'PATCH',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: UpdatePaymentSchema,
     responses: {
       201: PaymentSchema,
@@ -50,6 +55,9 @@ export const payment = initContract().router({
   delete: {
     method: 'DELETE',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: z.any().optional(),
     responses: {
       204: z.any().optional(),

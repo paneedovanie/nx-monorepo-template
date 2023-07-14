@@ -23,6 +23,9 @@ export const tag = initContract().router({
   get: {
     method: 'GET',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     responses: {
       200: TagSchema,
     },
@@ -40,6 +43,9 @@ export const tag = initContract().router({
   update: {
     method: 'PATCH',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: UpdateTagSchema,
     responses: {
       201: TagSchema,
@@ -49,6 +55,9 @@ export const tag = initContract().router({
   delete: {
     method: 'DELETE',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: z.any().optional(),
     responses: {
       204: z.any().optional(),

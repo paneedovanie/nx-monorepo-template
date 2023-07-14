@@ -119,6 +119,9 @@ exports.category = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.CategorySchema,
         },
@@ -136,6 +139,9 @@ exports.category = (0, core_1.initContract)().router({
     update: {
         method: 'PATCH',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: schemas_1.UpdateCategorySchema,
         responses: {
             201: schemas_1.CategorySchema,
@@ -145,6 +151,9 @@ exports.category = (0, core_1.initContract)().router({
     delete: {
         method: 'DELETE',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             204: zod_1.z.any().optional(),
@@ -219,6 +228,9 @@ exports.notification = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.NotificationSchema,
         },
@@ -236,6 +248,9 @@ exports.notification = (0, core_1.initContract)().router({
     delete: {
         method: 'DELETE',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             204: zod_1.z.any().optional(),
@@ -245,6 +260,9 @@ exports.notification = (0, core_1.initContract)().router({
     read: {
         method: 'PATCH',
         path: `${prefix}/:id/read`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             201: zod_1.z.any().optional(),
@@ -288,6 +306,9 @@ exports.order = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.OrderSchema,
         },
@@ -305,6 +326,9 @@ exports.order = (0, core_1.initContract)().router({
     update: {
         method: 'PATCH',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         query: schemas_1.UnrestrictedSchema,
         body: schemas_1.UpdateOrderSchema,
         responses: {
@@ -315,6 +339,9 @@ exports.order = (0, core_1.initContract)().router({
     delete: {
         method: 'DELETE',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             204: zod_1.z.any().optional(),
@@ -349,6 +376,9 @@ exports.payment = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.PaymentSchema,
         },
@@ -366,6 +396,9 @@ exports.payment = (0, core_1.initContract)().router({
     update: {
         method: 'PATCH',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: schemas_1.UpdatePaymentSchema,
         responses: {
             201: schemas_1.PaymentSchema,
@@ -375,6 +408,9 @@ exports.payment = (0, core_1.initContract)().router({
     delete: {
         method: 'DELETE',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             204: zod_1.z.any().optional(),
@@ -394,11 +430,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.permission = void 0;
 const core_1 = __webpack_require__("@ts-rest/core");
 const schemas_1 = __webpack_require__("../../lib/global/src/lib/schemas/index.ts");
+const zod_1 = __webpack_require__("zod");
 const prefix = `/api/v1/permissions`;
 exports.permission = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.PermissionSchema,
         },
@@ -442,6 +482,9 @@ exports.product = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.ProductSchema,
         },
@@ -459,6 +502,9 @@ exports.product = (0, core_1.initContract)().router({
     update: {
         method: 'PATCH',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         contentType: 'multipart/form-data',
         body: schemas_1.UpdateProductSchema,
         responses: {
@@ -469,6 +515,9 @@ exports.product = (0, core_1.initContract)().router({
     delete: {
         method: 'DELETE',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             204: zod_1.z.any().optional(),
@@ -503,6 +552,9 @@ exports.role = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.RoleSchema,
         },
@@ -520,6 +572,9 @@ exports.role = (0, core_1.initContract)().router({
     update: {
         method: 'PATCH',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: schemas_1.UpdateRoleSchema,
         responses: {
             201: schemas_1.RoleSchema,
@@ -529,6 +584,9 @@ exports.role = (0, core_1.initContract)().router({
     delete: {
         method: 'DELETE',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             204: zod_1.z.any().optional(),
@@ -538,6 +596,9 @@ exports.role = (0, core_1.initContract)().router({
     updatePermissions: {
         method: 'PATCH',
         path: `${prefix}/:id/permissions`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: schemas_1.UpdateRolePermissionsSchema,
         responses: {
             201: schemas_1.RoleSchema,
@@ -597,6 +658,9 @@ exports.store = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.StoreSchema,
         },
@@ -614,6 +678,9 @@ exports.store = (0, core_1.initContract)().router({
     update: {
         method: 'PATCH',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         contentType: 'multipart/form-data',
         body: schemas_1.UpdateStoreSchema,
         responses: {
@@ -624,6 +691,9 @@ exports.store = (0, core_1.initContract)().router({
     delete: {
         method: 'DELETE',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             204: zod_1.z.any().optional(),
@@ -658,6 +728,9 @@ exports.storeRating = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.StoreRatingSchema,
         },
@@ -684,6 +757,9 @@ exports.storeRating = (0, core_1.initContract)().router({
     delete: {
         method: 'DELETE',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             204: zod_1.z.any().optional(),
@@ -718,6 +794,9 @@ exports.tag = (0, core_1.initContract)().router({
     get: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.TagSchema,
         },
@@ -735,6 +814,9 @@ exports.tag = (0, core_1.initContract)().router({
     update: {
         method: 'PATCH',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: schemas_1.UpdateTagSchema,
         responses: {
             201: schemas_1.TagSchema,
@@ -744,6 +826,9 @@ exports.tag = (0, core_1.initContract)().router({
     delete: {
         method: 'DELETE',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: zod_1.z.any().optional(),
         responses: {
             204: zod_1.z.any().optional(),
@@ -825,6 +910,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.user = void 0;
 const core_1 = __webpack_require__("@ts-rest/core");
 const schemas_1 = __webpack_require__("../../lib/global/src/lib/schemas/index.ts");
+const zod_1 = __webpack_require__("zod");
 const prefix = `/api/v1/users`;
 exports.user = (0, core_1.initContract)().router({
     createUser: {
@@ -839,6 +925,9 @@ exports.user = (0, core_1.initContract)().router({
     getUser: {
         method: 'GET',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         responses: {
             200: schemas_1.UserSchema,
         },
@@ -856,6 +945,9 @@ exports.user = (0, core_1.initContract)().router({
     updateUser: {
         method: 'PATCH',
         path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: schemas_1.UpdateUserSchema,
         responses: {
             201: schemas_1.UserSchema,
@@ -865,6 +957,9 @@ exports.user = (0, core_1.initContract)().router({
     assignRole: {
         method: 'PATCH',
         path: `${prefix}/:id/assign-role`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: schemas_1.UpdateUserRoleSchema,
         responses: {
             201: schemas_1.UserSchema,
@@ -874,6 +969,9 @@ exports.user = (0, core_1.initContract)().router({
     unassignRole: {
         method: 'PATCH',
         path: `${prefix}/:id/unassign-role`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
         body: schemas_1.UpdateUserRoleSchema,
         responses: {
             201: schemas_1.UserSchema,

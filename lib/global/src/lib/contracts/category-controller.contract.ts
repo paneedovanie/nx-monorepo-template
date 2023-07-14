@@ -23,6 +23,9 @@ export const category = initContract().router({
   get: {
     method: 'GET',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     responses: {
       200: CategorySchema,
     },
@@ -40,6 +43,9 @@ export const category = initContract().router({
   update: {
     method: 'PATCH',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: UpdateCategorySchema,
     responses: {
       201: CategorySchema,
@@ -49,6 +55,9 @@ export const category = initContract().router({
   delete: {
     method: 'DELETE',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: z.any().optional(),
     responses: {
       204: z.any().optional(),

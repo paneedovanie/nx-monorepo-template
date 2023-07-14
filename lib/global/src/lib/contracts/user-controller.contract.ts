@@ -7,6 +7,7 @@ import {
   UpdateUserSchema,
   UserSchema,
 } from '../schemas';
+import { z } from 'zod';
 
 const prefix = `/api/v1/users`;
 
@@ -23,6 +24,9 @@ export const user = initContract().router({
   getUser: {
     method: 'GET',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     responses: {
       200: UserSchema,
     },
@@ -40,6 +44,9 @@ export const user = initContract().router({
   updateUser: {
     method: 'PATCH',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: UpdateUserSchema,
     responses: {
       201: UserSchema,
@@ -49,6 +56,9 @@ export const user = initContract().router({
   assignRole: {
     method: 'PATCH',
     path: `${prefix}/:id/assign-role`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: UpdateUserRoleSchema,
     responses: {
       201: UserSchema,
@@ -58,6 +68,9 @@ export const user = initContract().router({
   unassignRole: {
     method: 'PATCH',
     path: `${prefix}/:id/unassign-role`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: UpdateUserRoleSchema,
     responses: {
       201: UserSchema,

@@ -23,6 +23,9 @@ export const storeRating = initContract().router({
   get: {
     method: 'GET',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     responses: {
       200: StoreRatingSchema,
     },
@@ -49,6 +52,9 @@ export const storeRating = initContract().router({
   delete: {
     method: 'DELETE',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: z.any().optional(),
     responses: {
       204: z.any().optional(),

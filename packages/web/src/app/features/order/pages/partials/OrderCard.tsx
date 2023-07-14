@@ -1,5 +1,4 @@
 import {
-  DataTable,
   Loading,
   QrcodeDialog,
   formatCurrency,
@@ -20,7 +19,6 @@ import {
 import { OrderProduct } from '@nx-monorepo-template/global';
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Inventory as InventoryIcon } from '@mui/icons-material';
 import { BillDialog, PayDialog, StatusDialog } from '../../components';
 
 export const OrderCard = () => {
@@ -67,8 +65,10 @@ export const OrderCard = () => {
               <Box sx={{ cursor: 'pointer' }}>
                 <QrcodeDialog
                   imageProps={{
-                    width: '100%',
-                    height: 'auto',
+                    style: {
+                      width: '100%',
+                      height: 'auto',
+                    },
                   }}
                   filename={'order-ref-' + order?.ref + '-qrcode'}
                   text={window.location.href}

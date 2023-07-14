@@ -24,6 +24,9 @@ export const product = initContract().router({
   get: {
     method: 'GET',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     responses: {
       200: ProductSchema,
     },
@@ -41,6 +44,9 @@ export const product = initContract().router({
   update: {
     method: 'PATCH',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     contentType: 'multipart/form-data',
     body: UpdateProductSchema,
     responses: {
@@ -51,6 +57,9 @@ export const product = initContract().router({
   delete: {
     method: 'DELETE',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: z.any().optional(),
     responses: {
       204: z.any().optional(),

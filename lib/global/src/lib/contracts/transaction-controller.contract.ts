@@ -3,7 +3,6 @@ import {
   CreateTransactionSchema,
   GetTransactionsOptionsSchema,
   GetTransactionsResponseSchema,
-  PaginationOptionsSchema,
   PaySchema,
   TransactionSchema,
 } from '../schemas';

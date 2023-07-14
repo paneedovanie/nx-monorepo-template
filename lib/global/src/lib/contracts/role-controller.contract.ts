@@ -24,6 +24,9 @@ export const role = initContract().router({
   get: {
     method: 'GET',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     responses: {
       200: RoleSchema,
     },
@@ -41,6 +44,9 @@ export const role = initContract().router({
   update: {
     method: 'PATCH',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: UpdateRoleSchema,
     responses: {
       201: RoleSchema,
@@ -50,6 +56,9 @@ export const role = initContract().router({
   delete: {
     method: 'DELETE',
     path: `${prefix}/:id`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: z.any().optional(),
     responses: {
       204: z.any().optional(),
@@ -59,6 +68,9 @@ export const role = initContract().router({
   updatePermissions: {
     method: 'PATCH',
     path: `${prefix}/:id/permissions`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
     body: UpdateRolePermissionsSchema,
     responses: {
       201: RoleSchema,
