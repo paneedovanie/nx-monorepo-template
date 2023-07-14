@@ -1,11 +1,19 @@
 import { Box, Button, Dialog, DialogActions, Link } from '@mui/material';
 import { generateQrcode } from '@nx-monorepo-template/global';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  HtmlHTMLAttributes,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 export const QrcodeDialog = ({
+  imageProps,
   filename,
   text,
 }: {
+  imageProps?: HtmlHTMLAttributes<HTMLImageElement>;
   filename: string;
   text: string;
 }) => {
@@ -24,11 +32,12 @@ export const QrcodeDialog = ({
   return (
     <>
       <img
-        src={qrcode}
         alt="qrcode"
         width={100}
         height={100}
         onClick={() => setQrcodeOpen(true)}
+        {...imageProps}
+        src={qrcode}
       />
       <Dialog
         open={qrcodeOpen}

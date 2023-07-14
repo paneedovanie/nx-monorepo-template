@@ -66,6 +66,10 @@ export const OrderCard = () => {
             <Grid item xs={12} md="auto">
               <Box sx={{ cursor: 'pointer' }}>
                 <QrcodeDialog
+                  imageProps={{
+                    width: '100%',
+                    height: 'auto',
+                  }}
                   filename={'order-ref-' + order?.ref + '-qrcode'}
                   text={window.location.href}
                 />
@@ -110,21 +114,50 @@ export const OrderCard = () => {
               </Typography>
             </Grid>
           </Grid>
+          <Divider sx={{ my: 1 }} />
+          <Box sx={{ display: 'flex' }}>
+            <Typography fontSize={[12, 16]} sx={{ fontWeight: 700 }}>
+              Product
+            </Typography>
+            <Typography
+              fontSize={[12, 16]}
+              sx={{ flex: 1, textAlign: 'right', fontWeight: 700 }}
+            >
+              Total Price
+            </Typography>
+          </Box>
+          <Box>
+            {order?.items.map((item, i) => {
+              return (
+                <Box key={i} sx={{ display: 'flex' }}>
+                  <Typography fontSize={[12, 16]}>{item.title}</Typography>
+                  <Typography
+                    fontSize={[12, 16]}
+                    sx={{ flex: 1, textAlign: 'right' }}
+                  >
+                    {formatCurrency(item.price)} x {item.count} ={' '}
+                    {formatCurrency(item.price * item.count)}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+          <Divider sx={{ mt: 1 }} />
         </CardContent>
 
-        <DataTable<OrderProduct>
+        {/* <DataTable<OrderProduct>
           columns={[
-            {
-              name: 'image',
-              label: 'Image',
-              render: ({ image }) => {
-                return image ? (
-                  <img src={image} alt="store" width={30} height={30} />
-                ) : (
-                  <InventoryIcon sx={{ width: 30, height: 30 }} />
-                );
-              },
-            },
+            // {
+            //   name: 'image',
+            //   label: 'Image',
+            //   render: ({ image }) => {
+            //     return image ? (
+            //       <img src={image} alt="store" width={30} height={30} />
+            //     ) : (
+            //       <InventoryIcon sx={{ width: 30, height: 30 }} />
+            //     );
+            //   },
+            // },
             {
               name: 'title',
               label: 'Title',
@@ -150,7 +183,7 @@ export const OrderCard = () => {
           ]}
           data={order?.items}
           pagination={false}
-        />
+        /> */}
 
         <CardActions>
           <Box>
