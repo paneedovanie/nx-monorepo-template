@@ -1,6 +1,8 @@
+import { Shadows, createTheme } from '@mui/material/styles';
+
 const color = {
-  primary: '#000000',
-  secondary: '#ffffff',
+  primary: '#31525B',
+  secondary: '#B3DEE5',
   accent: '#0072c6',
   black: '#000000',
   white: '#FFFFFF',
@@ -29,6 +31,30 @@ export const theme = {
   padding: defaultSize,
   radius: defaultSize,
 };
+
+export const muiTheme = createTheme({
+  palette: {
+    primary: {
+      main: color.primary,
+    },
+    secondary: {
+      main: color.secondary,
+    },
+  },
+  shadows: Array(25).fill('none') as Shadows,
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+        },
+      },
+    },
+  },
+  shape: {
+    borderRadius: 12,
+  },
+});
 
 export const isProduction = import.meta.env.VITE_ENVIRONMENT === 'production';
 export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? '';

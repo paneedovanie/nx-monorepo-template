@@ -99,7 +99,6 @@ export const HomePage = () => {
           return (
             <Grid item key={i}>
               <Card
-                elevation={0}
                 sx={{
                   cursor: 'pointer',
                   display: 'flex',

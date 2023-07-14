@@ -311,18 +311,10 @@ export const FormGenerator = <R, I extends FormikValues = any>({
 
         <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
           <>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={
-                (!dirty && !defaultEnableSubmit) || !isValid || isSubmitting
-              }
-            >
-              Submit
-            </Button>
             {onCancel ? (
               <Button
-                variant="outlined"
+                color="secondary"
+                variant="contained"
                 onClick={() => {
                   resetForm();
                   onCancel?.();
@@ -332,6 +324,15 @@ export const FormGenerator = <R, I extends FormikValues = any>({
                 Cancel
               </Button>
             ) : null}
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={
+                (!dirty && !defaultEnableSubmit) || !isValid || isSubmitting
+              }
+            >
+              Submit
+            </Button>
           </>
         </Box>
       </fieldset>

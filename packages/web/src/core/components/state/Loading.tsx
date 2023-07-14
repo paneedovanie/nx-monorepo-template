@@ -1,7 +1,7 @@
-import LoadingSvg from '@/assets/loading.svg';
+import { theme } from '@/core/constant';
 import { Box, BoxProps, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { LoadingSvg } from '../svgs';
 
 type Size = 'small' | 'medium' | 'large';
 
@@ -70,7 +70,7 @@ export const Loading = ({
           position: 'relative',
         }}
       >
-        <img src={LoadingSvg} alt="loading" height="100%" width="100%" />
+        <LoadingSvg color={theme.color.primary} width="100%" />
         <Box
           sx={{
             position: 'absolute',

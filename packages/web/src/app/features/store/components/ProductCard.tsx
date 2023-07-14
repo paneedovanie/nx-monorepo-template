@@ -49,9 +49,7 @@ export const ProductCard = ({ data }: { data: Product }) => {
   return (
     <>
       <Card
-        elevation={0}
         sx={{
-          borderRadius: 4,
           '&:hover': {
             boxShadow: '0 0 5px gray',
           },
@@ -60,7 +58,7 @@ export const ProductCard = ({ data }: { data: Product }) => {
         onClick={handleOpen}
       >
         {data.image ? (
-          <CardMedia sx={{ height: 200 }} image={data.image} />
+          <CardMedia sx={{ height: [100, 200] }} image={data.image} />
         ) : (
           <Box
             sx={{
@@ -79,8 +77,9 @@ export const ProductCard = ({ data }: { data: Product }) => {
           <Tooltip title={data.title}>
             <Typography
               variant="h6"
-              fontWeight={700}
+              fontWeight={900}
               sx={{
+                fontSize: [14, 20],
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -93,6 +92,7 @@ export const ProductCard = ({ data }: { data: Product }) => {
             <Typography
               color="gray"
               sx={{
+                display: ['none', 'block'],
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -101,7 +101,9 @@ export const ProductCard = ({ data }: { data: Product }) => {
               {data.description}
             </Typography>
           </Tooltip>
-          <Typography fontWeight={600}>{formatCurrency(data.price)}</Typography>
+          <Typography fontWeight={600} fontSize={[12, 18]}>
+            {formatCurrency(data.price)}
+          </Typography>
         </CardContent>
       </Card>
       <Dialog
@@ -110,7 +112,6 @@ export const ProductCard = ({ data }: { data: Product }) => {
         PaperProps={{
           sx: {
             overflow: 'hidden',
-            borderRadius: 4,
             position: 'relative',
             maxWidth: 480,
             width: '100%',
@@ -172,11 +173,25 @@ export const ProductCard = ({ data }: { data: Product }) => {
               {data.description}
             </Typography>
           </Box>
-          <Box sx={{ mb: 1 }}>
-            <Typography variant="caption">Price:</Typography>
-            <Typography fontWeight={600}>
-              {formatCurrency(data.price)}
-            </Typography>
+          <Box sx={{ mb: 1, display: 'flex', gap: 2 }}>
+            <Box>
+              <Typography variant="caption">Price:</Typography>
+              <Typography fontWeight={600} fontSize={18}>
+                {formatCurrency(data.price)}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption">Count:</Typography>
+              <Typography fontWeight={600} fontSize={18}>
+                {cart[data.id] ?? 0}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption">Total Price:</Typography>
+              <Typography fontWeight={600} fontSize={18}>
+                {formatCurrency((cart[data.id] ?? 0) * data.price)}
+              </Typography>
+            </Box>
           </Box>
           <Box>
             <IconButton
@@ -190,9 +205,13 @@ export const ProductCard = ({ data }: { data: Product }) => {
               type="number"
               size="small"
               value={cart[data.id] ?? 0}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                set(data.id, +e.target.value)
-              }
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                if (+e.target.value === 0) {
+                  remove(data.id);
+                  return;
+                }
+                set(data.id, +e.target.value);
+              }}
             />
             <IconButton
               disabled={!cart[data.id]}

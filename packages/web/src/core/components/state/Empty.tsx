@@ -1,5 +1,6 @@
-import NoDataSvg from '@/assets/no-data.svg';
 import { Box, BoxProps, Typography } from '@mui/material';
+import { NoDataSvg } from '../svgs';
+import { theme } from '@/core';
 
 type Size = 'small' | 'medium' | 'large';
 
@@ -37,16 +38,12 @@ export const Empty = ({
           position: 'relative',
         }}
       >
-        <img src={NoDataSvg} alt="loading" height="100%" width="100%" />
+        <NoDataSvg color={theme.color.primary} width="100%" />
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            transform: 'translate(-50%, -50%)',
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>

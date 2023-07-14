@@ -1,15 +1,17 @@
-import { ThemeProvider } from 'styled-components';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import {
   BreadcrumbsContextProvider,
   SnackbarContextProvider,
-  theme,
   AuthContextProvider,
   NotificationContextProvider,
+  muiTheme,
+  theme,
 } from '@/core';
 import { Layout } from './Layout';
 import { useEffect } from 'react';
 import { app } from '@nx-monorepo-template/global';
+import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 
 export const App = () => {
   useEffect(() => {
@@ -30,17 +32,19 @@ export const App = () => {
         })
       }
     >
-      <ThemeProvider theme={theme}>
-        <BreadcrumbsContextProvider>
-          <SnackbarContextProvider>
-            <AuthContextProvider>
-              <NotificationContextProvider>
-                <Layout />
-              </NotificationContextProvider>
-            </AuthContextProvider>
-          </SnackbarContextProvider>
-        </BreadcrumbsContextProvider>
-      </ThemeProvider>
+      <StyledThemeProvider theme={theme}>
+        <ThemeProvider theme={muiTheme}>
+          <BreadcrumbsContextProvider>
+            <SnackbarContextProvider>
+              <AuthContextProvider>
+                <NotificationContextProvider>
+                  <Layout />
+                </NotificationContextProvider>
+              </AuthContextProvider>
+            </SnackbarContextProvider>
+          </BreadcrumbsContextProvider>
+        </ThemeProvider>
+      </StyledThemeProvider>
     </QueryClientProvider>
   );
 };

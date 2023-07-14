@@ -75,7 +75,7 @@ export const DataTable = <T,>({
     display === undefined ? true : display;
 
   return (
-    <Paper elevation={0} sx={{ width: '100%', overflow: 'hidden' }}>
+    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader {...tableProps}>
           <TableHead>

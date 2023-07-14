@@ -47,7 +47,7 @@ export const TopBar = ({
 
   return (
     <>
-      <AppBar position="sticky" sx={{ zIndex: 1300 }} elevation={0}>
+      <AppBar position="sticky" sx={{ zIndex: 1300 }}>
         <Toolbar>
           {location.pathname.substring(0, 7) === '/manage' && (
             <IconButton

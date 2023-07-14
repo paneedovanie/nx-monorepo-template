@@ -65,9 +65,10 @@ export const CartDialog = () => {
       <Dialog
         open={open}
         onClose={handleClose}
-        PaperProps={{ sx: { borderRadius: 4, maxWidth: 750, width: '100%' } }}
+        PaperProps={{ sx: { maxWidth: 750, width: '100%' } }}
       >
         <DialogTitle
+          component="div"
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -148,14 +149,23 @@ export const CartDialog = () => {
           pagination={false}
         />
 
-        <DialogActions>
-          <Button onClick={handleClose} autoFocus color="error">
+        <DialogActions
+          sx={{
+            display: ['flex', 'block'],
+          }}
+        >
+          <Button
+            variant="contained"
+            sx={{ flex: 1 }}
+            onClick={handleClose}
+            color="secondary"
+          >
             Close
           </Button>
           <Button
+            sx={{ flex: 1 }}
             variant="contained"
             onClick={() => navigate(`/stores/${store?.id}/checkout`)}
-            autoFocus
             disabled={!length}
           >
             Checkout
