@@ -43,6 +43,15 @@ export const muiTheme = createTheme({
   },
   shadows: Array(25).fill('none') as Shadows,
   components: {
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          '&:last-child': {
+            paddingBottom: '1rem',
+          },
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {

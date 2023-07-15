@@ -1,7 +1,13 @@
-import { useTsQueryClient } from '@/core/plugins';
-import { NotificationsCount } from '@nx-monorepo-template/global';
-import { ReactNode, createContext, useContext } from 'react';
+import { Event, NotificationsCount } from '@nx-monorepo-template/global';
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useAuthContext } from './AuthContext';
+import { useEventContext } from './EventContext';
 
 const defaultValue = {
   all: 0,
@@ -24,22 +30,21 @@ export const NotificationContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const tsQueryClient = useTsQueryClient();
+  const { socket } = useEventContext();
+  const [data, setData] = useState(defaultValue);
   const { user } = useAuthContext();
 
-  const { data, refetch } = tsQueryClient.notification.count.useQuery(
-    ['notificationCount'],
-    {},
-    {
-      refetchInterval: 5000,
-      enabled: !!user,
+  useEffect(() => {
+    if (user?.id) {
+      socket?.on('connect', () => {
+        socket?.on(Event.NotificationStatus, setData);
+        socket?.emit(Event.NotificationStatus, user.id);
+      });
     }
-  );
+  }, [socket, socket?.connected, user?.id]);
 
   return (
-    <NotificationContext.Provider
-      value={{ ...defaultValue, ...data?.body, refetch }}
-    >
+    <NotificationContext.Provider value={{ ...defaultValue, ...data }}>
       {children}
     </NotificationContext.Provider>
   );

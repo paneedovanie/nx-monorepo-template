@@ -5,7 +5,7 @@ import {
   formatCurrency,
   ConfirmDialog,
 } from '@/core';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, Button, IconButton, Toolbar, Typography } from '@mui/material';
 import { Product, Store, generateColor } from '@nx-monorepo-template/global';
 import {
   Edit as EditIcon,
@@ -48,13 +48,14 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
 
   return (
     <>
-      <Box
+      <Toolbar
         sx={{
           p: 2,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
+        disableGutters
       >
         <Typography variant="h5">Filters here</Typography>
         <Button
@@ -66,7 +67,7 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
         >
           Add
         </Button>
-      </Box>
+      </Toolbar>
       <DataTable<Product>
         columns={[
           {

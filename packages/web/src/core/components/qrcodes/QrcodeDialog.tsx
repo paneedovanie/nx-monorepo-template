@@ -2,6 +2,7 @@ import { Box, Button, Dialog, DialogActions, Link } from '@mui/material';
 import { generateQrcode } from '@nx-monorepo-template/global';
 import {
   HtmlHTMLAttributes,
+  ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -12,10 +13,18 @@ export const QrcodeDialog = ({
   imageProps,
   filename,
   text,
+  trigger,
+  displayTrigger = true,
+  open = false,
+  onClose,
 }: {
   imageProps?: HtmlHTMLAttributes<HTMLImageElement>;
   filename: string;
   text: string;
+  trigger?: ReactNode;
+  displayTrigger?: boolean;
+  open?: boolean;
+  onClose?: () => void;
 }) => {
   const [qrcode, setQrcode] = useState<string>();
   const [qrcodeOpen, setQrcodeOpen] = useState(false);
@@ -31,16 +40,21 @@ export const QrcodeDialog = ({
 
   return (
     <>
-      <img
-        alt="qrcode"
-        width={100}
-        height={100}
-        onClick={() => setQrcodeOpen(true)}
-        {...imageProps}
-        src={qrcode}
-      />
+      <Box onClick={() => setQrcodeOpen(true)} sx={{ display: 'inline' }}>
+        {displayTrigger &&
+          (trigger ?? (
+            <img
+              alt="qrcode"
+              width={100}
+              height={100}
+              {...imageProps}
+              src={qrcode}
+            />
+          ))}
+      </Box>
+
       <Dialog
-        open={qrcodeOpen}
+        open={displayTrigger ? qrcodeOpen : open}
         onClose={() => setQrcodeOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -70,7 +84,12 @@ export const QrcodeDialog = ({
           <Button color="info" onClick={() => linkRef.current?.click()}>
             Download
           </Button>
-          <Button onClick={() => setQrcodeOpen(false)} color="inherit">
+          <Button
+            onClick={() =>
+              displayTrigger ? setQrcodeOpen(false) : onClose?.()
+            }
+            color="inherit"
+          >
             Close
           </Button>
         </DialogActions>

@@ -7,9 +7,11 @@ import {
 import { BaseService } from '../../../core';
 import {
   CreateNotification,
+  Event,
   GetNotificationsOptions,
 } from '@nx-monorepo-template/global';
 import { In } from 'typeorm';
+import { EventGateway } from '../../../event';
 
 @Injectable()
 export class NotificationService extends BaseService<
@@ -18,11 +20,14 @@ export class NotificationService extends BaseService<
   unknown,
   GetNotificationsOptions & { user: string }
 > {
-  constructor(protected readonly repository: NotificationRepository) {
+  constructor(
+    protected readonly repository: NotificationRepository,
+    protected readonly eventGateway: EventGateway
+  ) {
     super(repository);
   }
 
-  async getNotificationCount(userId: string) {
+  async getStatus(userId: string) {
     const user = { id: userId };
 
     const all = await this.repository.count({
@@ -97,13 +102,29 @@ export class NotificationService extends BaseService<
     };
   }
 
-  async read(id: string) {
-    const notification = await this.repository.getById(id);
+  async read(notificationId: string) {
+    const notification = await this.repository.getByIdWithRelations(
+      notificationId
+    );
     notification.opened = true;
     await this.repository.save(notification);
+    this.userNotificationStatusEvent(notification.user.id);
   }
 
   async readAll(userId: string) {
     await this.repository.update({ user: { id: userId } }, { opened: true });
+    this.userNotificationStatusEvent(userId);
+  }
+
+  protected async onCreated(value: NotificationEntity) {
+    this.userNotificationStatusEvent(value.user.id);
+  }
+
+  public async userNotificationStatusEvent(userId: string) {
+    this.eventGateway.emitToUser(
+      userId,
+      Event.NotificationStatus,
+      await this.getStatus(userId)
+    );
   }
 }

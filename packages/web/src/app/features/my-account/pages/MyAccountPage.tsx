@@ -26,8 +26,9 @@ export const MyAccountPage = () => {
           <FormGenerator<LoginResponse>
             successMessage="Email Verification Resent"
             onSubmit={(v, options) => {
-              resendVerifyEmail({}, options);
+              resendVerifyEmail({ body: null }, options);
             }}
+            defaultEnableSubmit
           />
         </CardContent>
       </Card>

@@ -3,21 +3,12 @@ import {
   NotificationSchema,
   GetNotificationsOptionsSchema,
   GetNotificationsResponseSchema,
-  NotificationsCountSchema,
 } from '../schemas';
 import { z } from 'zod';
 
 const prefix = `/api/v1/notifications`;
 
 export const notification = initContract().router({
-  count: {
-    method: 'GET',
-    path: `${prefix}/count`,
-    responses: {
-      200: NotificationsCountSchema,
-    },
-    summary: 'Notifications Count',
-  },
   get: {
     method: 'GET',
     path: `${prefix}/:id`,

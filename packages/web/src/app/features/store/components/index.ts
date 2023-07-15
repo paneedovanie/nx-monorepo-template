@@ -7,3 +7,5 @@ export * from './PaymentsTable';
 export * from './OtherInformation';
 export * from './StoreRatingDialog';
 export * from './ProductCard';
+export * from './StoreDetailsCard';
+export * from './StoreRatingsCard';

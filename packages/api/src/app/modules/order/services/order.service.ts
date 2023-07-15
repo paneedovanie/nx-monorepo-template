@@ -1,31 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import {
-  NotificationRepository,
-  OrderEntity,
-  OrderRepository,
-} from '../../../database';
+import { OrderEntity, OrderRepository } from '../../../database';
 import { BaseService } from '../../../core';
 import {
+  CreateOrder,
+  Event,
+  GetOrdersOptions,
   INotificationMetadata,
   NotificationType,
   OrderStatus,
+  UpdateOrder,
 } from '@nx-monorepo-template/global';
-import { StoreGateway, StoreService } from '../../store';
+import { StoreService } from '../../store';
+import { EventGateway } from '../../../event';
+import { StatisticService } from '../../statistic';
+import { NotificationService } from '../../notification';
 
 @Injectable()
-export class OrderService extends BaseService<OrderEntity> {
+export class OrderService extends BaseService<
+  OrderEntity,
+  CreateOrder,
+  UpdateOrder,
+  GetOrdersOptions
+> {
   constructor(
     protected readonly repository: OrderRepository,
-    protected readonly notificationRepository: NotificationRepository,
+    protected readonly notificationService: NotificationService,
     protected readonly storeService: StoreService,
-    protected readonly storeGateway: StoreGateway
+    protected readonly statisticService: StatisticService,
+    protected readonly eventGateway: EventGateway
   ) {
     super(repository);
   }
 
   protected async onCreated(order: OrderEntity): Promise<void> {
+    const storeId = order.store.id;
+    this.eventGateway.emitToUser(
+      order.store.owner.id,
+      Event.StoreDashboard,
+      await this.statisticService.getStoreDashboard(storeId)
+    );
     if (order.user) {
-      await this.notificationRepository.createWithRelations({
+      await this.notificationService.create({
         user: order.user.id,
         type: NotificationType.OrderCreated,
         metadata: {
@@ -33,7 +48,7 @@ export class OrderService extends BaseService<OrderEntity> {
         },
       });
     }
-    await this.notificationRepository.createWithRelations({
+    await this.notificationService.create({
       user: order.store.owner.id,
       type: NotificationType.StoreOrderCreated,
       metadata: {
@@ -52,20 +67,31 @@ export class OrderService extends BaseService<OrderEntity> {
       orderId: order.id,
     };
     if (prev.status !== order.status) {
-      (this.storeGateway.server.sockets as any).forEach(async (socket) => {
-        const storeId = socket.handshake.query.storeId;
-        if (storeId !== order.store.id) {
-          return;
-        }
-        socket.emit('status', await this.storeService.getStatus(storeId));
+      const storeId = order.store.id;
+
+      this.eventGateway.emitToUser(
+        order.store.owner.id,
+        Event.StoreStatus,
+        await this.storeService.getStatus(storeId)
+      );
+      const orderResult = await this.getAll({
+        storeIds: [storeId],
+        perPage: 10,
+        orderBy: 'createdAt',
+        status: OrderStatus.Preparing,
       });
+      this.eventGateway.emitToUser(
+        order.store.owner.id,
+        Event.StorePreparation,
+        orderResult.list
+      );
       baseMetadata.status = order.status;
     }
     if (prev.payment?.id !== order.payment?.id) {
       baseMetadata.amount = order.payment.totalCost;
     }
     if (order.user) {
-      await this.notificationRepository.createWithRelations({
+      await this.notificationService.create({
         user: order.user.id,
         type: NotificationType.OrderUpdated,
         metadata: {
@@ -73,7 +99,7 @@ export class OrderService extends BaseService<OrderEntity> {
         },
       });
     }
-    await this.notificationRepository.createWithRelations({
+    await this.notificationService.create({
       user: order.store.owner.id,
       type: NotificationType.StoreOrderUpdated,
       metadata: {
@@ -86,7 +112,7 @@ export class OrderService extends BaseService<OrderEntity> {
 
   protected async onDeleted(order: OrderEntity): Promise<void> {
     if (order.user) {
-      await this.notificationRepository.createWithRelations({
+      await this.notificationService.create({
         user: order.user.id,
         type: NotificationType.OrderDeleted,
         metadata: {
@@ -94,7 +120,7 @@ export class OrderService extends BaseService<OrderEntity> {
         },
       });
     }
-    await this.notificationRepository.createWithRelations({
+    await this.notificationService.create({
       user: order.store.owner.id,
       type: NotificationType.StoreOrderDeleted,
       metadata: {

@@ -1,7 +1,13 @@
 import { Star as StarIcon } from '@mui/icons-material';
 import { Box } from '@mui/material';
 
-export const StarRating = ({ rating }: { rating: number }) => {
+export const StarRating = ({
+  rating,
+  size = 'small',
+}: {
+  rating: number;
+  size?: 'small' | 'inherit' | 'medium' | 'large';
+}) => {
   const activeStarCount = Math.ceil(rating);
 
   return (
@@ -11,7 +17,7 @@ export const StarRating = ({ rating }: { rating: number }) => {
           <StarIcon
             key={item}
             color={item < activeStarCount ? 'warning' : 'inherit'}
-            fontSize="small"
+            fontSize={size}
           />
         );
       })}

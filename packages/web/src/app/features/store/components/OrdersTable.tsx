@@ -37,7 +37,10 @@ export const OrdersTable = ({ store }: { store: Store }) => {
   const orders = data?.body;
   return (
     <>
-      <Toolbar sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Toolbar
+        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+        disableGutters
+      >
         <TextField
           type="date"
           label="Start Date"

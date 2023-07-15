@@ -1,6 +1,5 @@
-import { Breadcrumbs } from '@/core';
+import { Breadcrumbs, CategoriesTable } from '@/core';
 import styled from 'styled-components';
-import { CategoriesTable } from '../../../shared';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};

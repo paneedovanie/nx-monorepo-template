@@ -59,8 +59,8 @@ export const CategoriesTablePartial = ({
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 1,
-          backgroundColor: 'white',
         }}
+        disableGutters
       >
         <Breadcrumbs
           items={[

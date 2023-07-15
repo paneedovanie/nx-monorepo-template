@@ -65,9 +65,7 @@ export const OrderCard = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <Typography variant="h5">Order</Typography>
-              <Typography variant="caption">
-                Reference No.: {order?.ref}
-              </Typography>
+              <Typography variant="caption">#{order?.ref}</Typography>
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography sx={{ textTransform: 'Capitalize' }}>

@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { NotificationController } from './controllers';
 import { NotificationService } from './services';
-import { StoreService } from '../store';
 
+@Global()
 @Module({
   controllers: [NotificationController],
-  providers: [NotificationService, StoreService],
+  providers: [NotificationService],
+  exports: [NotificationService],
 })
 export class NotificationModule {}

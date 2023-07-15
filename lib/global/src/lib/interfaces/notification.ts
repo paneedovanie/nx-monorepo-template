@@ -41,3 +41,7 @@ export type GetNotificationsOptions = z.infer<
 >;
 
 export type NotificationsCount = z.infer<typeof NotificationsCountSchema>;
+
+export enum ENotificationEvent {
+  Status = 'status',
+}

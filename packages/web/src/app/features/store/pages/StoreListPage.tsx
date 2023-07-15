@@ -10,9 +10,9 @@ import {
   Box,
   Button,
   Card,
-  CardContent,
   Checkbox,
   IconButton,
+  Toolbar,
   Typography,
 } from '@mui/material';
 import {
@@ -74,34 +74,35 @@ export const StoreListPage = () => {
         items={[{ label: 'Dashboard', to: '/manage' }, { label: 'Stores' }]}
         sx={{ my: 1 }}
       />
-      <Card>
-        <CardContent
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Typography variant="h5">Stores</Typography>
-            <Allow permissions={[RolePermission.OrderGetAllUnrestricted]}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Checkbox
-                  value={unrestricted}
-                  onChange={(e) => {
-                    setUnrestricted(e.target.checked);
-                  }}
-                />
-                <Typography>All</Typography>
-              </Box>
-            </Allow>
-          </Box>
-          <Allow permissions={[RolePermission.StoreCreate]}>
-            <Button variant="contained" onClick={() => setDialogOpen(true)}>
-              Add
-            </Button>
+      <Toolbar
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+        disableGutters
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          <Typography variant="h5">Stores</Typography>
+          <Allow permissions={[RolePermission.OrderGetAllUnrestricted]}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Checkbox
+                value={unrestricted}
+                onChange={(e) => {
+                  setUnrestricted(e.target.checked);
+                }}
+              />
+              <Typography>All</Typography>
+            </Box>
           </Allow>
-        </CardContent>
+        </Box>
+        <Allow permissions={[RolePermission.StoreCreate]}>
+          <Button variant="contained" onClick={() => setDialogOpen(true)}>
+            Add
+          </Button>
+        </Allow>
+      </Toolbar>
+      <Card>
         <DataTable<Store>
           columns={[
             {

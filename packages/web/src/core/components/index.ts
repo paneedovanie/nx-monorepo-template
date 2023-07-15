@@ -10,3 +10,4 @@ export * from './tags';
 export * from './qrcodes';
 export * from './dialogs';
 export * from './svgs';
+export * from './widgets';

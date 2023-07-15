@@ -162,17 +162,6 @@ export const PublicStoreViewPage = () => {
 
   const categories = categoriesResult?.body;
 
-  const { data: ratingsResult } = tsQueryClient.storeRating.getAll.useQuery(
-    ['getStoreRatings'],
-    {
-      query: {
-        store: store?.id,
-      },
-    }
-  );
-
-  const ratings = ratingsResult?.body;
-
   const pageCount = useMemo(() => {
     const count = products?.count ?? 0;
     const perPage = products?.perPage ?? 0;

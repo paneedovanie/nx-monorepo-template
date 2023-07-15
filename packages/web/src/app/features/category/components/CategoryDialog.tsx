@@ -26,7 +26,6 @@ export const CategoryDialog = ({
   onClose: () => void;
   onSuccess?: (data: Category) => void;
 }) => {
-  console.log('open', open);
   const tsQueryClient = useTsQueryClient();
 
   const { mutate: create } = tsQueryClient.category.create.useMutation({

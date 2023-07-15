@@ -25,13 +25,6 @@ export class NotificationController
 {
   constructor(private readonly service: NotificationService) {}
 
-  @TsRest(c.count)
-  async count(@Request() { user }) {
-    const result = await this.service.getNotificationCount(user.id);
-
-    return { status: 200 as const, body: result };
-  }
-
   @TsRest(c.get)
   async get(
     @TsRestRequest() { params }: RequestShapes['get'],

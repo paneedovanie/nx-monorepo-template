@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { TagController } from './controllers';
 import { TagService } from './services';
-import { StoreService } from '../store';
 
+@Global()
 @Module({
   controllers: [TagController],
-  providers: [TagService, StoreService],
+  providers: [TagService],
+  exports: [TagService],
 })
 export class TagModule {}

@@ -3,3 +3,8 @@ export * from './StoreViewPage';
 export * from './PublicStoreViewPage';
 export * from './CheckoutPage';
 export * from './StoreStatusPage';
+export * from './StoreCategoryListPage';
+export * from './StoreProductListPage';
+export * from './StoreOrderListPage';
+export * from './StorePaymentListPage';
+export * from './StorePreparationPage';

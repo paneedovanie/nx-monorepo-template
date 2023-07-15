@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import {
   CategoryRepository,
   OrderRepository,
+  ProductRepository,
   RoleRepository,
   StoreRepository,
   TransactionRepository,
   UserRepository,
 } from '../../../database';
+import { IsNull, Not } from 'typeorm';
 
 @Injectable()
 export class StatisticService {
@@ -16,7 +18,8 @@ export class StatisticService {
     private readonly storeRepository: StoreRepository,
     private readonly orderRepository: OrderRepository,
     private readonly categoryRepository: CategoryRepository,
-    private readonly transactionRepository: TransactionRepository
+    private readonly transactionRepository: TransactionRepository,
+    private readonly productRepository: ProductRepository
   ) {}
 
   async getStoresCount(userId?: string): Promise<number> {
@@ -45,6 +48,39 @@ export class StatisticService {
     });
   }
 
+  async getStoreOrdersCount(storeId: string): Promise<number> {
+    return this.orderRepository.count({
+      where: { store: { id: storeId } },
+    });
+  }
+
+  async getStorePaymentsCount(storeId: string): Promise<number> {
+    return this.orderRepository.count({
+      where: {
+        store: { id: storeId },
+        payment: {
+          id: Not(IsNull()),
+        },
+      },
+    });
+  }
+
+  async getStoreCategoriesCount(storeId: string): Promise<number> {
+    return this.categoryRepository.count({
+      where: {
+        store: { id: storeId },
+      },
+    });
+  }
+
+  async getStoreProductsCount(storeId: string): Promise<number> {
+    return this.productRepository.count({
+      where: {
+        store: { id: storeId },
+      },
+    });
+  }
+
   async getUsersCount(): Promise<number> {
     return this.userRepository.count();
   }
@@ -59,5 +95,14 @@ export class StatisticService {
 
   async getCirculatingAmount(): Promise<number> {
     return this.transactionRepository.systemCirculatingAmount();
+  }
+
+  async getStoreDashboard(storeId: string) {
+    return {
+      categoriesCount: await this.getStoreCategoriesCount(storeId),
+      productsCount: await this.getStoreProductsCount(storeId),
+      ordersCount: await this.getStoreOrdersCount(storeId),
+      paymentsCount: await this.getStorePaymentsCount(storeId),
+    };
   }
 }

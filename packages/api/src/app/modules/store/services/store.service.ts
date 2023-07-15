@@ -5,13 +5,17 @@ import {
   StoreRepository,
 } from '../../../database';
 import { BaseService } from '../../../core';
-import { OrderStatus } from '@nx-monorepo-template/global';
+import { EStoreEvent, OrderStatus } from '@nx-monorepo-template/global';
+import { StatisticService } from '../../statistic';
+import { EventGateway } from '../../../event';
 
 @Injectable()
 export class StoreService extends BaseService<StoreEntity> {
   constructor(
     protected readonly repository: StoreRepository,
-    protected readonly orderRepository: OrderRepository
+    protected readonly orderRepository: OrderRepository,
+    protected readonly eventGateway: EventGateway,
+    protected readonly statisticService: StatisticService
   ) {
     super(repository);
   }
@@ -35,5 +39,22 @@ export class StoreService extends BaseService<StoreEntity> {
         },
       }),
     };
+  }
+
+  public async storeStatusEvent(storeId: string) {
+    const store = await this.repository.getByIdWithRelations(storeId);
+    const socket = this.eventGateway.getSocket(store.owner.id);
+
+    socket?.emit(EStoreEvent.Status, await this.getStatus(storeId));
+  }
+
+  async storeDashboardEvent(storeId: string) {
+    const store = await this.repository.getByIdWithRelations(storeId);
+    const socket = this.eventGateway.getSocket(store.owner.id);
+
+    socket?.emit(
+      EStoreEvent.Dashboard,
+      await this.statisticService.getStoreDashboard(storeId)
+    );
   }
 }

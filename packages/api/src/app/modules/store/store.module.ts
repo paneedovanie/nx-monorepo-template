@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { StoreController } from './controllers';
 import { StoreService } from './services';
-import { StoreGateway } from './gateways';
-import { CategoryService } from '../category';
 
+@Global()
 @Module({
   controllers: [StoreController],
-  providers: [StoreService, StoreGateway, CategoryService],
+  providers: [StoreService],
+  exports: [StoreService],
 })
 export class StoreModule {}

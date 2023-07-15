@@ -62,6 +62,7 @@ export const GetOrdersOptionsSchema = PaginationOptionsSchema.merge(
         (a: string) => a && new Date(a),
         z.date().optional()
       ),
+      status: z.string().optional(),
     })
     .merge(UnrestrictedSchema)
 );

@@ -19,6 +19,7 @@ import { useMedia } from '@/core';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { RolePermission, Store, app } from '@nx-monorepo-template/global';
 import { AccountSettings, Notifications } from './partials';
+import { theme } from '@/core';
 
 export const TopBar = ({
   store,
@@ -121,22 +122,47 @@ export const TopBar = ({
           <List>
             {items
               .filter(({ permissions }) => checkPermission(permissions))
-              .map(({ label, icon, to }, index) => (
-                <ListItem
-                  key={index}
-                  disablePadding
-                  selected={to === location.pathname}
-                >
-                  <ListItemButton
-                    component={Link}
-                    to={to}
-                    onClick={() => setOpenSidebar(false)}
-                  >
-                    <ListItemIcon>{icon}</ListItemIcon>
-                    <ListItemText primary={label} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
+              .map(({ label, icon, to }, index) => {
+                const escapeRegExp = (string: string) => {
+                  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes special characters
+                };
+                const regexPattern = new RegExp(
+                  `^${escapeRegExp(to)}(\/[^\/]+)*$`
+                );
+                const isActive =
+                  to !== '/manage'
+                    ? regexPattern.test(location.pathname)
+                    : location.pathname === '/manage';
+                const activeStyle = {
+                  bgcolor: `${theme.color.primary} !important`,
+                  color: theme.color.white,
+                  '.MuiListItemIcon-root': {
+                    color: theme.color.white,
+                  },
+                };
+                const hoverStyle = {
+                  bgcolor: `${theme.color.secondary}`,
+                };
+                return (
+                  <ListItem key={index} disablePadding selected={isActive}>
+                    <ListItemButton
+                      component={Link}
+                      to={to}
+                      onClick={() => setOpenSidebar(false)}
+                      sx={
+                        isActive
+                          ? activeStyle
+                          : {
+                              '&:hover': hoverStyle,
+                            }
+                      }
+                    >
+                      <ListItemIcon color="primary">{icon}</ListItemIcon>
+                      <ListItemText primary={label} />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
           </List>
         </Drawer>
       )}

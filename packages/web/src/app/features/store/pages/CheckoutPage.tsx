@@ -9,7 +9,14 @@ import {
   Loading,
   TopBar,
 } from '@/core';
-import { Box, Card, CardActions, CardContent, Typography } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  Divider,
+  Typography,
+} from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -25,7 +32,7 @@ export const CheckoutPage = () => {
   const { user } = useAuthContext();
   const params = useParams();
   const navigate = useNavigate();
-  const { store, cart, length } = useCartContext();
+  const { store, cart, length, clear } = useCartContext();
   const { page, perPage } = usePagination();
 
   const { data, isFetching } = tsQueryClient.product.getAll.useQuery(
@@ -45,6 +52,7 @@ export const CheckoutPage = () => {
 
   const { mutate } = tsQueryClient.order.create.useMutation({
     onSuccess: (v) => {
+      clear();
       if (user) {
         navigate(`/manage/orders/${v.body.id}`);
       } else {
@@ -87,38 +95,42 @@ export const CheckoutPage = () => {
           <CardContent>
             <Typography variant="h4">Checkout</Typography>
           </CardContent>
-
-          <DataTable<Product>
-            columns={[
-              {
-                name: 'title',
-                label: 'Title',
-              },
-              {
-                name: 'price',
-                label: 'Unit Price',
-                render: ({ price }) => {
-                  return formatCurrency(price);
-                },
-              },
-              {
-                name: 'count',
-                label: 'Quantity',
-                render: ({ id }) => {
-                  return cart[id];
-                },
-              },
-              {
-                name: 'totalPrice',
-                label: 'Price',
-                render: ({ id, price }) => {
-                  return formatCurrency(price * cart[id]);
-                },
-              },
-            ]}
-            data={products?.list}
-            pagination={false}
-          />
+          <CardContent>
+            <Divider sx={{ my: 1 }} />
+            <Box sx={{ display: 'flex' }}>
+              <Typography fontSize={[12, 16]} sx={{ fontWeight: 700 }}>
+                Product
+              </Typography>
+              <Typography
+                fontSize={[12, 16]}
+                sx={{ flex: 1, textAlign: 'right', fontWeight: 700 }}
+              >
+                Total Price
+              </Typography>
+            </Box>
+            <Box>
+              {products?.list.map((item: Product, i: number) => {
+                return (
+                  <Box key={i} sx={{ display: 'flex' }}>
+                    <Typography
+                      fontSize={[12, 16]}
+                      sx={{ maxWidth: [150, 'auto'] }}
+                    >
+                      {item.title}
+                    </Typography>
+                    <Typography
+                      fontSize={[12, 16]}
+                      sx={{ flex: 1, textAlign: 'right' }}
+                    >
+                      {formatCurrency(item.price)} x {cart[item.id]} ={' '}
+                      {formatCurrency(item.price * cart[item.id])}
+                    </Typography>
+                  </Box>
+                );
+              })}
+            </Box>
+            <Divider sx={{ mt: 1 }} />
+          </CardContent>
 
           <CardContent>
             <Typography variant="h6">

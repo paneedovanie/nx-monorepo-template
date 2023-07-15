@@ -26,6 +26,7 @@ export const OrderCard = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [paymentOpen, setPaymentOpen] = useState(false);
+  const [billOpen, setBillOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const { user } = useAuthContext();
 
@@ -77,7 +78,7 @@ export const OrderCard = () => {
             </Grid>
             <Grid item xs={12} md="auto">
               <Typography variant="h5" sx={{ mb: 1 }}>
-                Ref #: {order?.ref}
+                #{order?.ref}
               </Typography>
               <Typography sx={{ textTransform: 'Capitalize' }}>
                 Status: {order?.status}
@@ -105,7 +106,7 @@ export const OrderCard = () => {
                 {!order.payment && isStoreOwner && (
                   <Button
                     onClick={() => {
-                      setPaymentOpen(true);
+                      setBillOpen(true);
                     }}
                   >
                     Bill
@@ -144,46 +145,6 @@ export const OrderCard = () => {
           </Box>
           <Divider sx={{ mt: 1 }} />
         </CardContent>
-
-        {/* <DataTable<OrderProduct>
-          columns={[
-            // {
-            //   name: 'image',
-            //   label: 'Image',
-            //   render: ({ image }) => {
-            //     return image ? (
-            //       <img src={image} alt="store" width={30} height={30} />
-            //     ) : (
-            //       <InventoryIcon sx={{ width: 30, height: 30 }} />
-            //     );
-            //   },
-            // },
-            {
-              name: 'title',
-              label: 'Title',
-            },
-            {
-              name: 'price',
-              label: 'Unit Price',
-              render: ({ price }) => {
-                return formatCurrency(price);
-              },
-            },
-            {
-              name: 'count',
-              label: 'Quantity',
-            },
-            {
-              name: 'totalPrice',
-              label: 'Price',
-              render: ({ price, count }) => {
-                return formatCurrency(price * count);
-              },
-            },
-          ]}
-          data={order?.items}
-          pagination={false}
-        /> */}
 
         <CardActions>
           <Box>
@@ -225,7 +186,7 @@ export const OrderCard = () => {
           </CardContent>
         </Card>
       )}
-      {isCustomer ? (
+      {isCustomer && (
         <PayDialog
           data={order}
           open={paymentOpen}
@@ -237,16 +198,17 @@ export const OrderCard = () => {
             setPaymentOpen(false);
           }}
         />
-      ) : (
+      )}
+      {isStoreOwner && (
         <BillDialog
           data={order}
-          open={paymentOpen}
+          open={billOpen}
           onClose={() => {
-            setPaymentOpen(false);
+            setBillOpen(false);
           }}
           onSuccess={() => {
             refetch();
-            setPaymentOpen(false);
+            setBillOpen(false);
           }}
         />
       )}

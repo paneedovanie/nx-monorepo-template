@@ -1,34 +1,27 @@
 import {
   Breadcrumbs,
-  FormGenerator,
+  DashboardCountWidget,
   Loading,
-  QrcodeDialog,
-  StarRating,
-  Tags,
-  usePagination,
+  useEventContext,
+  useSocket,
   useTsQueryClient,
 } from '@/core';
-import { Edit as EditIcon, Store as StoreIcon } from '@mui/icons-material';
-import {
-  Box,
-  Card,
-  CardContent,
-  IconButton,
-  Link,
-  Typography,
-} from '@mui/material';
-import {
-  UpdateStore,
-  Store,
-  UpdateStoreSchema,
-  generateColor,
-  Tag,
-} from '@nx-monorepo-template/global';
-import { SyntheticEvent, useState } from 'react';
+import { Grid } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { OtherInformation } from '../components';
-import { Link as RouterLink } from 'react-router-dom';
+import { StoreDetailsCard, StoreRatingsCard } from '../components';
+import {
+  Category as CategoryIcon,
+  AddShoppingCart as AddShoppingCartIcon,
+  Inventory as InventoryIcon,
+  Payment as PaymentIcon,
+} from '@mui/icons-material';
+import {
+  EStoreEvent,
+  Event,
+  StoreDashboardEvent,
+} from '@nx-monorepo-template/global';
+import { useEffect, useState } from 'react';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
@@ -38,53 +31,39 @@ export const StoreViewPage = () => {
   const tsQueryClient = useTsQueryClient();
   const params = useParams();
   const navigate = useNavigate();
-  const [editable, setEditable] = useState(false);
-  const id = params.id as string;
-
-  const { search, perPage, page, setSearch } = usePagination();
+  const [dashboard, setDashboard] = useState<StoreDashboardEvent>({
+    categoriesCount: 0,
+    productsCount: 0,
+    ordersCount: 0,
+    paymentsCount: 0,
+  });
+  const { socket } = useEventContext();
+  const id = params.storeId as string;
 
   const {
     data: storeResult,
     isFetching,
     refetch,
   } = tsQueryClient.store.get.useQuery(
-    ['getStore'],
+    ['getStore', id],
     {
       params: { id },
     },
     {
-      cacheTime: 0,
-    }
-  );
-
-  const data = storeResult?.body;
-
-  const { data: tagsResult } = tsQueryClient.tag.getAll.useQuery(
-    ['getTags', search],
-    {
-      query: {
-        search,
-        type: 'product',
-        perPage,
-        page,
+      onSuccess: () => {
+        socket?.emit(Event.StoreDashboard, id);
       },
-    },
-    {
-      cacheTime: 0,
     }
   );
 
-  const tags = tagsResult?.body;
+  const store = storeResult?.body;
 
-  const { mutate } = tsQueryClient.store.update.useMutation({
-    onSuccess: () => {
-      refetch();
-      setEditable(false);
-    },
-  });
+  useEffect(() => {
+    socket?.on(Event.StoreDashboard, setDashboard);
+  }, [socket, socket?.connected]);
 
   if (isFetching) return <Loading />;
-  else if (!data) {
+  else if (!store) {
     navigate('/manage/stores');
     return null;
   }
@@ -95,142 +74,57 @@ export const StoreViewPage = () => {
         items={[
           { label: 'Dashboard', to: '/manage' },
           { label: 'Stores', to: '/manage/stores' },
-          { label: data.title },
+          { label: store.title },
         ]}
         sx={{ my: 1 }}
       />
-      <Card sx={{ mb: 1 }}>
-        <CardContent>
-          {editable && data ? (
-            <>
-              <Typography sx={{ mb: 1 }} variant="h5">
-                Edit Store Profile
-              </Typography>
-              <FormGenerator<Store, UpdateStore>
-                initialValues={{
-                  title: data.title,
-                  description: data.description,
-                  owner: data.owner.id,
-                  tags: data.tags.map(({ id }: Tag) => id),
-                }}
-                schema={UpdateStoreSchema}
-                onSubmit={(v, options) => {
-                  mutate({ params: { id }, body: v }, options);
-                }}
-                successMessage="Store Profile Updated"
-                onCancel={() => setEditable(false)}
-                items={[
-                  {
-                    label: 'Image',
-                    name: 'image',
-                    component: 'FileField',
-                  },
-                  {
-                    label: 'Title',
-                    name: 'title',
-                    component: 'TextField',
-                  },
-                  {
-                    label: 'Description',
-                    name: 'description',
-                    component: 'TextField',
-                    props: {
-                      multiline: true,
-                      rows: 2,
-                    },
-                  },
-                  {
-                    label: 'Tags',
-                    name: 'tags',
-                    valueKey: 'id',
-                    labelKey: 'title',
-                    component: 'AutoComplete',
-                    props: {
-                      freeSolo: true,
-                      multiple: true,
-                      defaultValue: data?.tags,
-                      options: tags?.list ?? [],
-                      onInputChange: (event: SyntheticEvent, value: string) => {
-                        setSearch(value);
-                      },
-                    },
-                  },
-                ]}
-              />
-            </>
-          ) : (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center',
-                position: 'relative',
-              }}
-            >
-              <Box
-                sx={{
-                  backgroundColor: generateColor(data.title),
-                  borderRadius: '50%',
-                  color: 'white',
-                  width: 150,
-                  height: 150,
-                  overflow: 'hidden',
-                  mb: 1,
-                }}
-              >
-                {data?.image ? (
-                  <Box
-                    sx={{
-                      width: 150,
-                      height: 150,
-                      backgroundImage: `url('${data.image}')`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }}
-                  />
-                ) : (
-                  <StoreIcon
-                    sx={{
-                      height: 150,
-                      width: 150,
-                      mb: 4,
-                    }}
-                    color="inherit"
-                  />
-                )}
-              </Box>
-              <IconButton
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  right: 0,
-                }}
-                onClick={() => setEditable(true)}
-              >
-                <EditIcon color="warning" />
-              </IconButton>
-              <Tags tags={data?.tags} />
-              <Typography variant="h4">{data?.title}</Typography>
-              <StarRating rating={data?.rating ?? 0} />
-              <Typography>{data?.description}</Typography>
-              <Link
-                component={RouterLink}
-                target="__blank"
-                to={`/stores/${id}/status`}
-              >
-                Status Page
-              </Link>
-              <QrcodeDialog
-                filename={data?.title + '-qrcode'}
-                text={`${window.location.href.replace('/manage', '')}`}
-              />
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      <OtherInformation store={data} />
+      <Grid container sx={{ mb: 1 }} spacing={1}>
+        <Grid item xs={12} md={6} lg={4} order={1}>
+          <StoreDetailsCard
+            store={store}
+            onUpdate={refetch}
+            sx={{ minHeight: '100%', height: '100%' }}
+          />
+        </Grid>
+        <Grid item xs={12} md={6} lg={8} order={[6, 6, 2]}>
+          <StoreRatingsCard
+            store={store}
+            sx={{ minHeight: '100%', height: '100%' }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3} order={[2, 2, 3]}>
+          <DashboardCountWidget
+            title="Categories"
+            icon={<CategoryIcon color="primary" />}
+            count={dashboard.categoriesCount}
+            onClick={() => navigate(`/manage/stores/${store.id}/categories`)}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3} order={[3, 3, 4]}>
+          <DashboardCountWidget
+            title="Products"
+            icon={<InventoryIcon color="primary" />}
+            count={dashboard.productsCount}
+            onClick={() => navigate(`/manage/stores/${store.id}/products`)}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3} order={[4, 4, 5]}>
+          <DashboardCountWidget
+            title="Orders"
+            icon={<AddShoppingCartIcon color="primary" />}
+            count={dashboard.ordersCount}
+            onClick={() => navigate(`/manage/stores/${store.id}/orders`)}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3} order={[5, 5, 6]}>
+          <DashboardCountWidget
+            title="Payments"
+            icon={<PaymentIcon color="primary" />}
+            count={dashboard.paymentsCount}
+            onClick={() => navigate(`/manage/stores/${store.id}/payments`)}
+          />
+        </Grid>
+      </Grid>
     </Container>
   );
 };

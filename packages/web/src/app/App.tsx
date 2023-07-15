@@ -6,6 +6,7 @@ import {
   NotificationContextProvider,
   muiTheme,
   theme,
+  EventContextProvider,
 } from '@/core';
 import { Layout } from './Layout';
 import { useEffect } from 'react';
@@ -37,9 +38,11 @@ export const App = () => {
           <BreadcrumbsContextProvider>
             <SnackbarContextProvider>
               <AuthContextProvider>
-                <NotificationContextProvider>
-                  <Layout />
-                </NotificationContextProvider>
+                <EventContextProvider>
+                  <NotificationContextProvider>
+                    <Layout />
+                  </NotificationContextProvider>
+                </EventContextProvider>
               </AuthContextProvider>
             </SnackbarContextProvider>
           </BreadcrumbsContextProvider>

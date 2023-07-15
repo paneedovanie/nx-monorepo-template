@@ -23,6 +23,7 @@ import express from 'express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FileModule } from './file';
+import { EventModule } from './event';
 
 @Module({
   imports: [
@@ -62,9 +63,8 @@ import { FileModule } from './file';
     NotificationModule,
     StoreRatingModule,
     TagModule,
+    EventModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

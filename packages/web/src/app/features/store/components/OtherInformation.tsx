@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ProductsTable } from './ProductsTable';
 import { OrdersTable } from './OrdersTable';
 import { PaymentsTable } from './PaymentsTable';
-import { CategoriesTable } from '../../../shared';
+import { CategoriesTable } from '@/core';
 
 export const OtherInformation = ({ store }: { store: Store }) => {
   const [value, setValue] = useState(0);

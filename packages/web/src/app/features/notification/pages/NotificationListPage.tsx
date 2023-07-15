@@ -8,8 +8,8 @@ import {
   Box,
   Button,
   Card,
-  CardContent,
   IconButton,
+  Toolbar,
   Typography,
 } from '@mui/material';
 import styled from 'styled-components';
@@ -59,29 +59,30 @@ export const NotificationListPage = () => {
         ]}
         sx={{ my: 1 }}
       />
-      <Card>
-        <CardContent
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+      <Toolbar
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+        disableGutters
+      >
+        <Typography sx={{ mb: 1 }} variant="h5">
+          Notifications
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={async () => {
+            await tsQueryClient.notification.readAll.mutation({
+              body: {},
+            });
+            refetch();
           }}
         >
-          <Typography sx={{ mb: 1 }} variant="h5">
-            Notifications
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={async () => {
-              await tsQueryClient.notification.readAll.mutation({
-                body: {},
-              });
-              refetch();
-            }}
-          >
-            Read All
-          </Button>
-        </CardContent>
+          Read All
+        </Button>
+      </Toolbar>
+      <Card>
         <DataTable<Notification>
           columns={[
             {
