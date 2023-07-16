@@ -24,7 +24,7 @@ export class StoreEntity {
   owner?: UserEntity;
 
   @OneToMany(() => ProductEntity, (product) => product.store)
-  products: ProductEntity;
+  products: ProductEntity[];
 
   @Column()
   title: string;

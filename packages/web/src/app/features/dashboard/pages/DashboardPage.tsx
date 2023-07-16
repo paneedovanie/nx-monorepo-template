@@ -32,10 +32,7 @@ export const DashboardPage = () => {
 
   return (
     <Box sx={{ p: 1, height: '100vh' }}>
-      <Breadcrumbs
-        items={[{ label: 'Dashboard', to: '/manage' }]}
-        sx={{ my: 1 }}
-      />
+      <Breadcrumbs sx={{ my: 1 }} />
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Checkbox
           value={unrestricted}

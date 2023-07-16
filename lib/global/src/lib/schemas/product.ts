@@ -6,6 +6,7 @@ import {
 import { CategorySchema } from './category';
 import { FileSchema } from './file';
 import { StoreSchema } from './store';
+import { Product } from '../interfaces';
 
 const base = {
   title: z.string(),
@@ -21,14 +22,16 @@ export const NonCircularProductSchema = z.object({
   ...base,
 });
 
-export const ProductSchema = z.object({
-  id: z.string(),
-  store: z.lazy(() => StoreSchema),
-  category: CategorySchema,
-  categories: CategorySchema.array(),
-  image: z.string(),
-  ...base,
-});
+export const ProductSchema = z.lazy(() =>
+  z.object({
+    id: z.string(),
+    store: StoreSchema,
+    category: CategorySchema,
+    categories: CategorySchema.array(),
+    image: z.string(),
+    ...base,
+  })
+);
 
 export const CreateProductSchema = z.object({
   ...base,

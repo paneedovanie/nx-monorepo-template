@@ -1,20 +1,19 @@
-import styled from 'styled-components';
-import { OrderCard } from '../components';
 import {
   Breadcrumbs,
   Loading,
   PageContextProvider,
   usePageContext,
 } from '@/core';
-import { Box, Typography } from '@mui/material';
+import styled from 'styled-components';
+import { OrderCard } from '../../order';
+import { Typography } from '@mui/material';
 
-const Container = styled(Box)`
+const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
 `;
 
-export const OrderViewContent = () => {
+export const StoreOrderViewPageContent = () => {
   const { orderQueryResult } = usePageContext();
-
   const order = orderQueryResult.data?.body;
 
   if (orderQueryResult.isFetching) {
@@ -27,15 +26,15 @@ export const OrderViewContent = () => {
   return (
     <Container>
       <Breadcrumbs sx={{ my: 1 }} />
-      <OrderCard order={order} />
+      <OrderCard order={order} onUpdate={orderQueryResult.refetch} />
     </Container>
   );
 };
 
-export const OrderView = () => {
+export const StoreOrderViewPage = () => {
   return (
     <PageContextProvider>
-      <OrderViewContent />
+      <StoreOrderViewPageContent />
     </PageContextProvider>
   );
 };

@@ -44,15 +44,7 @@ export const RoleListPage = () => {
 
   return (
     <Container>
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/manage' },
-          {
-            label: 'roles',
-          },
-        ]}
-        sx={{ my: 1 }}
-      />
+      <Breadcrumbs sx={{ my: 1 }} />
       <Card>
         <CardContent
           sx={{

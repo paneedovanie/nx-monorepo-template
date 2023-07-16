@@ -131,7 +131,9 @@ export const OrdersTable = ({ store }: { store: Store }) => {
                 <Box sx={{ textAlign: 'right' }}>
                   <IconButton
                     size="small"
-                    onClick={() => navigate(`/manage/orders/${id}`)}
+                    onClick={() =>
+                      navigate(`/manage/stores/${store.id}/orders/${id}`)
+                    }
                   >
                     <EyeIcon />
                   </IconButton>

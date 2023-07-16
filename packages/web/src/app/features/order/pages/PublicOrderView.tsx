@@ -1,20 +1,45 @@
 import styled from 'styled-components';
-import { OrderCard } from './partials';
-import { TopBar, useCartContext } from '@/core';
-import { Box } from '@mui/material';
+import { OrderCard } from '../components';
+import {
+  Loading,
+  PageContextProvider,
+  TopBar,
+  useCartContext,
+  usePageContext,
+} from '@/core';
+import { Box, Typography } from '@mui/material';
 
 const Container = styled(Box)`
   padding: ${({ theme }) => theme.padding.md};
 `;
 
-export const PublicOrderView = () => {
+export const PublicOrderViewContent = () => {
   const { store } = useCartContext();
+  const { orderQueryResult } = usePageContext();
+
+  const order = orderQueryResult.data?.body;
+
+  if (orderQueryResult.isFetching) {
+    return <Loading />;
+  }
+  if (!order) {
+    return <Typography>404</Typography>;
+  }
+
   return (
     <>
       <TopBar store={store} />
       <Container component="main">
-        <OrderCard />
+        <OrderCard order={order} />
       </Container>
     </>
+  );
+};
+
+export const PublicOrderView = () => {
+  return (
+    <PageContextProvider>
+      <PublicOrderViewContent />
+    </PageContextProvider>
   );
 };

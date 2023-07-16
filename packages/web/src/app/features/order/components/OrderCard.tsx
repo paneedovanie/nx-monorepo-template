@@ -1,10 +1,4 @@
-import {
-  DataTable,
-  Loading,
-  formatCurrency,
-  useAuthContext,
-  useTsQueryClient,
-} from '@/core';
+import { QrcodeDialog, formatCurrency, useAuthContext } from '@/core';
 import {
   Box,
   Button,
@@ -16,31 +10,24 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-import { OrderProduct } from '@nx-monorepo-template/global';
+import { Order, OrderProduct } from '@nx-monorepo-template/global';
 import { useMemo, useState } from 'react';
-import { BillDialog } from './BillDialog';
-import { StatusDialog } from './StatusDialog';
-import { useNavigate, useParams } from 'react-router-dom';
-import { PayDialog } from './PayDialog';
-import { Inventory as InventoryIcon } from '@mui/icons-material';
+import { BillDialog, PayDialog, StatusDialog } from '.';
 
-export const OrderCard = () => {
-  const tsQueryClient = useTsQueryClient();
-  const params = useParams();
-  const navigate = useNavigate();
+export const OrderCard = ({
+  order,
+  onUpdate,
+}: {
+  order: Order;
+  onUpdate?: () => void;
+}) => {
   const [paymentOpen, setPaymentOpen] = useState(false);
+  const [billOpen, setBillOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const { user } = useAuthContext();
 
-  const { data, isFetching, refetch } = tsQueryClient.order.get.useQuery(
-    ['getOrder', params.orderId],
-    {
-      params: { id: params.orderId as string },
-    }
-  );
-
-  const order = data?.body;
-  const isCustomer = order?.user?.id === user?.id;
+  const isCustomer = order.user?.id === user?.id;
+  const isStoreOwner = order.store?.owner?.id === user?.id;
 
   const totalCost = useMemo(() => {
     let total = 0;
@@ -51,26 +38,32 @@ export const OrderCard = () => {
     return total;
   }, [order?.items]);
 
-  if (isFetching) return <Loading />;
-
-  if (!order) {
-    navigate('/orders');
-    return null;
-  }
-
   return (
     <>
       <Card sx={{ mb: 1 }}>
         <CardContent>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <Typography variant="h5">Order</Typography>
-              <Typography variant="caption">#{order?.ref}</Typography>
+            <Grid item xs={12} sm="auto">
+              <Box sx={{ cursor: 'pointer' }}>
+                <QrcodeDialog
+                  imageProps={{
+                    style: {
+                      width: '100%',
+                      height: 'auto',
+                    },
+                  }}
+                  filename={'order-ref-' + order?.ref + '-qrcode'}
+                  text={window.location.href}
+                />
+              </Box>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} sm="auto">
+              <Typography variant="h5" sx={{ mb: 1 }}>
+                #{order?.ref}
+              </Typography>
               <Typography sx={{ textTransform: 'Capitalize' }}>
-                Status: {order?.status}{' '}
-                {order?.status !== 'completed' && !isCustomer && (
+                Status: {order?.status}
+                {order?.status !== 'completed' && isStoreOwner && (
                   <Button
                     onClick={() => {
                       setStatusOpen(true);
@@ -82,58 +75,57 @@ export const OrderCard = () => {
               </Typography>
               <Typography>
                 Paid: {order?.payment ? 'Yes' : 'No'}
-                {!order.payment && (
+                {!order.payment && isCustomer && !!order.user && (
                   <Button
                     onClick={() => {
                       setPaymentOpen(true);
                     }}
                   >
-                    {isCustomer ? 'Pay' : 'Bill'}
+                    Pay
+                  </Button>
+                )}
+                {!order.payment && isStoreOwner && (
+                  <Button
+                    onClick={() => {
+                      setBillOpen(true);
+                    }}
+                  >
+                    Bill
                   </Button>
                 )}
               </Typography>
             </Grid>
           </Grid>
+          <Divider sx={{ my: 1 }} />
+          <Box sx={{ display: 'flex' }}>
+            <Typography fontSize={[12, 16]} sx={{ fontWeight: 700 }}>
+              Product
+            </Typography>
+            <Typography
+              fontSize={[12, 16]}
+              sx={{ flex: 1, textAlign: 'right', fontWeight: 700 }}
+            >
+              Total Price
+            </Typography>
+          </Box>
+          <Box>
+            {order?.items.map((item, i) => {
+              return (
+                <Box key={i} sx={{ display: 'flex' }}>
+                  <Typography fontSize={[12, 16]}>{item.title}</Typography>
+                  <Typography
+                    fontSize={[12, 16]}
+                    sx={{ flex: 1, textAlign: 'right' }}
+                  >
+                    {formatCurrency(item.price)} x {item.count} ={' '}
+                    {formatCurrency(item.price * item.count)}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+          <Divider sx={{ mt: 1 }} />
         </CardContent>
-
-        <DataTable<OrderProduct>
-          columns={[
-            {
-              name: 'image',
-              label: 'Image',
-              render: ({ image }) => {
-                return image ? (
-                  <img src={image} alt="store" width={30} height={30} />
-                ) : (
-                  <InventoryIcon sx={{ width: 30, height: 30 }} />
-                );
-              },
-            },
-            {
-              name: 'title',
-              label: 'Title',
-            },
-            {
-              name: 'price',
-              label: 'Unit Price',
-              render: ({ price }) => {
-                return formatCurrency(price);
-              },
-            },
-            {
-              name: 'count',
-              label: 'Quantity',
-            },
-            {
-              name: 'totalPrice',
-              label: 'Price',
-              render: ({ price, count }) => {
-                return formatCurrency(price * count);
-              },
-            },
-          ]}
-          data={order?.items}
-        />
 
         <CardActions>
           <Box>
@@ -175,7 +167,7 @@ export const OrderCard = () => {
           </CardContent>
         </Card>
       )}
-      {isCustomer ? (
+      {isCustomer && (
         <PayDialog
           data={order}
           open={paymentOpen}
@@ -183,20 +175,21 @@ export const OrderCard = () => {
             setPaymentOpen(false);
           }}
           onSuccess={() => {
-            refetch();
+            onUpdate?.();
             setPaymentOpen(false);
           }}
         />
-      ) : (
+      )}
+      {isStoreOwner && (
         <BillDialog
           data={order}
-          open={paymentOpen}
+          open={billOpen}
           onClose={() => {
-            setPaymentOpen(false);
+            setBillOpen(false);
           }}
           onSuccess={() => {
-            refetch();
-            setPaymentOpen(false);
+            onUpdate?.();
+            setBillOpen(false);
           }}
         />
       )}
@@ -207,7 +200,7 @@ export const OrderCard = () => {
           setStatusOpen(false);
         }}
         onSuccess={() => {
-          refetch();
+          onUpdate?.();
           setStatusOpen(false);
         }}
       />

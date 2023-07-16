@@ -8,9 +8,9 @@ import {
 } from '../schemas';
 import { Store } from './store';
 
-export type Product = z.infer<typeof NonCircularProductSchema> & {
-  store: Store;
-};
+export interface Product extends z.infer<typeof NonCircularProductSchema> {
+  store?: Store;
+}
 
 export type CreateProduct = z.infer<typeof CreateProductSchema>;
 

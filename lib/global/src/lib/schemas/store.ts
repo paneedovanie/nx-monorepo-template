@@ -7,7 +7,8 @@ import { UserSchema } from './user';
 import { FileSchema } from './file';
 import { UnrestrictedSchema } from './unrestricted';
 import { TagSchema } from './tag';
-import { ProductSchema } from './product';
+import { NonCircularProductSchema, ProductSchema } from './product';
+import { Product, Store } from '../interfaces';
 
 const base = {
   title: z.string(),
@@ -23,15 +24,17 @@ export const NonCircularStoreSchema = z.object({
   ...base,
 });
 
-export const StoreSchema = z.object({
-  id: z.string(),
-  owner: UserSchema,
-  image: z.string().optional(),
-  rating: z.number(),
-  tags: TagSchema.array(),
-  products: ProductSchema.array(),
-  ...base,
-});
+export const StoreSchema: z.ZodType<Store> = z.lazy(() =>
+  z.object({
+    id: z.string(),
+    image: z.string().optional(),
+    rating: z.number(),
+    owner: UserSchema,
+    tags: TagSchema.array(),
+    products: ProductSchema.array(),
+    ...base,
+  })
+);
 
 export const CreateStoreSchema = z.object({
   ...base,

@@ -5,12 +5,14 @@ import {
   UpdateStoreSchema,
   GetStoresOptionsSchema,
   NonCircularStoreSchema,
+  StoreSchema,
+  ProductSchema,
 } from '../schemas';
 import { Product } from './product';
 
-export type Store = z.infer<typeof NonCircularStoreSchema> & {
-  products: Product[];
-};
+export interface Store extends z.infer<typeof NonCircularStoreSchema> {
+  products?: Product[];
+}
 
 export type CreateStore = z.infer<typeof CreateStoreSchema>;
 

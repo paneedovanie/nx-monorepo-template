@@ -8,15 +8,7 @@ const Container = styled.div`
 export const CategoryListPage = () => {
   return (
     <Container>
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/manage' },
-          {
-            label: 'Categories',
-          },
-        ]}
-        sx={{ my: 1 }}
-      />
+      <Breadcrumbs sx={{ my: 1 }} />
       <CategoriesTable />
     </Container>
   );

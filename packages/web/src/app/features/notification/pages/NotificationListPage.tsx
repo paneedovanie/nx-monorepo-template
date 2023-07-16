@@ -50,15 +50,7 @@ export const NotificationListPage = () => {
 
   return (
     <Container>
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/manage' },
-          {
-            label: 'Notifications',
-          },
-        ]}
-        sx={{ my: 1 }}
-      />
+      <Breadcrumbs sx={{ my: 1 }} />
       <Toolbar
         sx={{
           display: 'flex',

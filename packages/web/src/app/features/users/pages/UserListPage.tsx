@@ -30,15 +30,7 @@ export const UserListPage = () => {
 
   return (
     <Container>
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/manage' },
-          {
-            label: 'Users',
-          },
-        ]}
-        sx={{ my: 1 }}
-      />
+      <Breadcrumbs sx={{ my: 1 }} />
       <Card>
         <CardContent>
           <Typography sx={{ mb: 1 }} variant="h5">

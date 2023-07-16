@@ -2,58 +2,40 @@ import {
   Breadcrumbs,
   CategoriesTable,
   Loading,
-  useTsQueryClient,
+  PageContextProvider,
+  usePageContext,
 } from '@/core';
-import { useParams } from 'react-router-dom';
+import { Typography } from '@mui/material';
 import styled from 'styled-components';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
 `;
 
-export const StoreCategoryListPage = () => {
-  const tsQueryClient = useTsQueryClient();
-  const params = useParams();
-  const storeId = params.storeId as string;
+export const StoreCategoryListPageContent = () => {
+  const { storeQueryResult } = usePageContext();
 
-  const { data: storeResult } = tsQueryClient.store.get.useQuery(
-    ['getStore', storeId],
-    {
-      params: {
-        id: storeId,
-      },
-    },
-    {
-      enabled: !!storeId,
-    }
-  );
+  const store = storeQueryResult.data?.body;
 
-  const store = storeResult?.body;
-
-  if (!store) {
+  if (storeQueryResult.isFetching) {
     return <Loading />;
+  }
+  if (!store) {
+    return <Typography>404</Typography>;
   }
 
   return (
     <Container>
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/manage' },
-          {
-            label: 'Stores',
-            to: '/manage/stores',
-          },
-          {
-            label: store.title,
-            to: `/manage/stores/${storeId}`,
-          },
-          {
-            label: 'Categories',
-          },
-        ]}
-        sx={{ my: 1 }}
-      />
+      <Breadcrumbs sx={{ my: 1 }} />
       <CategoriesTable store={store} />
     </Container>
+  );
+};
+
+export const StoreCategoryListPage = () => {
+  return (
+    <PageContextProvider>
+      <StoreCategoryListPageContent />
+    </PageContextProvider>
   );
 };

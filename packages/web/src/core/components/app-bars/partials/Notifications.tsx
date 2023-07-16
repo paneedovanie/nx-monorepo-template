@@ -1,6 +1,7 @@
 import {
   Badge,
   Box,
+  Button,
   IconButton,
   ListItemIcon,
   Menu,
@@ -103,7 +104,9 @@ export const Notifications = () => {
           );
         })}
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Link to="/manage/notifications">See more</Link>
+          <Button component={Link} to="/manage/notifications">
+            See more
+          </Button>
         </Box>
       </Menu>
     </>

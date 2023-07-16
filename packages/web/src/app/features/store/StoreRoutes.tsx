@@ -3,6 +3,7 @@ import {
   StoreCategoryListPage,
   StoreListPage,
   StoreOrderListPage,
+  StoreOrderViewPage,
   StorePaymentListPage,
   StorePreparationPage,
   StoreProductListPage,
@@ -18,7 +19,15 @@ export const StoreRoutes = () => (
           <Route path="/" element={<StoreViewPage />} />
           <Route path="/categories" element={<StoreCategoryListPage />} />
           <Route path="/products" element={<StoreProductListPage />} />
-          <Route path="/orders" element={<StoreOrderListPage />} />
+          <Route
+            path="/orders/*"
+            element={
+              <Routes>
+                <Route path="/" element={<StoreOrderListPage />} />
+                <Route path="/:orderId" element={<StoreOrderViewPage />} />
+              </Routes>
+            }
+          />
           <Route path="/payments" element={<StorePaymentListPage />} />
         </Routes>
       }

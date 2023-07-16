@@ -70,10 +70,7 @@ export const OrderList = () => {
 
   return (
     <Container>
-      <Breadcrumbs
-        items={[{ label: 'Dashboard', to: '/manage' }, { label: 'Orders' }]}
-        sx={{ my: 1 }}
-      />
+      <Breadcrumbs sx={{ my: 1 }} />
       <Card>
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>

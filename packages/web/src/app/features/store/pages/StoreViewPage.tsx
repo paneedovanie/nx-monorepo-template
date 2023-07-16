@@ -2,12 +2,12 @@ import {
   Breadcrumbs,
   DashboardCountWidget,
   Loading,
+  PageContextProvider,
   useEventContext,
-  useSocket,
-  useTsQueryClient,
+  usePageContext,
 } from '@/core';
-import { Grid } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Grid, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { StoreDetailsCard, StoreRatingsCard } from '../components';
 import {
@@ -16,21 +16,16 @@ import {
   Inventory as InventoryIcon,
   Payment as PaymentIcon,
 } from '@mui/icons-material';
-import {
-  EStoreEvent,
-  Event,
-  StoreDashboardEvent,
-} from '@nx-monorepo-template/global';
+import { Event, StoreDashboardEvent } from '@nx-monorepo-template/global';
 import { useEffect, useState } from 'react';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
 `;
 
-export const StoreViewPage = () => {
-  const tsQueryClient = useTsQueryClient();
-  const params = useParams();
+export const StoreViewPageContent = () => {
   const navigate = useNavigate();
+  const { storeQueryResult } = usePageContext();
   const [dashboard, setDashboard] = useState<StoreDashboardEvent>({
     categoriesCount: 0,
     productsCount: 0,
@@ -38,51 +33,31 @@ export const StoreViewPage = () => {
     paymentsCount: 0,
   });
   const { socket } = useEventContext();
-  const id = params.storeId as string;
 
-  const {
-    data: storeResult,
-    isFetching,
-    refetch,
-  } = tsQueryClient.store.get.useQuery(
-    ['getStore', id],
-    {
-      params: { id },
-    },
-    {
-      onSuccess: () => {
-        socket?.emit(Event.StoreDashboard, id);
-      },
-    }
-  );
-
-  const store = storeResult?.body;
+  const store = storeQueryResult.data?.body;
 
   useEffect(() => {
     socket?.on(Event.StoreDashboard, setDashboard);
-  }, [socket, socket?.connected]);
+    if (store?.id) {
+      socket?.emit(Event.StoreDashboard, store?.id);
+    }
+  }, [socket, socket?.connected, store?.id]);
 
-  if (isFetching) return <Loading />;
-  else if (!store) {
-    navigate('/manage/stores');
-    return null;
+  if (storeQueryResult.isFetching) {
+    return <Loading />;
+  }
+  if (!store) {
+    return <Typography>404</Typography>;
   }
 
   return (
     <Container>
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/manage' },
-          { label: 'Stores', to: '/manage/stores' },
-          { label: store.title },
-        ]}
-        sx={{ my: 1 }}
-      />
+      <Breadcrumbs sx={{ my: 1 }} />
       <Grid container sx={{ mb: 1 }} spacing={1}>
         <Grid item xs={12} md={6} lg={4} order={1}>
           <StoreDetailsCard
             store={store}
-            onUpdate={refetch}
+            onUpdate={storeQueryResult.refetch}
             sx={{ minHeight: '100%', height: '100%' }}
           />
         </Grid>
@@ -126,5 +101,13 @@ export const StoreViewPage = () => {
         </Grid>
       </Grid>
     </Container>
+  );
+};
+
+export const StoreViewPage = () => {
+  return (
+    <PageContextProvider>
+      <StoreViewPageContent />
+    </PageContextProvider>
   );
 };

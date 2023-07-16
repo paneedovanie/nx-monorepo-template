@@ -1908,7 +1908,7 @@ const base = {
     price: zod_1.z.number().min(0.01, 'Price must be greater than 0.01'),
 };
 exports.NonCircularProductSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base));
-exports.ProductSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), store: zod_1.z.lazy(() => store_1.StoreSchema), category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base));
+exports.ProductSchema = zod_1.z.lazy(() => zod_1.z.object(Object.assign({ id: zod_1.z.string(), store: store_1.StoreSchema, category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base)));
 exports.CreateProductSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { store: zod_1.z.string(), category: zod_1.z.string(), image: file_1.FileSchema.optional() }));
 exports.UpdateProductSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { store: zod_1.z.string(), category: zod_1.z.string(), image: file_1.FileSchema.optional() }));
 exports.GetProductsResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.ProductSchema.array() }));
@@ -2015,7 +2015,7 @@ const base = {
     description: zod_1.z.string(),
 };
 exports.NonCircularStoreSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), owner: user_1.UserSchema, image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array() }, base));
-exports.StoreSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), owner: user_1.UserSchema, image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array(), products: product_1.ProductSchema.array() }, base));
+exports.StoreSchema = zod_1.z.lazy(() => zod_1.z.object(Object.assign({ id: zod_1.z.string(), image: zod_1.z.string().optional(), rating: zod_1.z.number(), owner: user_1.UserSchema, tags: tag_1.TagSchema.array(), products: product_1.ProductSchema.array() }, base)));
 exports.CreateStoreSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { owner: zod_1.z.string(), image: file_1.FileSchema.optional(), tags: zod_1.z.string().array() }));
 exports.UpdateStoreSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { owner: zod_1.z.string(), image: file_1.FileSchema.optional(), tags: zod_1.z.string().array() }));
 exports.GetStoresResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.StoreSchema.array() }));
@@ -3620,7 +3620,7 @@ exports.StoreRatingEntity = StoreRatingEntity;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c;
+var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StoreEntity = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -3641,7 +3641,7 @@ tslib_1.__decorate([
 ], StoreEntity.prototype, "owner", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.OneToMany)(() => product_entity_1.ProductEntity, (product) => product.store),
-    tslib_1.__metadata("design:type", typeof (_b = typeof product_entity_1.ProductEntity !== "undefined" && product_entity_1.ProductEntity) === "function" ? _b : Object)
+    tslib_1.__metadata("design:type", Array)
 ], StoreEntity.prototype, "products", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.Column)(),
@@ -3667,7 +3667,7 @@ tslib_1.__decorate([
 ], StoreEntity.prototype, "categories", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.CreateDateColumn)(),
-    tslib_1.__metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+    tslib_1.__metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
 ], StoreEntity.prototype, "createdAt", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.Column)({ select: false, insert: false, readonly: true, nullable: true }),
