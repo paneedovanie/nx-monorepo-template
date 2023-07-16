@@ -1916,6 +1916,8 @@ exports.GetProductsOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zo
     store: zod_1.z.string().optional(),
     ids: zod_1.z.string().array().optional(),
     categoryIds: zod_1.z.string().array().optional(),
+    minPrice: zod_1.z.preprocess((a) => a && parseInt(zod_1.z.string().parse(a)), zod_1.z.number().positive().optional()),
+    maxPrice: zod_1.z.preprocess((a) => a && parseInt(zod_1.z.string().parse(a)), zod_1.z.number().positive().optional()),
 }));
 
 
@@ -4313,7 +4315,7 @@ let ProductRepository = class ProductRepository extends core_1.BaseRepository {
         };
     }
     modifyWhere(_a) {
-        var { ids, categoryIds } = _a, conditions = tslib_1.__rest(_a, ["ids", "categoryIds"]);
+        var { ids, categoryIds, minPrice, maxPrice } = _a, conditions = tslib_1.__rest(_a, ["ids", "categoryIds", "minPrice", "maxPrice"]);
         if (ids)
             conditions.id = (0, typeorm_1.In)(ids);
         if (categoryIds) {
@@ -4321,6 +4323,12 @@ let ProductRepository = class ProductRepository extends core_1.BaseRepository {
                 { id: (0, typeorm_1.In)(categoryIds) },
                 { parent: (0, typeorm_1.In)(categoryIds) },
             ];
+        }
+        if (minPrice) {
+            conditions.price = (0, typeorm_1.MoreThanOrEqual)(minPrice);
+        }
+        if (maxPrice) {
+            conditions.price = (0, typeorm_1.LessThanOrEqual)(maxPrice);
         }
         return conditions;
     }

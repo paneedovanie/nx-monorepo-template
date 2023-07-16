@@ -56,5 +56,18 @@ export const GetProductsOptionsSchema = PaginationOptionsSchema.merge(
     store: z.string().optional(),
     ids: z.string().array().optional(),
     categoryIds: z.string().array().optional(),
+    minPrice: z.preprocess(
+      (a) => a && parseInt(z.string().parse(a)),
+      z.number().positive().optional()
+    ),
+    maxPrice: z.preprocess(
+      (a) => a && parseInt(z.string().parse(a)),
+      z.number().positive().optional()
+    ),
   })
 );
+
+export interface PriceRange {
+  minPrice: number;
+  maxPrice: number;
+}

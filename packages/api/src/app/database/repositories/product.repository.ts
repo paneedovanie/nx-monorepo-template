@@ -4,6 +4,8 @@ import {
   FindOptionsRelations,
   FindOptionsWhere,
   In,
+  LessThanOrEqual,
+  MoreThanOrEqual,
 } from 'typeorm';
 import { CategoryEntity, ProductEntity } from '../entities';
 import { BaseRepository } from '../../core';
@@ -60,10 +62,14 @@ export class ProductRepository extends BaseRepository<
   protected modifyWhere({
     ids,
     categoryIds,
+    minPrice,
+    maxPrice,
     ...conditions
   }: FindOptionsWhere<ProductEntity> & {
     ids?: string[];
     categoryIds?: string[];
+    minPrice?: number;
+    maxPrice?: number;
   }): FindOptionsWhere<ProductEntity> {
     if (ids) conditions.id = In(ids);
     if (categoryIds) {
@@ -71,6 +77,12 @@ export class ProductRepository extends BaseRepository<
         { id: In(categoryIds) },
         { parent: In(categoryIds) },
       ];
+    }
+    if (minPrice) {
+      conditions.price = MoreThanOrEqual(minPrice);
+    }
+    if (maxPrice) {
+      conditions.price = LessThanOrEqual(maxPrice);
     }
     return conditions;
   }

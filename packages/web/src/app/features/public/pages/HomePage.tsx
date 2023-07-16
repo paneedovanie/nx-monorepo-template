@@ -19,6 +19,7 @@ import {
 import { Product, Store, generateColor } from '@nx-monorepo-template/global';
 import { BaseSyntheticEvent, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 export const HomePage = () => {
   const tsQueryClient = useTsQueryClient();
   const navigate = useNavigate();

@@ -34,8 +34,13 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { CartDialog, ProductCard } from '../components';
-import { Category, Product, Store } from '@nx-monorepo-template/global';
+import { CartDialog, PriceRanges, ProductCard } from '../components';
+import {
+  Category,
+  PriceRange,
+  Product,
+  Store,
+} from '@nx-monorepo-template/global';
 
 const Container = styled(Box)`
   padding: ${({ theme }) => theme.padding.md};
@@ -124,6 +129,7 @@ export const PublicStoreViewPage = () => {
   const tsQueryClient = useTsQueryClient();
   const { store, isFetchingStore } = useCartContext();
   const { search, page, perPage, setSearch, setPage } = usePagination();
+  const [priceRange, setPriceRange] = useState<PriceRange>();
   const [categoryIds, setCategoryIds] = useState<string[]>();
   const navigate = useNavigate();
   const drawerWidth = 250;
@@ -134,7 +140,15 @@ export const PublicStoreViewPage = () => {
 
   const { data: productsResult, isFetching: isFetchingProducts } =
     tsQueryClient.product.getAll.useQuery(
-      ['getProducts', store?.id, categoryIds, page, store?.id],
+      [
+        'getProducts',
+        store?.id,
+        categoryIds,
+        page,
+        store?.id,
+        priceRange?.minPrice,
+        priceRange?.maxPrice,
+      ],
       {
         query: {
           store: store?.id,
@@ -142,6 +156,8 @@ export const PublicStoreViewPage = () => {
           search,
           perPage,
           page,
+          minPrice: priceRange?.minPrice,
+          maxPrice: priceRange?.maxPrice,
         },
       }
     );
@@ -243,7 +259,7 @@ export const PublicStoreViewPage = () => {
         <Box
           sx={{
             flexGrow: 1,
-            width: { md: `calc(100% - ${drawerWidth}px)` },
+            width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
           }}
         >
           <Toolbar
@@ -278,6 +294,9 @@ export const PublicStoreViewPage = () => {
             </Box>
           </Toolbar>
           <Container>
+            <Box sx={{ mb: 1, overflowX: 'auto      ', maxWidth: '100%' }}>
+              <PriceRanges onChange={setPriceRange} />
+            </Box>
             <Box>
               {isFetchingProducts ? (
                 <Loading size="small" text="Fetching..." />
