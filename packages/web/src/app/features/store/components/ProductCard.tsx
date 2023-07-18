@@ -66,14 +66,17 @@ export const ProductCard = ({ data }: { data: Product }) => {
           <Box
             sx={{
               width: '100%',
-              height: 200,
+              height: [100, 200],
               display: 'flex',
               justifyContent: 'center',
               backgroundColor: generateColor(data.title),
               color: 'white',
             }}
           >
-            <InventoryIcon sx={{ height: 200, width: 200 }} color="inherit" />
+            <InventoryIcon
+              sx={{ height: [100, 200], width: 200 }}
+              color="inherit"
+            />
           </Box>
         )}
         <CardContent>
