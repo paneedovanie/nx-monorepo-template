@@ -142,6 +142,7 @@ export const PublicStoreViewPage = () => {
     tsQueryClient.product.getAll.useQuery(
       [
         'getProducts',
+        search,
         store?.id,
         categoryIds,
         page,
