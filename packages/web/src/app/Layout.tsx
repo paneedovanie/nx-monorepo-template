@@ -14,7 +14,7 @@ import {
   StorePublicRoutes,
 } from '@/app/features';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { Loading, TopBar, useAuthContext, useTsQueryClient } from '@/core';
+import { Loading, TopBar, useAuthContext } from '@/core';
 import Box from '@mui/material/Box';
 import { sidebarItems } from './sidebar';
 
@@ -22,11 +22,7 @@ const drawerWidth = 250;
 
 export const Layout = () => {
   const { user, isFetching } = useAuthContext();
-  const tsQueryClient = useTsQueryClient();
-  const { data } = tsQueryClient.store.get.useQuery(['getStore'], {
-    params: { id: '' },
-  });
-  console.log(data);
+
   if (isFetching) return <Loading sx={{ height: '100vh' }} />;
   return (
     <Routes>
