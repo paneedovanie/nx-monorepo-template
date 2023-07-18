@@ -38,7 +38,7 @@ const NumberField = styled(TextField)`
 
 export const ProductCard = ({ data }: { data: Product }) => {
   const [open, setOpen] = useState(false);
-  const { cart, add, minus, set, remove } = useCartContext();
+  const { cart, set } = useCartContext();
   const [count, setCount] = useState(0);
 
   const handleOpen = () => {
@@ -137,10 +137,21 @@ export const ProductCard = ({ data }: { data: Product }) => {
         <Box
           sx={{
             width: '100%',
+            height: 200,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           {data.image ? (
-            <img src={data.image} alt="product" width="100%" />
+            <img
+              src={data.image}
+              alt="product"
+              style={{
+                maxHeight: '100%',
+                maxWidth: '100%',
+              }}
+            />
           ) : (
             <Box
               sx={{
