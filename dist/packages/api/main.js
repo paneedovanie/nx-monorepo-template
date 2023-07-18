@@ -1802,6 +1802,7 @@ exports.GetOrdersOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_
     startDate: zod_1.z.preprocess((a) => a && new Date(a), zod_1.z.date().optional()),
     endDate: zod_1.z.preprocess((a) => a && new Date(a), zod_1.z.date().optional()),
     status: zod_1.z.string().optional(),
+    ref: zod_1.z.preprocess((a) => a && parseInt(zod_1.z.string().parse(a)), zod_1.z.number().positive().optional()),
 })
     .merge(unrestricted_1.UnrestrictedSchema));
 
@@ -4174,8 +4175,8 @@ let OrderRepository = class OrderRepository extends core_1.BaseRepository {
         if (storeIds) {
             conditions.store = { id: (0, typeorm_1.In)(storeIds) };
         }
-        if (isPaid) {
-            conditions.payment = (0, typeorm_1.Not)((0, typeorm_1.IsNull)());
+        if (isPaid !== undefined) {
+            conditions.payment = isPaid ? (0, typeorm_1.Not)((0, typeorm_1.IsNull)()) : (0, typeorm_1.IsNull)();
         }
         if (userIds) {
             conditions.user = { id: (0, typeorm_1.In)(userIds) };
@@ -4324,10 +4325,13 @@ let ProductRepository = class ProductRepository extends core_1.BaseRepository {
                 { parent: (0, typeorm_1.In)(categoryIds) },
             ];
         }
-        if (minPrice) {
+        if (minPrice && maxPrice) {
+            conditions.price = (0, typeorm_1.Between)(minPrice, maxPrice);
+        }
+        else if (minPrice) {
             conditions.price = (0, typeorm_1.MoreThanOrEqual)(minPrice);
         }
-        if (maxPrice) {
+        else if (maxPrice) {
             conditions.price = (0, typeorm_1.LessThanOrEqual)(maxPrice);
         }
         return conditions;

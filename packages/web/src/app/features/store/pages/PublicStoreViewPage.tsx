@@ -294,7 +294,7 @@ export const PublicStoreViewPage = () => {
             </Box>
           </Toolbar>
           <Container>
-            <Box sx={{ mb: 1, overflowX: 'auto      ', maxWidth: '100%' }}>
+            <Box sx={{ mb: 1, overflowX: 'auto', maxWidth: '100%' }}>
               <PriceRanges onChange={setPriceRange} />
             </Box>
             <Box>

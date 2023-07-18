@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
+  Between,
   DataSource,
   FindOptionsRelations,
   FindOptionsWhere,
@@ -78,10 +79,11 @@ export class ProductRepository extends BaseRepository<
         { parent: In(categoryIds) },
       ];
     }
-    if (minPrice) {
+    if (minPrice && maxPrice) {
+      conditions.price = Between(minPrice, maxPrice);
+    } else if (minPrice) {
       conditions.price = MoreThanOrEqual(minPrice);
-    }
-    if (maxPrice) {
+    } else if (maxPrice) {
       conditions.price = LessThanOrEqual(maxPrice);
     }
     return conditions;

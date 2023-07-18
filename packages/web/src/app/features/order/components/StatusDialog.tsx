@@ -49,6 +49,7 @@ export const StatusDialog = ({
             {
               name: 'status',
               component: 'Select',
+              label: 'Status',
               props: {
                 options: statusOptions,
               },

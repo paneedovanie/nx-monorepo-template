@@ -5,8 +5,25 @@ import {
   formatCurrency,
 } from '@/core';
 import { RemoveRedEye as EyeIcon } from '@mui/icons-material';
-import { Box, IconButton, TextField, Toolbar, Typography } from '@mui/material';
-import { Store, Order, OrderProduct } from '@nx-monorepo-template/global';
+import {
+  Box,
+  Checkbox,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Toolbar,
+  Typography,
+} from '@mui/material';
+import {
+  Store,
+  Order,
+  OrderProduct,
+  OrderStatus,
+} from '@nx-monorepo-template/global';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { BaseSyntheticEvent, useState } from 'react';
@@ -16,11 +33,39 @@ export const OrdersTable = ({ store }: { store: Store }) => {
   const navigate = useNavigate();
   const { page, perPage, order, setPage, setPerPage, setOrder } =
     usePagination();
+  const [ref, setRef] = useState<string>();
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [status, setStatus] = useState<string>('');
+  const [paid, setPaid] = useState<string>('');
+
+  const statusOptions = [
+    { label: 'Clear', value: '' },
+    ...Object.values(OrderStatus).map((status) => ({
+      label: status.charAt(0).toUpperCase() + status.substring(1),
+      value: status,
+    })),
+  ];
+
+  const paidOptions = [
+    { label: 'Clear', value: '' },
+    { label: 'Paid', value: 'paid' },
+    { label: 'Unpaid', value: 'unpaid' },
+  ];
 
   const { data, isLoading } = tsQueryClient.order.getAll.useQuery(
-    ['getOrders', perPage, page, startDate, endDate, order?.by, order?.dir],
+    [
+      'getOrders',
+      perPage,
+      page,
+      startDate,
+      endDate,
+      order?.by,
+      order?.dir,
+      ref,
+      status,
+      paid,
+    ],
     {
       query: {
         storeIds: [store.id],
@@ -30,17 +75,33 @@ export const OrdersTable = ({ store }: { store: Store }) => {
         endDate,
         orderBy: order?.by,
         orderDir: order?.dir,
+        ref,
+        status: status === '' ? undefined : status,
+        isPaid: paid === '' ? undefined : paid === 'paid' ? true : false,
       },
     }
   );
 
   const orders = data?.body;
+
   return (
     <>
       <Toolbar
-        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+        sx={{
+          display: 'flex',
+          flexDirection: ['column', null, 'row'],
+          alignItems: 'center',
+          gap: 1,
+        }}
         disableGutters
       >
+        <TextField
+          label="Ref"
+          onChange={(e: BaseSyntheticEvent) =>
+            setRef(e.target.value === '' ? undefined : e.target.value)
+          }
+          size="small"
+        />
         <TextField
           type="date"
           label="Start Date"
@@ -55,6 +116,40 @@ export const OrdersTable = ({ store }: { store: Store }) => {
           size="small"
           InputLabelProps={{ shrink: true }}
         />
+        <FormControl sx={{ maxWidth: 169, width: '100%' }}>
+          <InputLabel id="status-label" size="small">
+            Status
+          </InputLabel>
+          <Select
+            labelId="status-label"
+            label="Status"
+            size="small"
+            onChange={(e: SelectChangeEvent) => setStatus(e.target.value)}
+          >
+            {statusOptions.map((item, i) => (
+              <MenuItem value={item.value} key={i}>
+                {item.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl sx={{ maxWidth: 169, width: '100%' }}>
+          <InputLabel id="paid-label" size="small">
+            Paid
+          </InputLabel>
+          <Select
+            labelId="paid-label"
+            label="Paid"
+            size="small"
+            onChange={(e: SelectChangeEvent) => setPaid(e.target.value)}
+          >
+            {paidOptions.map((item, i) => (
+              <MenuItem value={item.value} key={i}>
+                {item.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Toolbar>
       <DataTable<Order>
         isLoading={isLoading}
@@ -64,14 +159,14 @@ export const OrdersTable = ({ store }: { store: Store }) => {
             label: 'Reference No.',
             sortable: true,
           },
-          {
-            name: 'store.title',
-            label: 'Store',
-            sortable: true,
-            render: ({ store }) => {
-              return store.title;
-            },
-          },
+          // {
+          //   name: 'store.title',
+          //   label: 'Store',
+          //   sortable: true,
+          //   render: ({ store }) => {
+          //     return store.title;
+          //   },
+          // },
           {
             name: 'items',
             label: 'Total Items',
@@ -80,7 +175,7 @@ export const OrdersTable = ({ store }: { store: Store }) => {
               const reducer = (curr: number, item: OrderProduct) => {
                 return curr + item.count;
               };
-              return formatCurrency(items.reduce(reducer, 0));
+              return items.reduce(reducer, 0);
             },
           },
           {
@@ -97,8 +192,16 @@ export const OrdersTable = ({ store }: { store: Store }) => {
             name: 'status',
             label: 'Status',
             sortable: true,
+            sx: { textTransform: 'capitalize' },
             render: ({ status }) => {
-              return status;
+              return (
+                <Typography
+                  variant="body2"
+                  sx={{ textTransform: 'capitalize' }}
+                >
+                  {status}
+                </Typography>
+              );
             },
           },
           {

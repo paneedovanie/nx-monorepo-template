@@ -15,7 +15,7 @@ import {
 } from '@/app/features';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Loading, TopBar, useAuthContext, useTsQueryClient } from '@/core';
-import { Box } from '@mui/material';
+import Box from '@mui/material/Box';
 import { sidebarItems } from './sidebar';
 
 const drawerWidth = 250;

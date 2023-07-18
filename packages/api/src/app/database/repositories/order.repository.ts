@@ -68,8 +68,8 @@ export class OrderRepository extends BaseRepository<
     if (storeIds) {
       conditions.store = { id: In(storeIds) };
     }
-    if (isPaid) {
-      conditions.payment = Not(IsNull());
+    if (isPaid !== undefined) {
+      conditions.payment = isPaid ? Not(IsNull()) : IsNull();
     }
     if (userIds) {
       conditions.user = { id: In(userIds) };
