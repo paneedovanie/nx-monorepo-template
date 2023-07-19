@@ -27,7 +27,7 @@ export const OrderViewContent = () => {
   return (
     <Container>
       <Breadcrumbs sx={{ my: 1 }} />
-      <OrderCard order={order} />
+      <OrderCard order={order} onUpdate={orderQueryResult.refetch} />
     </Container>
   );
 };
