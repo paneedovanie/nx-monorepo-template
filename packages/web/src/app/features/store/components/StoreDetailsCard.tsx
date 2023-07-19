@@ -12,6 +12,7 @@ import {
   Share as ShareIcon,
   ListAlt as ListAltIcon,
   AvTimer as AvTimerIcon,
+  Web as WebIcon,
 } from '@mui/icons-material';
 import {
   Box,
@@ -247,6 +248,16 @@ export const StoreDetailsCard = ({
                   <AvTimerIcon fontSize="small" />
                 </ListItemIcon>
                 Preparation Screen
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  window.open(`/stores/${store.id}`, '_blank');
+                }}
+              >
+                <ListItemIcon>
+                  <WebIcon fontSize="small" />
+                </ListItemIcon>
+                Store Page
               </MenuItem>
               <MenuItem
                 onClick={() => {
