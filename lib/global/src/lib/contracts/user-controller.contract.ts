@@ -77,4 +77,16 @@ export const user = initContract().router({
     },
     summary: 'Assign user role',
   },
+  assignAsStoreOwner: {
+    method: 'PATCH',
+    path: `${prefix}/:id/assign-as-store-owner`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
+    body: z.any(),
+    responses: {
+      201: UserSchema,
+    },
+    summary: 'Assign user role',
+  },
 });

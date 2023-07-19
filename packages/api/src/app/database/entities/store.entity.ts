@@ -13,6 +13,7 @@ import { UserEntity } from './user.entity';
 import { ProductEntity } from './product.entity';
 import { TagEntity } from './tag.entity';
 import { CategoryEntity } from './category.entity';
+import { StoreConfig } from '@nx-monorepo-template/global';
 
 @Entity('stores')
 @Index(['title', 'owner'], { unique: true })
@@ -42,6 +43,9 @@ export class StoreEntity {
   @OneToMany(() => CategoryEntity, (category) => category.store)
   @JoinTable({ name: 'store_categories' })
   categories: CategoryEntity[];
+
+  @Column({ type: 'jsonb', nullable: true })
+  config?: StoreConfig;
 
   @CreateDateColumn()
   createdAt: Date;

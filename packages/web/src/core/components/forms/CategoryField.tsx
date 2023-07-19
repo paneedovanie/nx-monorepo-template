@@ -12,9 +12,10 @@ import {
   Collapse,
   ListItemText,
   ListItemButton,
+  FormControl,
 } from '@mui/material';
 import { Category, Store } from '@nx-monorepo-template/global';
-import { MouseEventHandler, useState } from 'react';
+import { MouseEventHandler, useRef, useState } from 'react';
 
 type CategoryFieldProps = Omit<TextFieldProps, 'onSelect'> & {
   value?: Category;
@@ -71,7 +72,7 @@ const RenderItem = ({
         </ListItemButton>
         {hasChildren && (
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <List dense component="div" sx={{ pl: 1 }}>
+            <List component="div" sx={{ pl: 1 }}>
               {categories?.list.map((item) => (
                 <RenderItem
                   store={store}
@@ -103,6 +104,7 @@ export const CategoryField = ({
   const tsQueryClient = useTsQueryClient();
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [value, setValue] = useState<Category | undefined>(propsValue);
+  const container = useRef<HTMLDivElement | null>(null);
 
   const { data: categoriesResult } = tsQueryClient.category.getAll.useQuery(
     ['getCategories', props.store],
@@ -127,16 +129,16 @@ export const CategoryField = ({
   };
 
   return (
-    <>
+    <FormControl ref={container} sx={{ width: '100%', position: 'relative' }}>
       <TextField
         placeholder="Select category"
         {...props}
         onClick={handleOpen}
-        contentEditable={false}
-        value={
-          value && `${value?.title} (Parent: ${value?.parent?.title ?? 'None'})`
-        }
+        value={value && `${value?.title}`}
         InputLabelProps={{ shrink: true }}
+        InputProps={{
+          readOnly: true,
+        }}
       />
       <Menu
         anchorEl={anchorEl}
@@ -144,9 +146,10 @@ export const CategoryField = ({
         onClose={handleClose}
         transformOrigin={{ horizontal: 'left', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+        PaperProps={{ sx: { width: container.current?.clientWidth } }}
       >
-        <List dense>
-          {categories?.list.map((item) => (
+        <List>
+          {categories?.list.map((item, i) => (
             <RenderItem
               store={props.store}
               value={value}
@@ -156,10 +159,11 @@ export const CategoryField = ({
                 onSelect?.(v);
                 handleClose();
               }}
+              key={i}
             />
           ))}
         </List>
       </Menu>
-    </>
+    </FormControl>
   );
 };

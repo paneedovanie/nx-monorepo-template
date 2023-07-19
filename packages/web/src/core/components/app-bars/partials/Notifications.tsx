@@ -7,6 +7,7 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import { useNotificationContext } from '../../contexts';
 import {
@@ -103,11 +104,17 @@ export const Notifications = () => {
             </MenuItem>
           );
         })}
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Button component={Link} to="/manage/notifications">
-            See more
-          </Button>
-        </Box>
+        {notification.items.length ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Button component={Link} to="/manage/notifications">
+              See more
+            </Button>
+          </Box>
+        ) : (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 1 }}>
+            <Typography>No notification</Typography>
+          </Box>
+        )}
       </Menu>
     </>
   );

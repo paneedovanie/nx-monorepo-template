@@ -19,7 +19,7 @@ export const sidebarItems = [
   },
   {
     icon: <WalletIcon color="inherit" />,
-    label: 'Wallet',
+    label: 'My Wallet',
     to: '/manage/wallet',
     permissions: [RolePermission.TransactionBalance],
   },
@@ -33,7 +33,7 @@ export const sidebarItems = [
     icon: <CategoryIcon color="inherit" />,
     label: 'Categories',
     to: '/manage/categories',
-    permissions: [RolePermission.CategoryGetAll],
+    permissions: [RolePermission.CategoryGetAllUnrestricted],
   },
   {
     icon: <LocalOfferIcon color="inherit" />,
@@ -45,7 +45,7 @@ export const sidebarItems = [
     icon: <StoreIcon color="inherit" />,
     label: 'Stores',
     to: '/manage/stores',
-    permissions: [RolePermission.OrderGetAll],
+    permissions: [RolePermission.StoreCreate],
   },
   {
     icon: <EngineeringIcon color="inherit" />,
@@ -55,13 +55,8 @@ export const sidebarItems = [
   },
   {
     icon: <AddShoppingCartIcon color="inherit" />,
-    label: 'Orders',
+    label: 'My Orders',
     to: '/manage/orders',
     permissions: [RolePermission.OrderGetAll],
-  },
-  {
-    icon: <NotificationsIcon color="inherit" />,
-    label: 'Notifications',
-    to: '/manage/notifications',
   },
 ];

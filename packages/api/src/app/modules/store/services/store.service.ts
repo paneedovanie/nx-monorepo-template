@@ -5,7 +5,11 @@ import {
   StoreRepository,
 } from '../../../database';
 import { BaseService } from '../../../core';
-import { EStoreEvent, OrderStatus } from '@nx-monorepo-template/global';
+import {
+  EStoreEvent,
+  OrderStatus,
+  UpdateStoreConfig,
+} from '@nx-monorepo-template/global';
 import { StatisticService } from '../../statistic';
 import { EventGateway } from '../../../event';
 
@@ -56,5 +60,10 @@ export class StoreService extends BaseService<StoreEntity> {
       EStoreEvent.Dashboard,
       await this.statisticService.getStoreDashboard(storeId)
     );
+  }
+
+  async updateConfig(storeId: string, input: UpdateStoreConfig) {
+    await this.repository.updateWithRelations(storeId, { config: input });
+    return this.getById(storeId);
   }
 }

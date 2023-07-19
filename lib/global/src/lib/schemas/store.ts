@@ -15,12 +15,31 @@ const base = {
   description: z.string(),
 };
 
+export const CreateStoreConfigSchema = z.object({
+  headerTextColor: z.string(),
+  primaryColor: z.string(),
+  secondaryColor: z.string(),
+});
+
+export const UpdateStoreConfigSchema = z.object({
+  headerTextColor: z.string(),
+  primaryColor: z.string(),
+  secondaryColor: z.string(),
+});
+
+export const StoreConfigSchema = z.object({
+  headerTextColor: z.string(),
+  primaryColor: z.string(),
+  secondaryColor: z.string(),
+});
+
 export const NonCircularStoreSchema = z.object({
   id: z.string(),
   owner: UserSchema,
   image: z.string().optional(),
   rating: z.number(),
   tags: TagSchema.array(),
+  config: StoreConfigSchema.optional(),
   ...base,
 });
 
@@ -32,6 +51,7 @@ export const StoreSchema: z.ZodType<Store> = z.lazy(() =>
     owner: UserSchema,
     tags: TagSchema.array(),
     products: ProductSchema.array(),
+    config: StoreConfigSchema.optional(),
     ...base,
   })
 );
@@ -48,6 +68,7 @@ export const UpdateStoreSchema = z.object({
   owner: z.string(),
   image: FileSchema.optional(),
   tags: z.string().array(),
+  config: StoreConfigSchema.optional(),
 });
 
 export const GetStoresResponseSchema = PaginationResponseSchema.merge(

@@ -99,4 +99,14 @@ export class UserController implements NestControllerInterface<typeof c> {
 
     return { status: 201 as const, body: updatedUser };
   }
+
+  @Permissions(RolePermission.UserUpdate)
+  @TsRest(c.assignAsStoreOwner)
+  async assignAsStoreOwner(
+    @TsRestRequest() { params }: RequestShapes['assignAsStoreOwner']
+  ) {
+    const updatedUser = await this.userService.assignAsStoreOwner(params.id);
+
+    return { status: 201 as const, body: updatedUser };
+  }
 }

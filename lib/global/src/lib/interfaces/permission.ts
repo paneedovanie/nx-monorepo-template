@@ -38,6 +38,7 @@ export enum RolePermission {
   CategoryUpdate = 'category.update',
   CategoryDelete = 'category.delete',
   CategoryGetAll = 'category.get_all',
+  CategoryGetAllUnrestricted = 'category.get_all_unrestricted',
 
   StoreCreate = 'store.create',
   StoreGet = 'store.get',

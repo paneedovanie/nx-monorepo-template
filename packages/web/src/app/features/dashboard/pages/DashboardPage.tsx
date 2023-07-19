@@ -1,4 +1,10 @@
-import { Breadcrumbs, DashboardCountWidget, useTsQueryClient } from '@/core';
+import {
+  Allow,
+  BeAStoreOwnerAlert,
+  Breadcrumbs,
+  DashboardCountWidget,
+  useTsQueryClient,
+} from '@/core';
 import { Box, Checkbox, Grid, Typography } from '@mui/material';
 import {
   Store as StoreIcon,
@@ -10,6 +16,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { RolePermission } from '@nx-monorepo-template/global';
 
 export const DashboardPage = () => {
   const tsQueryClient = useTsQueryClient();
@@ -33,6 +40,9 @@ export const DashboardPage = () => {
   return (
     <Box sx={{ p: 1, height: '100vh' }}>
       <Breadcrumbs sx={{ my: 1 }} />
+
+      <BeAStoreOwnerAlert />
+
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Checkbox
           value={unrestricted}
@@ -43,14 +53,16 @@ export const DashboardPage = () => {
         <Typography>All</Typography>
       </Box>
       <Grid container spacing={1} sx={{ width: '100%' }}>
-        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-          <DashboardCountWidget
-            title="My Stores"
-            icon={<StoreIcon />}
-            count={dashboard?.myStoresCount}
-            onClick={() => navigate('/manage/stores')}
-          />
-        </Grid>
+        <Allow permissions={[RolePermission.StoreCreate]}>
+          <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+            <DashboardCountWidget
+              title="My Stores"
+              icon={<StoreIcon />}
+              count={dashboard?.myStoresCount}
+              onClick={() => navigate('/manage/stores')}
+            />
+          </Grid>
+        </Allow>
         <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
           <DashboardCountWidget
             title="My Orders"
@@ -59,14 +71,16 @@ export const DashboardPage = () => {
             onClick={() => navigate('/manage/orders')}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-          <DashboardCountWidget
-            title="My Stores Orders"
-            icon={<StoreIcon />}
-            count={dashboard?.myStoresOrdersCount}
-            onClick={() => navigate('/manage/orders')}
-          />
-        </Grid>
+        <Allow permissions={[RolePermission.StoreCreate]}>
+          <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+            <DashboardCountWidget
+              title="My Stores Orders"
+              icon={<StoreIcon />}
+              count={dashboard?.myStoresOrdersCount}
+              onClick={() => navigate('/manage/orders')}
+            />
+          </Grid>
+        </Allow>
         <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
           {dashboard?.storesCount !== undefined && (
             <DashboardCountWidget

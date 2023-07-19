@@ -20,8 +20,16 @@ export class UserService extends BaseService<UserEntity> {
   }
 
   public async unassignRole(id: string, roleId: string) {
-    const user = await this.repository.getById(id);
+    const user = await this.repository.getByIdWithRelations(id);
     user.roles = user.roles.filter((role) => role.id !== roleId);
+
+    return this.repository.save(user);
+  }
+
+  public async assignAsStoreOwner(id: string) {
+    const user = await this.repository.getByIdWithRelations(id);
+    const role = await this.roleRepository.findOneBy({ title: 'Store Owner' });
+    user.roles.push(role);
 
     return this.repository.save(user);
   }

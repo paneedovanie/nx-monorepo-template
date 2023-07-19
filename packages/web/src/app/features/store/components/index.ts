@@ -10,3 +10,4 @@ export * from './ProductCard';
 export * from './StoreDetailsCard';
 export * from './StoreRatingsCard';
 export * from './PriceRanges';
+export * from './EditorDialog';

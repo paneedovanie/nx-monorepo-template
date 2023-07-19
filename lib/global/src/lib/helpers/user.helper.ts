@@ -1,12 +1,14 @@
 import { TokenUser } from '../interfaces';
 
 export const checkUserPermission = (user: TokenUser, permissions: string[]) => {
-  const rolePermissions = user.roles[0]?.permissions;
-  if (!rolePermissions) return false;
+  if (!user.roles.length) return false;
 
-  for (const permission of permissions) {
-    return !!rolePermissions.find((code) => permission === code);
+  for (const role of user.roles) {
+    for (const permission of permissions) {
+      if (role.permissions?.find((code) => permission === code)) {
+        return true;
+      }
+    }
   }
-
   return false;
 };

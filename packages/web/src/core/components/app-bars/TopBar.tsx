@@ -127,7 +127,7 @@ export const TopBar = ({
                   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes special characters
                 };
                 const regexPattern = new RegExp(
-                  `^${escapeRegExp(to)}(\/[^\/]+)*$`
+                  `^${escapeRegExp(to)}(/[^/]+)*$`
                 );
                 const isActive =
                   to !== '/manage'

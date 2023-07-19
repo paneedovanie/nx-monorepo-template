@@ -5,6 +5,7 @@ import {
   GetStoresOptionsSchema,
   GetStoresResponseSchema,
   UpdateStoreSchema,
+  UpdateStoreConfigSchema,
 } from '../schemas';
 import { z } from 'zod';
 
@@ -65,5 +66,17 @@ export const store = initContract().router({
       204: z.any().optional(),
     },
     summary: 'Delete store',
+  },
+  updateConfig: {
+    method: 'PATCH',
+    path: `${prefix}/:id/config`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
+    body: UpdateStoreConfigSchema,
+    responses: {
+      201: StoreSchema,
+    },
+    summary: 'Update store config',
   },
 });

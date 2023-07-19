@@ -692,6 +692,18 @@ exports.store = (0, core_1.initContract)().router({
         },
         summary: 'Delete store',
     },
+    updateConfig: {
+        method: 'PATCH',
+        path: `${prefix}/:id/config`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
+        body: schemas_1.UpdateStoreConfigSchema,
+        responses: {
+            201: schemas_1.StoreSchema,
+        },
+        summary: 'Update store config',
+    },
 });
 
 
@@ -965,6 +977,18 @@ exports.user = (0, core_1.initContract)().router({
             id: zod_1.z.string().uuid(),
         }),
         body: schemas_1.UpdateUserRoleSchema,
+        responses: {
+            201: schemas_1.UserSchema,
+        },
+        summary: 'Assign user role',
+    },
+    assignAsStoreOwner: {
+        method: 'PATCH',
+        path: `${prefix}/:id/assign-as-store-owner`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
+        body: zod_1.z.any(),
         responses: {
             201: schemas_1.UserSchema,
         },
@@ -1281,11 +1305,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkUserPermission = void 0;
 const checkUserPermission = (user, permissions) => {
     var _a;
-    const rolePermissions = (_a = user.roles[0]) === null || _a === void 0 ? void 0 : _a.permissions;
-    if (!rolePermissions)
+    if (!user.roles.length)
         return false;
-    for (const permission of permissions) {
-        return !!rolePermissions.find((code) => permission === code);
+    for (const role of user.roles) {
+        for (const permission of permissions) {
+            if ((_a = role.permissions) === null || _a === void 0 ? void 0 : _a.find((code) => permission === code)) {
+                return true;
+            }
+        }
     }
     return false;
 };
@@ -1478,6 +1505,7 @@ var RolePermission;
     RolePermission["CategoryUpdate"] = "category.update";
     RolePermission["CategoryDelete"] = "category.delete";
     RolePermission["CategoryGetAll"] = "category.get_all";
+    RolePermission["CategoryGetAllUnrestricted"] = "category.get_all_unrestricted";
     RolePermission["StoreCreate"] = "store.create";
     RolePermission["StoreGet"] = "store.get";
     RolePermission["StoreUpdate"] = "store.update";
@@ -2005,7 +2033,7 @@ exports.GetStoreRatingsOptionsSchema = pagination_1.PaginationOptionsSchema.merg
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetStoresOptionsSchema = exports.GetStoresResponseSchema = exports.UpdateStoreSchema = exports.CreateStoreSchema = exports.StoreSchema = exports.NonCircularStoreSchema = void 0;
+exports.GetStoresOptionsSchema = exports.GetStoresResponseSchema = exports.UpdateStoreSchema = exports.CreateStoreSchema = exports.StoreSchema = exports.NonCircularStoreSchema = exports.StoreConfigSchema = exports.UpdateStoreConfigSchema = exports.CreateStoreConfigSchema = void 0;
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const user_1 = __webpack_require__("../../lib/global/src/lib/schemas/user.ts");
@@ -2017,10 +2045,25 @@ const base = {
     title: zod_1.z.string(),
     description: zod_1.z.string(),
 };
-exports.NonCircularStoreSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), owner: user_1.UserSchema, image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array() }, base));
-exports.StoreSchema = zod_1.z.lazy(() => zod_1.z.object(Object.assign({ id: zod_1.z.string(), image: zod_1.z.string().optional(), rating: zod_1.z.number(), owner: user_1.UserSchema, tags: tag_1.TagSchema.array(), products: product_1.ProductSchema.array() }, base)));
+exports.CreateStoreConfigSchema = zod_1.z.object({
+    headerTextColor: zod_1.z.string(),
+    primaryColor: zod_1.z.string(),
+    secondaryColor: zod_1.z.string(),
+});
+exports.UpdateStoreConfigSchema = zod_1.z.object({
+    headerTextColor: zod_1.z.string(),
+    primaryColor: zod_1.z.string(),
+    secondaryColor: zod_1.z.string(),
+});
+exports.StoreConfigSchema = zod_1.z.object({
+    headerTextColor: zod_1.z.string(),
+    primaryColor: zod_1.z.string(),
+    secondaryColor: zod_1.z.string(),
+});
+exports.NonCircularStoreSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), owner: user_1.UserSchema, image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array(), config: exports.StoreConfigSchema.optional() }, base));
+exports.StoreSchema = zod_1.z.lazy(() => zod_1.z.object(Object.assign({ id: zod_1.z.string(), image: zod_1.z.string().optional(), rating: zod_1.z.number(), owner: user_1.UserSchema, tags: tag_1.TagSchema.array(), products: product_1.ProductSchema.array(), config: exports.StoreConfigSchema.optional() }, base)));
 exports.CreateStoreSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { owner: zod_1.z.string(), image: file_1.FileSchema.optional(), tags: zod_1.z.string().array() }));
-exports.UpdateStoreSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { owner: zod_1.z.string(), image: file_1.FileSchema.optional(), tags: zod_1.z.string().array() }));
+exports.UpdateStoreSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { owner: zod_1.z.string(), image: file_1.FileSchema.optional(), tags: zod_1.z.string().array(), config: exports.StoreConfigSchema.optional() }));
 exports.GetStoresResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.StoreSchema.array() }));
 exports.GetStoresOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_1.z
     .object({
@@ -2283,6 +2326,10 @@ exports.roles = [
         title: 'User',
         description: 'User of the system',
     },
+    {
+        title: 'Store Owner',
+        description: 'User that owns a store',
+    },
 ];
 const AuthPermissions = {
     title: 'Auth',
@@ -2376,31 +2423,37 @@ const CategoryPermissions = {
             code: 'category.create',
             title: 'Create Category',
             description: 'Allow to create category',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'category.get',
             title: 'Get Category',
             description: 'Allow to get category',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'category.get_all',
             title: 'Get All Categories',
             description: 'Allow to get all categories',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
+        },
+        {
+            code: 'category.get_all_unrestricted',
+            title: 'Get All Categories',
+            description: 'Allow to get all categories unrestricted',
+            roles: ['Superadmin'],
         },
         {
             code: 'category.update',
             title: 'Update Category',
             description: 'Allow to update category',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'category.delete',
             title: 'Delete Category',
             description: 'Allow to delete category',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
     ],
 };
@@ -2448,31 +2501,31 @@ const StorePermissions = {
             code: 'store.create',
             title: 'Create Store',
             description: 'Allow to create store',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'store.get',
             title: 'Get Store',
             description: 'Allow to get store',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'store.get_all',
             title: 'Get All Stores',
             description: 'Allow to get all stores',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'store.get_all_unrestricted',
             title: 'Get All Stores Unrestricted',
             description: 'Allow to get all stores of all users',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'store.update',
             title: 'Update Store',
             description: 'Allow to update store',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'store.update_unrestricted',
@@ -2484,7 +2537,7 @@ const StorePermissions = {
             code: 'store.delete',
             title: 'Delete Store',
             description: 'Allow to delete store',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'store.delete_unrestricted',
@@ -2502,31 +2555,31 @@ const ProductPermissions = {
             code: 'product.create',
             title: 'Create Product',
             description: 'Allow to create product',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'product.get',
             title: 'Get Product',
             description: 'Allow to get product',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'User', 'Store Owner'],
         },
         {
             code: 'product.get_all',
-            title: 'Get All Categories',
-            description: 'Allow to get all categories',
-            roles: ['Superadmin', 'User'],
+            title: 'Get All Products',
+            description: 'Allow to get all products',
+            roles: ['Superadmin', 'User', 'Store Owner'],
         },
         {
             code: 'product.update',
             title: 'Update Product',
             description: 'Allow to update product',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
         {
             code: 'product.delete',
             title: 'Delete Product',
             description: 'Allow to delete product',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'Store Owner'],
         },
     ],
 };
@@ -2544,25 +2597,25 @@ const OrderPermissions = {
             code: 'order.get',
             title: 'Get Order',
             description: 'Allow to get order',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'User', 'Store Owner'],
         },
         {
             code: 'order.get_all',
             title: 'Get All Orders',
-            description: 'Allow to get all categories',
-            roles: ['Superadmin', 'User'],
+            description: 'Allow to get all orders',
+            roles: ['Superadmin', 'User', 'Store Owner'],
         },
         {
             code: 'order.get_all_unrestricted',
             title: 'Get All Orders Unrestricted',
-            description: 'Allow to get all categories unrestricted',
+            description: 'Allow to get all orders unrestricted',
             roles: ['Superadmin'],
         },
         {
             code: 'order.update',
             title: 'Update Order',
             description: 'Allow to update order',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'User', 'Store Owner'],
         },
         {
             code: 'order.update_unrestricted',
@@ -2574,7 +2627,7 @@ const OrderPermissions = {
             code: 'order.delete',
             title: 'Delete Order',
             description: 'Allow to delete order',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin'],
         },
         {
             code: 'order.delete_unrestricted',
@@ -2592,25 +2645,25 @@ const PaymentPermissions = {
             code: 'payment.create',
             title: 'Create Payment',
             description: 'Allow to create payment',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'User', 'Store Owner'],
         },
         {
             code: 'payment.get',
             title: 'Get Payment',
             description: 'Allow to get payment',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin', 'User', 'Store Owner'],
         },
         {
             code: 'payment.get_all',
             title: 'Get All Payments',
-            description: 'Allow to get all categories',
-            roles: ['Superadmin', 'User'],
+            description: 'Allow to get all payments',
+            roles: ['Superadmin', 'User', 'Store Owner'],
         },
         {
             code: 'payment.update',
             title: 'Update Payment',
             description: 'Allow to update payment',
-            roles: ['Superadmin', 'User'],
+            roles: ['Superadmin'],
         },
         {
             code: 'payment.delete',
@@ -3623,7 +3676,7 @@ exports.StoreRatingEntity = StoreRatingEntity;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b;
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StoreEntity = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -3632,6 +3685,7 @@ const user_entity_1 = __webpack_require__("./src/app/database/entities/user.enti
 const product_entity_1 = __webpack_require__("./src/app/database/entities/product.entity.ts");
 const tag_entity_1 = __webpack_require__("./src/app/database/entities/tag.entity.ts");
 const category_entity_1 = __webpack_require__("./src/app/database/entities/category.entity.ts");
+const global_1 = __webpack_require__("../../lib/global/src/index.ts");
 let StoreEntity = class StoreEntity {
 };
 tslib_1.__decorate([
@@ -3669,8 +3723,12 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:type", Array)
 ], StoreEntity.prototype, "categories", void 0);
 tslib_1.__decorate([
+    (0, typeorm_1.Column)({ type: 'jsonb', nullable: true }),
+    tslib_1.__metadata("design:type", typeof (_b = typeof global_1.StoreConfig !== "undefined" && global_1.StoreConfig) === "function" ? _b : Object)
+], StoreEntity.prototype, "config", void 0);
+tslib_1.__decorate([
     (0, typeorm_1.CreateDateColumn)(),
-    tslib_1.__metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+    tslib_1.__metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
 ], StoreEntity.prototype, "createdAt", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.Column)({ select: false, insert: false, readonly: true, nullable: true }),
@@ -7856,6 +7914,12 @@ let StoreController = class StoreController {
             return { status: 204, body: '' };
         });
     }
+    updateConfig({ params, body }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const updatedUser = yield this.storeService.updateConfig(params.id, body);
+            return { status: 201, body: updatedUser };
+        });
+    }
 };
 tslib_1.__decorate([
     (0, auth_1.Permissions)(global_1.RolePermission.StoreCreate),
@@ -7902,6 +7966,14 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], StoreController.prototype, "delete", null);
+tslib_1.__decorate([
+    (0, auth_1.Permissions)(global_1.RolePermission.StoreUpdate),
+    (0, nest_1.TsRest)(c.updateConfig),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], StoreController.prototype, "updateConfig", null);
 StoreController = tslib_1.__decorate([
     (0, common_1.UseGuards)(guards_1.JwtAuthGuard, guards_1.PermissionGuard),
     (0, common_1.Controller)(),
@@ -7991,6 +8063,12 @@ let StoreService = class StoreService extends core_1.BaseService {
             const store = yield this.repository.getByIdWithRelations(storeId);
             const socket = this.eventGateway.getSocket(store.owner.id);
             socket === null || socket === void 0 ? void 0 : socket.emit(global_1.EStoreEvent.Dashboard, yield this.statisticService.getStoreDashboard(storeId));
+        });
+    }
+    updateConfig(storeId, input) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield this.repository.updateWithRelations(storeId, { config: input });
+            return this.getById(storeId);
         });
     }
 };
@@ -8603,6 +8681,12 @@ let UserController = class UserController {
             return { status: 201, body: updatedUser };
         });
     }
+    assignAsStoreOwner({ params }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const updatedUser = yield this.userService.assignAsStoreOwner(params.id);
+            return { status: 201, body: updatedUser };
+        });
+    }
 };
 tslib_1.__decorate([
     (0, auth_1.Permissions)(global_1.RolePermission.UserCreate),
@@ -8653,6 +8737,14 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], UserController.prototype, "unassignRole", null);
+tslib_1.__decorate([
+    (0, auth_1.Permissions)(global_1.RolePermission.UserUpdate),
+    (0, nest_1.TsRest)(c.assignAsStoreOwner),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], UserController.prototype, "assignAsStoreOwner", null);
 UserController = tslib_1.__decorate([
     (0, common_1.UseGuards)(guards_1.JwtAuthGuard, guards_1.PermissionGuard),
     (0, common_1.Controller)(),
@@ -8712,8 +8804,16 @@ let UserService = class UserService extends core_1.BaseService {
     }
     unassignRole(id, roleId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const user = yield this.repository.getById(id);
+            const user = yield this.repository.getByIdWithRelations(id);
             user.roles = user.roles.filter((role) => role.id !== roleId);
+            return this.repository.save(user);
+        });
+    }
+    assignAsStoreOwner(id) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const user = yield this.repository.getByIdWithRelations(id);
+            const role = yield this.roleRepository.findOneBy({ title: 'Store Owner' });
+            user.roles.push(role);
             return this.repository.save(user);
         });
     }

@@ -127,4 +127,14 @@ export class StoreController implements NestControllerInterface<typeof c> {
 
     return { status: 204 as const, body: '' };
   }
+
+  @Permissions(RolePermission.StoreUpdate)
+  @TsRest(c.updateConfig)
+  async updateConfig(
+    @TsRestRequest() { params, body }: RequestShapes['updateConfig']
+  ) {
+    const updatedUser = await this.storeService.updateConfig(params.id, body);
+
+    return { status: 201 as const, body: updatedUser };
+  }
 }
