@@ -10,8 +10,8 @@ export const generateQrcode = async (text: string, logoPath?: string) => {
       light: '#ffffff',
     },
   };
-  const qrCodeSize = 400;
-  const logoSize = 75;
+  const qrCodeSize = 300;
+  const logoSize = 100;
 
   if (logoPath) {
     const canvas = createCanvas(qrCodeSize, qrCodeSize);
@@ -29,7 +29,8 @@ export const generateQrcode = async (text: string, logoPath?: string) => {
     logoCtx.drawImage(logoImg, 0, 0, logoSize, logoSize);
 
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(logoCanvas, 62.5, 62.5, logoSize, logoSize);
+    const center = (qrCodeSize - logoSize) / 2;
+    ctx.drawImage(logoCanvas, center, center, logoSize, logoSize);
 
     return canvas.toDataURL('image/png');
   }

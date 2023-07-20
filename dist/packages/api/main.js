@@ -1217,8 +1217,8 @@ const generateQrcode = (text, logoPath) => tslib_1.__awaiter(void 0, void 0, voi
             light: '#ffffff',
         },
     };
-    const qrCodeSize = 400;
-    const logoSize = 75;
+    const qrCodeSize = 300;
+    const logoSize = 100;
     if (logoPath) {
         const canvas = (0, canvas_1.createCanvas)(qrCodeSize, qrCodeSize);
         QRCode.toCanvas(canvas, text, option);
@@ -1231,7 +1231,8 @@ const generateQrcode = (text, logoPath) => tslib_1.__awaiter(void 0, void 0, voi
         const logoImg = yield (0, canvas_1.loadImage)(logoPath);
         logoCtx.drawImage(logoImg, 0, 0, logoSize, logoSize);
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(logoCanvas, 62.5, 62.5, logoSize, logoSize);
+        const center = (qrCodeSize - logoSize) / 2;
+        ctx.drawImage(logoCanvas, center, center, logoSize, logoSize);
         return canvas.toDataURL('image/png');
     }
     return QRCode.toDataURL(text, option);
