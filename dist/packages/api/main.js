@@ -1231,7 +1231,7 @@ const generateQrcode = (text, logoPath) => tslib_1.__awaiter(void 0, void 0, voi
         const logoImg = yield (0, canvas_1.loadImage)(logoPath);
         logoCtx.drawImage(logoImg, 0, 0, logoSize, logoSize);
         const ctx = canvas.getContext('2d');
-        const center = (qrCodeSize - logoSize) / 2;
+        const center = (qrCodeSize - logoSize - logoSize / 2) / 2;
         ctx.drawImage(logoCanvas, center, center, logoSize, logoSize);
         return canvas.toDataURL('image/png');
     }

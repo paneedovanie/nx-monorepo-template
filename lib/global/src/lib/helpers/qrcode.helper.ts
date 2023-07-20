@@ -29,7 +29,7 @@ export const generateQrcode = async (text: string, logoPath?: string) => {
     logoCtx.drawImage(logoImg, 0, 0, logoSize, logoSize);
 
     const ctx = canvas.getContext('2d');
-    const center = (qrCodeSize - logoSize) / 2;
+    const center = (qrCodeSize - logoSize - logoSize / 2) / 2;
     ctx.drawImage(logoCanvas, center, center, logoSize, logoSize);
 
     return canvas.toDataURL('image/png');
