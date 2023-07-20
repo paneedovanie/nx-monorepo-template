@@ -30,6 +30,7 @@ export class PaymentEntity {
   type: PaymentType;
 
   @Column({
+    type: 'bigint',
     transformer: {
       to: (v) => v * 100,
       from: (v) => v / 100,
@@ -38,6 +39,7 @@ export class PaymentEntity {
   amountPaid: number;
 
   @Column({
+    type: 'bigint',
     transformer: {
       to: (v) => v * 100,
       from: (v) => v / 100,
@@ -45,7 +47,13 @@ export class PaymentEntity {
   })
   totalCost: number;
 
-  @Column()
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (v) => v * 100,
+      from: (v) => v / 100,
+    },
+  })
   change: number;
 
   @BeforeInsert()

@@ -112,7 +112,7 @@ export const OrderList = () => {
               name: 'store',
               label: 'Store',
               render: ({ store }) => {
-                return store.title;
+                return store?.title ?? 'Deleted';
               },
             },
             {

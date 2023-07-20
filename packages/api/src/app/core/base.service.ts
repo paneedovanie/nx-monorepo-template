@@ -46,9 +46,13 @@ export class BaseService<
     return res;
   }
 
-  async delete(id: string) {
+  async delete(id: string, soft?: boolean) {
     const res = await this.getById(id);
-    await this.repository.delete({ id: id as any });
+    if (soft) {
+      await this.repository.softDelete({ id: id as any });
+    } else {
+      await this.repository.delete({ id: id as any });
+    }
     this.onDeleted(res);
     return;
   }

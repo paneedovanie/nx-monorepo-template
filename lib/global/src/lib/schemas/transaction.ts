@@ -4,17 +4,18 @@ import {
   PaginationResponseSchema,
 } from './pagination';
 import { UserSchema } from './user';
+import { CurrencySchema } from './common';
 
 const base = {
   receiver: z.string().length(13),
-  amount: z.number().min(1).multipleOf(0.01, 'Max of 2 decimal places'),
+  amount: CurrencySchema,
 };
 
 export const TransactionSchema = z.object({
   id: z.string(),
   sender: UserSchema,
   receiver: UserSchema,
-  amount: z.number(),
+  amount: CurrencySchema,
 });
 
 export const CreateTransactionSchema = z.object(base);

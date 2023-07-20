@@ -1,13 +1,7 @@
+import { useTsQueryClient } from '@/core/plugins';
 import { Box, Button, Dialog, DialogActions, Link } from '@mui/material';
-import { generateQrcode } from '@nx-monorepo-template/global';
-import {
-  HtmlHTMLAttributes,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Store } from '@nx-monorepo-template/global';
+import { HtmlHTMLAttributes, ReactNode, useRef, useState } from 'react';
 
 export const QrcodeDialog = ({
   imageProps,
@@ -16,6 +10,7 @@ export const QrcodeDialog = ({
   trigger,
   displayTrigger = true,
   open = false,
+  store,
   onClose,
 }: {
   imageProps?: HtmlHTMLAttributes<HTMLImageElement>;
@@ -24,19 +19,24 @@ export const QrcodeDialog = ({
   trigger?: ReactNode;
   displayTrigger?: boolean;
   open?: boolean;
+  store?: Store;
   onClose?: () => void;
 }) => {
-  const [qrcode, setQrcode] = useState<string>();
+  const tsQueryClient = useTsQueryClient();
   const [qrcodeOpen, setQrcodeOpen] = useState(false);
   const linkRef = useRef<HTMLAnchorElement>(null);
 
-  const getQrcode = useCallback(async () => {
-    setQrcode(await generateQrcode(text));
-  }, [text]);
+  const { data: qrcodeResult } = tsQueryClient.qrcode.get.useQuery(
+    ['getQrCode', text, store],
+    {
+      query: {
+        text,
+        logo: store?.image,
+      },
+    }
+  );
 
-  useEffect(() => {
-    getQrcode();
-  }, [getQrcode]);
+  const qrcode = qrcodeResult?.body.qrcode;
 
   return (
     <>

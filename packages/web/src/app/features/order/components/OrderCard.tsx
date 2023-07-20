@@ -54,6 +54,7 @@ export const OrderCard = ({
                   }}
                   filename={'order-ref-' + order?.ref + '-qrcode'}
                   text={window.location.href}
+                  store={order.store}
                 />
               </Box>
             </Grid>

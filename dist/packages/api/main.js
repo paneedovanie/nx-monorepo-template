@@ -186,6 +186,7 @@ const statistic_controller_contract_1 = __webpack_require__("../../lib/global/sr
 const notification_controller_contract_1 = __webpack_require__("../../lib/global/src/lib/contracts/notification-controller.contract.ts");
 const store_rating_controller_contract_1 = __webpack_require__("../../lib/global/src/lib/contracts/store-rating-controller.contract.ts");
 const tag_controller_contract_1 = __webpack_require__("../../lib/global/src/lib/contracts/tag-controller.contract.ts");
+const qrcode_controller_contract_1 = __webpack_require__("../../lib/global/src/lib/contracts/qrcode-controller.contract.ts");
 exports.contract = (0, core_1.initContract)().router({
     user: user_controller_contract_1.user,
     auth: auth_controller_contract_1.auth,
@@ -201,6 +202,7 @@ exports.contract = (0, core_1.initContract)().router({
     notification: notification_controller_contract_1.notification,
     storeRating: store_rating_controller_contract_1.storeRating,
     tag: tag_controller_contract_1.tag,
+    qrcode: qrcode_controller_contract_1.qrcode,
 });
 
 
@@ -515,6 +517,33 @@ exports.product = (0, core_1.initContract)().router({
             204: zod_1.z.any().optional(),
         },
         summary: 'Delete product',
+    },
+});
+
+
+/***/ }),
+
+/***/ "../../lib/global/src/lib/contracts/qrcode-controller.contract.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.qrcode = void 0;
+const core_1 = __webpack_require__("@ts-rest/core");
+const zod_1 = __webpack_require__("zod");
+const prefix = `/api/v1/qrcodes`;
+exports.qrcode = (0, core_1.initContract)().router({
+    get: {
+        method: 'GET',
+        path: `${prefix}`,
+        query: zod_1.z.object({
+            text: zod_1.z.string(),
+            logo: zod_1.z.string().optional(),
+        }),
+        responses: {
+            200: zod_1.z.object({ qrcode: zod_1.z.string() }),
+        },
+        summary: 'Generate qrcode',
     },
 });
 
@@ -1178,9 +1207,35 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateQrcode = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const QRCode = tslib_1.__importStar(__webpack_require__("qrcode"));
-const generateQrcode = (text) => {
-    return QRCode.toDataURL(text);
-};
+const canvas_1 = __webpack_require__("canvas");
+const generateQrcode = (text, logoPath) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+    const option = {
+        errorCorrectionLevel: 'H',
+        margin: 1,
+        color: {
+            dark: '#000000',
+            light: '#ffffff',
+        },
+    };
+    const qrCodeSize = 400;
+    const logoSize = 75;
+    if (logoPath) {
+        const canvas = (0, canvas_1.createCanvas)(qrCodeSize, qrCodeSize);
+        QRCode.toCanvas(canvas, text, option);
+        const logoCanvas = (0, canvas_1.createCanvas)(logoSize, logoSize);
+        const logoCtx = logoCanvas.getContext('2d');
+        // Fill the logo canvas with a white background
+        logoCtx.fillStyle = '#ffffff';
+        logoCtx.fillRect(0, 0, logoSize, logoSize);
+        // Load the logo image and draw it on the logo canvas
+        const logoImg = yield (0, canvas_1.loadImage)(logoPath);
+        logoCtx.drawImage(logoImg, 0, 0, logoSize, logoSize);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(logoCanvas, 62.5, 62.5, logoSize, logoSize);
+        return canvas.toDataURL('image/png');
+    }
+    return QRCode.toDataURL(text, option);
+});
 exports.generateQrcode = generateQrcode;
 
 
@@ -1695,6 +1750,18 @@ exports.GetCategoriesOptionsSchema = pagination_1.PaginationOptionsSchema.merge(
 
 /***/ }),
 
+/***/ "../../lib/global/src/lib/schemas/common.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CurrencySchema = void 0;
+const zod_1 = __webpack_require__("zod");
+exports.CurrencySchema = zod_1.z.number().max(1000000000000000).min(0.01);
+
+
+/***/ }),
+
 /***/ "../../lib/global/src/lib/schemas/file.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -1734,6 +1801,7 @@ tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/stati
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/notification.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/store-rating.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/tag.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/common.ts"), exports);
 
 
 /***/ }),
@@ -1817,7 +1885,7 @@ const base = {
     items: exports.OrderProductSchema.array(),
     status: zod_1.z.string(),
 };
-exports.OrderSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), ref: zod_1.z.number(), store: store_1.StoreSchema, user: user_1.UserSchema.optional(), payment: payment_1.NonCircularPaymentSchema, createdAt: zod_1.z.date() }, base));
+exports.OrderSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), ref: zod_1.z.number(), store: store_1.StoreSchema.optional(), user: user_1.UserSchema.optional(), payment: payment_1.NonCircularPaymentSchema, createdAt: zod_1.z.date() }, base));
 exports.CreateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string().optional() }, base));
 exports.UpdateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string().optional() }, base));
 exports.GetOrdersResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.OrderSchema.array() }));
@@ -1869,20 +1937,21 @@ exports.GetPaymentsOptionsSchema = exports.GetPaymentsResponseSchema = exports.U
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const order_1 = __webpack_require__("../../lib/global/src/lib/schemas/order.ts");
+const common_1 = __webpack_require__("../../lib/global/src/lib/schemas/common.ts");
 const base = {
     type: zod_1.z.string(),
-    amountPaid: zod_1.z.number(),
-    totalCost: zod_1.z.number(),
+    amountPaid: common_1.CurrencySchema,
+    totalCost: common_1.CurrencySchema,
 };
 exports.NonCircularPaymentSchema = zod_1.z.object({
     id: zod_1.z.string(),
     type: zod_1.z.string(),
-    amountPaid: zod_1.z.number(),
-    totalCost: zod_1.z.number(),
-    change: zod_1.z.number(),
+    amountPaid: common_1.CurrencySchema,
+    totalCost: common_1.CurrencySchema,
+    change: common_1.CurrencySchema,
     createdAt: zod_1.z.date(),
 });
-exports.PaymentSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), order: zod_1.z.lazy(() => order_1.OrderSchema), change: zod_1.z.number(), createdAt: zod_1.z.date() }, base));
+exports.PaymentSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), order: zod_1.z.lazy(() => order_1.OrderSchema), change: common_1.CurrencySchema, createdAt: zod_1.z.date() }, base));
 exports.CreatePaymentSchema = zod_1.z
     .object(Object.assign({ order: zod_1.z.string() }, base))
     .refine((obj) => obj.amountPaid >= obj.totalCost, {
@@ -1931,10 +2000,11 @@ const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagin
 const category_1 = __webpack_require__("../../lib/global/src/lib/schemas/category.ts");
 const file_1 = __webpack_require__("../../lib/global/src/lib/schemas/file.ts");
 const store_1 = __webpack_require__("../../lib/global/src/lib/schemas/store.ts");
+const common_1 = __webpack_require__("../../lib/global/src/lib/schemas/common.ts");
 const base = {
     title: zod_1.z.string(),
     description: zod_1.z.string(),
-    price: zod_1.z.number().min(0.01, 'Price must be greater than 0.01'),
+    price: common_1.CurrencySchema,
 };
 exports.NonCircularProductSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base));
 exports.ProductSchema = zod_1.z.lazy(() => zod_1.z.object(Object.assign({ id: zod_1.z.string(), store: store_1.StoreSchema, category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base)));
@@ -2108,15 +2178,16 @@ exports.PaySchema = exports.GetTransactionsOptionsSchema = exports.GetTransactio
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const user_1 = __webpack_require__("../../lib/global/src/lib/schemas/user.ts");
+const common_1 = __webpack_require__("../../lib/global/src/lib/schemas/common.ts");
 const base = {
     receiver: zod_1.z.string().length(13),
-    amount: zod_1.z.number().min(1).multipleOf(0.01, 'Max of 2 decimal places'),
+    amount: common_1.CurrencySchema,
 };
 exports.TransactionSchema = zod_1.z.object({
     id: zod_1.z.string(),
     sender: user_1.UserSchema,
     receiver: user_1.UserSchema,
-    amount: zod_1.z.number(),
+    amount: common_1.CurrencySchema,
 });
 exports.CreateTransactionSchema = zod_1.z.object(base);
 exports.GetTransactionsResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({
@@ -2234,6 +2305,7 @@ AppModule = tslib_1.__decorate([
             modules_1.StoreRatingModule,
             modules_1.TagModule,
             event_1.EventModule,
+            modules_1.QrcodeModule,
         ],
     })
 ], AppModule);
@@ -3008,10 +3080,15 @@ let BaseService = class BaseService {
             return res;
         });
     }
-    delete(id) {
+    delete(id, soft) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const res = yield this.getById(id);
-            yield this.repository.delete({ id: id });
+            if (soft) {
+                yield this.repository.softDelete({ id: id });
+            }
+            else {
+                yield this.repository.delete({ id: id });
+            }
             this.onDeleted(res);
             return;
         });
@@ -3424,6 +3501,7 @@ tslib_1.__decorate([
 ], PaymentEntity.prototype, "type", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.Column)({
+        type: 'bigint',
         transformer: {
             to: (v) => v * 100,
             from: (v) => v / 100,
@@ -3433,6 +3511,7 @@ tslib_1.__decorate([
 ], PaymentEntity.prototype, "amountPaid", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.Column)({
+        type: 'bigint',
         transformer: {
             to: (v) => v * 100,
             from: (v) => v / 100,
@@ -3441,7 +3520,13 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:type", Number)
 ], PaymentEntity.prototype, "totalCost", void 0);
 tslib_1.__decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({
+        type: 'bigint',
+        transformer: {
+            to: (v) => v * 100,
+            from: (v) => v / 100,
+        },
+    }),
     tslib_1.__metadata("design:type", Number)
 ], PaymentEntity.prototype, "change", void 0);
 tslib_1.__decorate([
@@ -3542,6 +3627,7 @@ tslib_1.__decorate([
 ], ProductEntity.prototype, "description", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.Column)({
+        type: 'bigint',
         transformer: {
             to: (v) => v * 100,
             from: (v) => v / 100,
@@ -3676,7 +3762,7 @@ exports.StoreRatingEntity = StoreRatingEntity;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StoreEntity = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -3734,6 +3820,10 @@ tslib_1.__decorate([
     (0, typeorm_1.Column)({ select: false, insert: false, readonly: true, nullable: true }),
     tslib_1.__metadata("design:type", Number)
 ], StoreEntity.prototype, "rating", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.DeleteDateColumn)(),
+    tslib_1.__metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
+], StoreEntity.prototype, "deletedAt", void 0);
 StoreEntity = tslib_1.__decorate([
     (0, typeorm_1.Entity)('stores'),
     (0, typeorm_1.Index)(['title', 'owner'], { unique: true })
@@ -3812,6 +3902,7 @@ tslib_1.__decorate([
 ], TransactionEntity.prototype, "receiver", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.Column)({
+        type: 'bigint',
         transformer: {
             to: (v) => v * 100,
             from: (v) => v / 100,
@@ -5919,6 +6010,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/permission/index.ts"
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/notification/index.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/store-rating/index.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/tag/index.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/qrcode/index.ts"), exports);
 
 
 /***/ }),
@@ -7164,6 +7256,89 @@ exports.ProductService = ProductService;
 
 /***/ }),
 
+/***/ "./src/app/modules/qrcode/controllers/index.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/qrcode/controllers/qrcode.controller.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/app/modules/qrcode/controllers/qrcode.controller.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.QrcodeController = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const nest_1 = __webpack_require__("@ts-rest/nest");
+const common_1 = __webpack_require__("@nestjs/common");
+const global_1 = __webpack_require__("../../lib/global/src/index.ts");
+const c = (0, nest_1.nestControllerContract)(global_1.contract.qrcode);
+let QrcodeController = class QrcodeController {
+    get({ query }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const qrcode = yield (0, global_1.generateQrcode)(query.text, query.logo);
+            if (!qrcode) {
+                return { status: 404, body: null };
+            }
+            return { status: 200, body: { qrcode } };
+        });
+    }
+};
+tslib_1.__decorate([
+    (0, nest_1.TsRest)(c.get),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], QrcodeController.prototype, "get", null);
+QrcodeController = tslib_1.__decorate([
+    (0, common_1.Controller)()
+], QrcodeController);
+exports.QrcodeController = QrcodeController;
+
+
+/***/ }),
+
+/***/ "./src/app/modules/qrcode/index.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/qrcode/qrcode.module.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/app/modules/qrcode/qrcode.module.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.QrcodeModule = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const common_1 = __webpack_require__("@nestjs/common");
+const controllers_1 = __webpack_require__("./src/app/modules/qrcode/controllers/index.ts");
+let QrcodeModule = class QrcodeModule {
+};
+QrcodeModule = tslib_1.__decorate([
+    (0, common_1.Global)(),
+    (0, common_1.Module)({
+        controllers: [controllers_1.QrcodeController],
+        providers: [],
+        exports: [],
+    })
+], QrcodeModule);
+exports.QrcodeModule = QrcodeModule;
+
+
+/***/ }),
+
 /***/ "./src/app/modules/role/controllers/index.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -7910,7 +8085,7 @@ let StoreController = class StoreController {
             if (category) {
                 throw new common_1.ConflictException(`Store still linked to a category`);
             }
-            yield this.storeService.delete(params.id);
+            yield this.storeService.delete(params.id, true);
             return { status: 204, body: '' };
         });
     }
@@ -8947,6 +9122,13 @@ module.exports = require("@ts-rest/nest");
 /***/ ((module) => {
 
 module.exports = require("bcrypt");
+
+/***/ }),
+
+/***/ "canvas":
+/***/ ((module) => {
+
+module.exports = require("canvas");
 
 /***/ }),
 

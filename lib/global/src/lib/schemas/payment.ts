@@ -4,26 +4,27 @@ import {
   PaginationResponseSchema,
 } from './pagination';
 import { OrderSchema } from './order';
+import { CurrencySchema } from './common';
 
 const base = {
   type: z.string(),
-  amountPaid: z.number(),
-  totalCost: z.number(),
+  amountPaid: CurrencySchema,
+  totalCost: CurrencySchema,
 };
 
 export const NonCircularPaymentSchema = z.object({
   id: z.string(),
   type: z.string(),
-  amountPaid: z.number(),
-  totalCost: z.number(),
-  change: z.number(),
+  amountPaid: CurrencySchema,
+  totalCost: CurrencySchema,
+  change: CurrencySchema,
   createdAt: z.date(),
 });
 
 export const PaymentSchema = z.object({
   id: z.string(),
   order: z.lazy(() => OrderSchema),
-  change: z.number(),
+  change: CurrencySchema,
   createdAt: z.date(),
   ...base,
 });

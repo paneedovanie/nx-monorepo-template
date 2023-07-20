@@ -25,6 +25,11 @@ export const StatusDialog = ({
       onSuccess?.(v.body);
     },
   });
+
+  if (!data.store?.id) {
+    return null;
+  }
+
   return (
     <Dialog
       onClose={onClose}

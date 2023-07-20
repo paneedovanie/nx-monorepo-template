@@ -22,6 +22,7 @@ export class TransactionEntity {
   receiver?: UserEntity;
 
   @Column({
+    type: 'bigint',
     transformer: {
       to: (v) => v * 100,
       from: (v) => v / 100,

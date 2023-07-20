@@ -8,6 +8,7 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
+  DeleteDateColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { ProductEntity } from './product.entity';
@@ -52,4 +53,7 @@ export class StoreEntity {
 
   @Column({ select: false, insert: false, readonly: true, nullable: true })
   rating: number;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

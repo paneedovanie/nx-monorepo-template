@@ -15,6 +15,7 @@ import {
   NotificationModule,
   StoreRatingModule,
   TagModule,
+  QrcodeModule,
 } from './modules';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
@@ -64,6 +65,7 @@ import { EventModule } from './event';
     StoreRatingModule,
     TagModule,
     EventModule,
+    QrcodeModule,
   ],
 })
 export class AppModule {

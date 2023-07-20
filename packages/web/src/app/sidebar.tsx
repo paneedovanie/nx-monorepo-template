@@ -6,7 +6,6 @@ import {
   Store as StoreIcon,
   Engineering as EngineeringIcon,
   AddShoppingCart as AddShoppingCartIcon,
-  Notifications as NotificationsIcon,
   LocalOffer as LocalOfferIcon,
 } from '@mui/icons-material';
 import { RolePermission } from '@nx-monorepo-template/global';
@@ -43,7 +42,7 @@ export const sidebarItems = [
   },
   {
     icon: <StoreIcon color="inherit" />,
-    label: 'Stores',
+    label: 'My Stores',
     to: '/manage/stores',
     permissions: [RolePermission.StoreCreate],
   },

@@ -6,12 +6,12 @@ import {
 import { CategorySchema } from './category';
 import { FileSchema } from './file';
 import { StoreSchema } from './store';
-import { Product } from '../interfaces';
+import { CurrencySchema } from './common';
 
 const base = {
   title: z.string(),
   description: z.string(),
-  price: z.number().min(0.01, 'Price must be greater than 0.01'),
+  price: CurrencySchema,
 };
 
 export const NonCircularProductSchema = z.object({

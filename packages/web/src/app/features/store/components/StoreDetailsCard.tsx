@@ -280,6 +280,7 @@ export const StoreDetailsCard = ({
               text={`${window.location.href.replace('/manage', '')}`}
               open={qrOpen}
               onClose={() => setQrOpen(false)}
+              store={store}
             />
           </div>
         )}

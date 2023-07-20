@@ -123,7 +123,7 @@ export class StoreController implements NestControllerInterface<typeof c> {
       throw new ConflictException(`Store still linked to a category`);
     }
 
-    await this.storeService.delete(params.id);
+    await this.storeService.delete(params.id, true);
 
     return { status: 204 as const, body: '' };
   }

@@ -8,7 +8,12 @@ import {
 import { StoreEntity, TagEntity } from '../entities';
 import { BaseRepository } from '../../core';
 import { UserRepository } from './user.repository';
-import { CreateStore, UpdateStore, isUUID } from '@nx-monorepo-template/global';
+import {
+  CreateStore,
+  UpdateStore,
+  generateQrcode,
+  isUUID,
+} from '@nx-monorepo-template/global';
 import { StoreRatingRepository } from './store-rating.repository';
 import { TagRepository } from './tag.repository';
 

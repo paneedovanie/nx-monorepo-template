@@ -30,7 +30,7 @@ export const PublicOrderViewContent = () => {
     <>
       <TopBar store={store} />
       <Container component="main">
-        <OrderCard order={order} />
+        <OrderCard order={order} onUpdate={orderQueryResult.refetch} />
       </Container>
     </>
   );
