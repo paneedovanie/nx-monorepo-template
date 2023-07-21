@@ -11,11 +11,13 @@ const statusOptions = Object.values(OrderStatus).map((status) => ({
 export const StatusDialog = ({
   data,
   open,
+  isStoreOwner = false,
   onClose,
   onSuccess,
 }: {
   data: Order;
   open: boolean;
+  isStoreOwner?: boolean;
   onClose: () => void;
   onSuccess?: (data: Order) => void;
 }) => {
@@ -56,7 +58,11 @@ export const StatusDialog = ({
               component: 'Select',
               label: 'Status',
               props: {
-                options: statusOptions,
+                options: isStoreOwner
+                  ? statusOptions
+                  : statusOptions.filter(
+                      (item) => item.value === OrderStatus.Cancelled
+                    ),
               },
             },
           ]}

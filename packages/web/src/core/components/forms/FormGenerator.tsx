@@ -3,6 +3,8 @@ import {
   AutocompleteProps,
   Box,
   Button,
+  FormControl,
+  InputLabel,
   MenuItem,
   Select,
   SelectProps,
@@ -139,21 +141,31 @@ const FieldProvider = ({
       options: { [key: string]: any }[];
     };
     return (
-      <Select
-        value={value}
-        label={label}
-        name={name}
-        onChange={onChange}
-        error={error}
-        size="small"
-        {...props}
-      >
-        {_props.options.map((item, i) => (
-          <MenuItem value={item[valueKey]} key={i}>
-            {item[labelKey]}
-          </MenuItem>
-        ))}
-      </Select>
+      <FormControl sx={{ width: '100%' }}>
+        <InputLabel id={name + 'label'} size="small">
+          {label}
+        </InputLabel>
+        <Select
+          labelId={name + 'label'}
+          value={value}
+          label={label}
+          name={name}
+          onChange={onChange}
+          error={error}
+          size="small"
+          {...props}
+          sx={{
+            width: '100%',
+            ...props?.sx,
+          }}
+        >
+          {_props.options.map((item, i) => (
+            <MenuItem value={item[valueKey]} key={i}>
+              {item[labelKey]}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     );
   } else if (component === 'AutoComplete') {
     const _props = props as AutoCompleteFieldProps;

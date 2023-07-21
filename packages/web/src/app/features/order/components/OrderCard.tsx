@@ -13,7 +13,7 @@ import {
   MenuItem,
   Typography,
 } from '@mui/material';
-import { Order, OrderProduct } from '@nx-monorepo-template/global';
+import { Order, OrderProduct, OrderStatus } from '@nx-monorepo-template/global';
 import { useMemo, useState } from 'react';
 import { BillDialog, PayDialog, StatusDialog } from '.';
 import { format } from 'date-fns';
@@ -82,7 +82,9 @@ export const OrderCard = ({
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-            {order?.status !== 'completed' && (
+            {!(
+              [OrderStatus.Completed, OrderStatus.Cancelled] as string[]
+            ).includes(order?.status) && (
               <MenuItem
                 onClick={() => {
                   setStatusOpen(true);
@@ -265,6 +267,7 @@ export const OrderCard = ({
       )}
       <StatusDialog
         data={order}
+        isStoreOwner={isStoreOwner}
         open={statusOpen}
         onClose={() => {
           setStatusOpen(false);
