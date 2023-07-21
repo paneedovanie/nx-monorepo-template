@@ -11,7 +11,6 @@ import { UserRepository } from './user.repository';
 import {
   CreateStore,
   UpdateStore,
-  generateQrcode,
   isUUID,
 } from '@nx-monorepo-template/global';
 import { StoreRatingRepository } from './store-rating.repository';

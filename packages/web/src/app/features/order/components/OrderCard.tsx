@@ -43,8 +43,13 @@ export const OrderCard = ({
       <Card sx={{ mb: 1 }}>
         <CardContent>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm="auto">
-              <Box sx={{ cursor: 'pointer' }}>
+            <Grid
+              item
+              xs={12}
+              sm="auto"
+              sx={{ display: 'flex', justifyContent: 'center' }}
+            >
+              <Box sx={{ cursor: 'pointer', maxWidth: 150 }}>
                 <QrcodeDialog
                   imageProps={{
                     style: {

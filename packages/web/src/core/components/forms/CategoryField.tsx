@@ -28,11 +28,13 @@ const RenderItem = ({
   value,
   item,
   onSelect,
+  onAnchor,
 }: {
   store?: Store;
   value?: Category;
   item: Category;
   onSelect?: (v: Category) => void;
+  onAnchor?: (v: HTMLDivElement) => void;
 }) => {
   const tsQueryClient = useTsQueryClient();
   const [open, setOpen] = useState(false);
@@ -55,9 +57,10 @@ const RenderItem = ({
 
   const categories = categoriesResult?.body;
 
-  const handleClick = () => {
+  const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
     if (hasChildren) {
       setOpen((v) => !v);
+      onAnchor?.(e.currentTarget);
     } else {
       onSelect?.(item);
     }
@@ -79,6 +82,7 @@ const RenderItem = ({
                   value={value}
                   item={item}
                   onSelect={onSelect}
+                  onAnchor={onAnchor}
                 />
               ))}
             </List>
@@ -105,6 +109,7 @@ export const CategoryField = ({
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [value, setValue] = useState<Category | undefined>(propsValue);
   const container = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLDivElement | null>(null);
 
   const { data: categoriesResult } = tsQueryClient.category.getAll.useQuery(
     ['getCategories', props.store],
@@ -131,6 +136,7 @@ export const CategoryField = ({
   return (
     <FormControl ref={container} sx={{ width: '100%', position: 'relative' }}>
       <TextField
+        ref={buttonRef}
         placeholder="Select category"
         {...props}
         onClick={handleOpen}
@@ -144,9 +150,11 @@ export const CategoryField = ({
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-        PaperProps={{ sx: { width: container.current?.clientWidth } }}
+        transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
+        PaperProps={{
+          sx: { width: container.current?.clientWidth, maxHeight: 200 },
+        }}
       >
         <List>
           {categories?.list.map((item, i) => (
@@ -158,6 +166,10 @@ export const CategoryField = ({
                 setValue(v);
                 onSelect?.(v);
                 handleClose();
+              }}
+              onAnchor={(v) => {
+                setAnchorEl(v);
+                setAnchorEl(buttonRef?.current);
               }}
               key={i}
             />

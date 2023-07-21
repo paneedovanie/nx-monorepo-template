@@ -1116,7 +1116,6 @@ tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/curre
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/form.helper.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/notification.helper.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/string.helper.ts"), exports);
-tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/helpers/qrcode.helper.ts"), exports);
 
 
 /***/ }),
@@ -1195,49 +1194,6 @@ const getNotificationMessages = (notification) => {
     return messages;
 };
 exports.getNotificationMessages = getNotificationMessages;
-
-
-/***/ }),
-
-/***/ "../../lib/global/src/lib/helpers/qrcode.helper.ts":
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.generateQrcode = void 0;
-const tslib_1 = __webpack_require__("tslib");
-const QRCode = tslib_1.__importStar(__webpack_require__("qrcode"));
-const canvas_1 = __webpack_require__("canvas");
-const generateQrcode = (text, logoPath) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-    const option = {
-        errorCorrectionLevel: 'H',
-        margin: 1,
-        color: {
-            dark: '#000000',
-            light: '#ffffff',
-        },
-    };
-    const qrCodeSize = 300;
-    const logoSize = 100;
-    if (logoPath) {
-        const canvas = (0, canvas_1.createCanvas)(qrCodeSize, qrCodeSize);
-        QRCode.toCanvas(canvas, text, option);
-        const logoCanvas = (0, canvas_1.createCanvas)(logoSize, logoSize);
-        const logoCtx = logoCanvas.getContext('2d');
-        // Fill the logo canvas with a white background
-        logoCtx.fillStyle = '#ffffff';
-        logoCtx.fillRect(0, 0, logoSize, logoSize);
-        // Load the logo image and draw it on the logo canvas
-        const logoImg = yield (0, canvas_1.loadImage)(logoPath);
-        logoCtx.drawImage(logoImg, 0, 0, logoSize, logoSize);
-        const ctx = canvas.getContext('2d');
-        const center = (qrCodeSize - logoSize - logoSize / 2) / 2;
-        ctx.drawImage(logoCanvas, center, center, logoSize, logoSize);
-        return canvas.toDataURL('image/png');
-    }
-    return QRCode.toDataURL(text, option);
-});
-exports.generateQrcode = generateQrcode;
 
 
 /***/ }),
@@ -2262,7 +2218,6 @@ const express_1 = tslib_1.__importDefault(__webpack_require__("express"));
 const serve_static_1 = __webpack_require__("@nestjs/serve-static");
 const path_1 = __webpack_require__("path");
 const file_1 = __webpack_require__("./src/app/file/index.ts");
-const event_1 = __webpack_require__("./src/app/event/index.ts");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -2305,8 +2260,6 @@ AppModule = tslib_1.__decorate([
             modules_1.NotificationModule,
             modules_1.StoreRatingModule,
             modules_1.TagModule,
-            event_1.EventModule,
-            modules_1.QrcodeModule,
         ],
     })
 ], AppModule);
@@ -6011,7 +5964,6 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/permission/index.ts"
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/notification/index.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/store-rating/index.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/tag/index.ts"), exports);
-tslib_1.__exportStar(__webpack_require__("./src/app/modules/qrcode/index.ts"), exports);
 
 
 /***/ }),
@@ -7253,89 +7205,6 @@ ProductService = tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof database_1.ProductRepository !== "undefined" && database_1.ProductRepository) === "function" ? _a : Object])
 ], ProductService);
 exports.ProductService = ProductService;
-
-
-/***/ }),
-
-/***/ "./src/app/modules/qrcode/controllers/index.ts":
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const tslib_1 = __webpack_require__("tslib");
-tslib_1.__exportStar(__webpack_require__("./src/app/modules/qrcode/controllers/qrcode.controller.ts"), exports);
-
-
-/***/ }),
-
-/***/ "./src/app/modules/qrcode/controllers/qrcode.controller.ts":
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.QrcodeController = void 0;
-const tslib_1 = __webpack_require__("tslib");
-const nest_1 = __webpack_require__("@ts-rest/nest");
-const common_1 = __webpack_require__("@nestjs/common");
-const global_1 = __webpack_require__("../../lib/global/src/index.ts");
-const c = (0, nest_1.nestControllerContract)(global_1.contract.qrcode);
-let QrcodeController = class QrcodeController {
-    get({ query }) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const qrcode = yield (0, global_1.generateQrcode)(query.text, query.logo);
-            if (!qrcode) {
-                return { status: 404, body: null };
-            }
-            return { status: 200, body: { qrcode } };
-        });
-    }
-};
-tslib_1.__decorate([
-    (0, nest_1.TsRest)(c.get),
-    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [Object]),
-    tslib_1.__metadata("design:returntype", Promise)
-], QrcodeController.prototype, "get", null);
-QrcodeController = tslib_1.__decorate([
-    (0, common_1.Controller)()
-], QrcodeController);
-exports.QrcodeController = QrcodeController;
-
-
-/***/ }),
-
-/***/ "./src/app/modules/qrcode/index.ts":
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const tslib_1 = __webpack_require__("tslib");
-tslib_1.__exportStar(__webpack_require__("./src/app/modules/qrcode/qrcode.module.ts"), exports);
-
-
-/***/ }),
-
-/***/ "./src/app/modules/qrcode/qrcode.module.ts":
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.QrcodeModule = void 0;
-const tslib_1 = __webpack_require__("tslib");
-const common_1 = __webpack_require__("@nestjs/common");
-const controllers_1 = __webpack_require__("./src/app/modules/qrcode/controllers/index.ts");
-let QrcodeModule = class QrcodeModule {
-};
-QrcodeModule = tslib_1.__decorate([
-    (0, common_1.Global)(),
-    (0, common_1.Module)({
-        controllers: [controllers_1.QrcodeController],
-        providers: [],
-        exports: [],
-    })
-], QrcodeModule);
-exports.QrcodeModule = QrcodeModule;
 
 
 /***/ }),
@@ -9126,13 +8995,6 @@ module.exports = require("bcrypt");
 
 /***/ }),
 
-/***/ "canvas":
-/***/ ((module) => {
-
-module.exports = require("canvas");
-
-/***/ }),
-
 /***/ "cloudinary":
 /***/ ((module) => {
 
@@ -9165,13 +9027,6 @@ module.exports = require("passport-jwt");
 /***/ ((module) => {
 
 module.exports = require("passport-local");
-
-/***/ }),
-
-/***/ "qrcode":
-/***/ ((module) => {
-
-module.exports = require("qrcode");
 
 /***/ }),
 

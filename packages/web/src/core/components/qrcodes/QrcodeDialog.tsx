@@ -1,7 +1,28 @@
-import { useTsQueryClient } from '@/core/plugins';
+import { generateQrcode } from '@/core/helpers';
 import { Box, Button, Dialog, DialogActions, Link } from '@mui/material';
 import { Store } from '@nx-monorepo-template/global';
-import { HtmlHTMLAttributes, ReactNode, useRef, useState } from 'react';
+import {
+  HtmlHTMLAttributes,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+const blobToString = (blob: Blob) => {
+  return new Promise<string | undefined>((res, rej) => {
+    const reader = new FileReader();
+
+    reader.onload = function (event: ProgressEvent<FileReader>) {
+      const result = event.target?.result;
+      if (typeof result === 'string') res(result);
+      else res(result?.toString());
+    };
+
+    reader.readAsText(blob);
+  });
+};
 
 export const QrcodeDialog = ({
   imageProps,
@@ -22,21 +43,18 @@ export const QrcodeDialog = ({
   store?: Store;
   onClose?: () => void;
 }) => {
-  const tsQueryClient = useTsQueryClient();
+  const [qrcode, setQrcode] = useState<string>();
   const [qrcodeOpen, setQrcodeOpen] = useState(false);
   const linkRef = useRef<HTMLAnchorElement>(null);
 
-  const { data: qrcodeResult } = tsQueryClient.qrcode.get.useQuery(
-    ['getQrCode', text, store],
-    {
-      query: {
-        text,
-        logo: store?.image,
-      },
-    }
-  );
+  const getQrcode = useCallback(async () => {
+    const result = await generateQrcode(text, store?.image);
+    setQrcode(result ? URL.createObjectURL(result) : undefined);
+  }, [text, store]);
 
-  const qrcode = qrcodeResult?.body.qrcode;
+  useEffect(() => {
+    getQrcode();
+  }, [getQrcode]);
 
   return (
     <>

@@ -15,7 +15,6 @@ import {
   NotificationModule,
   StoreRatingModule,
   TagModule,
-  QrcodeModule,
 } from './modules';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
@@ -24,7 +23,6 @@ import express from 'express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FileModule } from './file';
-import { EventModule } from './event';
 
 @Module({
   imports: [
@@ -64,8 +62,6 @@ import { EventModule } from './event';
     NotificationModule,
     StoreRatingModule,
     TagModule,
-    EventModule,
-    QrcodeModule,
   ],
 })
 export class AppModule {
