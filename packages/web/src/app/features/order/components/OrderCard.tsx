@@ -1,18 +1,27 @@
 import { QrcodeDialog, formatCurrency, useAuthContext } from '@/core';
 import {
   Box,
-  Button,
   Card,
   CardActions,
   CardContent,
   Chip,
   Divider,
   Grid,
+  IconButton,
+  ListItemIcon,
+  Menu,
+  MenuItem,
   Typography,
 } from '@mui/material';
 import { Order, OrderProduct } from '@nx-monorepo-template/global';
 import { useMemo, useState } from 'react';
 import { BillDialog, PayDialog, StatusDialog } from '.';
+import { format } from 'date-fns';
+import {
+  Edit as EditIcon,
+  MoreVert as MoreVertIcon,
+  Payment as PaymentIcon,
+} from '@mui/icons-material';
 
 export const OrderCard = ({
   order,
@@ -25,6 +34,7 @@ export const OrderCard = ({
   const [billOpen, setBillOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const { user } = useAuthContext();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const isCustomer = order.user?.id === user?.id;
   const isStoreOwner = order.store?.owner?.id === user?.id;
@@ -38,10 +48,80 @@ export const OrderCard = ({
     return total;
   }, [order?.items]);
 
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <>
       <Card sx={{ mb: 1 }}>
-        <CardContent>
+        <CardContent sx={{ position: 'relative' }}>
+          <IconButton
+            sx={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+            }}
+            onClick={handleClick}
+          >
+            <MoreVertIcon />
+          </IconButton>{' '}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            PaperProps={{
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+              },
+            }}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          >
+            {order?.status !== 'completed' && (
+              <MenuItem
+                onClick={() => {
+                  setStatusOpen(true);
+                  handleClose();
+                }}
+              >
+                <ListItemIcon>
+                  <EditIcon fontSize="small" />
+                </ListItemIcon>
+                Update Status
+              </MenuItem>
+            )}
+            {!order.payment && isCustomer && !!order.user && (
+              <MenuItem
+                onClick={() => {
+                  setPaymentOpen(true);
+                  handleClose();
+                }}
+              >
+                <ListItemIcon>
+                  <PaymentIcon fontSize="small" />
+                </ListItemIcon>
+                Pay
+              </MenuItem>
+            )}
+            {!order.payment && isStoreOwner && (
+              <MenuItem
+                onClick={() => {
+                  setBillOpen(true);
+                  handleClose();
+                }}
+              >
+                <ListItemIcon>
+                  <PaymentIcon fontSize="small" />
+                </ListItemIcon>
+                Bill
+              </MenuItem>
+            )}
+          </Menu>
           <Grid container spacing={2}>
             <Grid
               item
@@ -64,41 +144,25 @@ export const OrderCard = ({
               </Box>
             </Grid>
             <Grid item xs={12} sm="auto">
-              <Typography variant="h5" sx={{ mb: 1 }}>
-                #{order?.ref}
+              <Typography variant="h4">
+                {order.store?.title ?? 'Deleted'}
               </Typography>
-              <Typography sx={{ textTransform: 'Capitalize' }}>
-                Status: {order?.status}
-                {order?.status !== 'completed' && isStoreOwner && (
-                  <Button
-                    onClick={() => {
-                      setStatusOpen(true);
-                    }}
-                  >
-                    Change
-                  </Button>
-                )}
+              <Typography variant="h5">#{order?.ref}</Typography>
+              <Typography
+                variant="caption"
+                sx={{ textTransform: 'Capitalize' }}
+              >
+                Created Date:{' '}
+                {format(new Date(order.createdAt), 'MMMM dd, Y - hh:mm a')}
+              </Typography>
+              <Typography sx={{ textTransform: 'Capitalize', flex: 1 }}>
+                <b>Status:</b>{' '}
+                <span style={{ textTransform: 'capitalize', flex: 1 }}>
+                  {order?.status}
+                </span>
               </Typography>
               <Typography>
-                Paid: {order?.payment ? 'Yes' : 'No'}
-                {!order.payment && isCustomer && !!order.user && (
-                  <Button
-                    onClick={() => {
-                      setPaymentOpen(true);
-                    }}
-                  >
-                    Pay
-                  </Button>
-                )}
-                {!order.payment && isStoreOwner && (
-                  <Button
-                    onClick={() => {
-                      setBillOpen(true);
-                    }}
-                  >
-                    Bill
-                  </Button>
-                )}
+                <b>Paid:</b> {order?.payment ? 'Yes' : 'No'}
               </Typography>
             </Grid>
           </Grid>
