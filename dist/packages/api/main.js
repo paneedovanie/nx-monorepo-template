@@ -2218,6 +2218,7 @@ const express_1 = tslib_1.__importDefault(__webpack_require__("express"));
 const serve_static_1 = __webpack_require__("@nestjs/serve-static");
 const path_1 = __webpack_require__("path");
 const file_1 = __webpack_require__("./src/app/file/index.ts");
+const event_1 = __webpack_require__("./src/app/event/index.ts");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -2260,6 +2261,7 @@ AppModule = tslib_1.__decorate([
             modules_1.NotificationModule,
             modules_1.StoreRatingModule,
             modules_1.TagModule,
+            event_1.EventModule,
         ],
     })
 ], AppModule);
