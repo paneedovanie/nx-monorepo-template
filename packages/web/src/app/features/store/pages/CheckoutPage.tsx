@@ -67,9 +67,6 @@ const CheckoutLoader = () => {
           <Skeleton variant="text" animation="wave" sx={{ width: 150 }} />
         </Typography>
       </CardContent>
-      {/* <CardActions>
-        <Skeleton variant="text" animation="wave" />
-      </CardActions> */}
     </Card>
   );
 };

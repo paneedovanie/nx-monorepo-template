@@ -59,16 +59,19 @@ export const OrderCard = ({
     <>
       <Card sx={{ mb: 1 }}>
         <CardContent sx={{ position: 'relative' }}>
-          <IconButton
-            sx={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-            }}
-            onClick={handleClick}
-          >
-            <MoreVertIcon />
-          </IconButton>{' '}
+          {isStoreOwner ||
+            (isCustomer && user && !order?.payment && (
+              <IconButton
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                }}
+                onClick={handleClick}
+              >
+                <MoreVertIcon />
+              </IconButton>
+            ))}
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
@@ -84,19 +87,20 @@ export const OrderCard = ({
           >
             {!(
               [OrderStatus.Completed, OrderStatus.Cancelled] as string[]
-            ).includes(order?.status) && (
-              <MenuItem
-                onClick={() => {
-                  setStatusOpen(true);
-                  handleClose();
-                }}
-              >
-                <ListItemIcon>
-                  <EditIcon fontSize="small" />
-                </ListItemIcon>
-                Update Status
-              </MenuItem>
-            )}
+            ).includes(order?.status) &&
+              isStoreOwner && (
+                <MenuItem
+                  onClick={() => {
+                    setStatusOpen(true);
+                    handleClose();
+                  }}
+                >
+                  <ListItemIcon>
+                    <EditIcon fontSize="small" />
+                  </ListItemIcon>
+                  Update Status
+                </MenuItem>
+              )}
             {!order.payment && isCustomer && !!order.user && (
               <MenuItem
                 onClick={() => {
@@ -267,7 +271,6 @@ export const OrderCard = ({
       )}
       <StatusDialog
         data={order}
-        isStoreOwner={isStoreOwner}
         open={statusOpen}
         onClose={() => {
           setStatusOpen(false);
