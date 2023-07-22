@@ -14,7 +14,7 @@ import {
   StorePublicRoutes,
 } from '@/app/features';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { Loading, TopBar, useAuthContext } from '@/core';
+import { LayoutLoader, Loading, TopBar, useAuthContext } from '@/core';
 import Box from '@mui/material/Box';
 import { sidebarItems } from './sidebar';
 
@@ -23,7 +23,8 @@ const drawerWidth = 250;
 export const Layout = () => {
   const { user, isFetching } = useAuthContext();
 
-  if (isFetching) return <Loading sx={{ height: '100vh' }} />;
+  if (isFetching) return <LayoutLoader />;
+
   return (
     <Routes>
       <Route

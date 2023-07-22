@@ -5,6 +5,7 @@ import {
   Empty,
   useTsQueryClient,
   TopBar,
+  LayoutLoader,
 } from '@/core';
 import {
   FilterAlt as FilterAltIcon,
@@ -34,7 +35,12 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { CartDialog, PriceRanges, ProductCard } from '../components';
+import {
+  CartDialog,
+  PriceRanges,
+  ProductCard,
+  ProductsLoader,
+} from '../components';
 import {
   Category,
   PriceRange,
@@ -212,7 +218,7 @@ export const PublicStoreViewPage = () => {
   }, [store]);
 
   if (isFetchingStore) {
-    return <Loading />;
+    return <LayoutLoader color={store?.config?.primaryColor} />;
   } else if (!store) {
     navigate('/');
     return null;
@@ -300,7 +306,7 @@ export const PublicStoreViewPage = () => {
             </Box>
             <Box>
               {isFetchingProducts ? (
-                <Loading size="small" text="Fetching..." />
+                <ProductsLoader />
               ) : (
                 <Grid container spacing={1}>
                   {products?.list?.map((item: Product, i: number) => {

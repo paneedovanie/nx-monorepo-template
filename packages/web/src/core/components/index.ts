@@ -12,3 +12,4 @@ export * from './dialogs';
 export * from './svgs';
 export * from './widgets';
 export * from './alerts';
+export * from './loaders';

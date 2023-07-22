@@ -4894,7 +4894,10 @@ let EventGateway = class EventGateway extends core_1.BaseGateway {
                 orderBy: 'createdAt',
                 status: global_1.OrderStatus.Preparing,
             });
-            client.emit(global_1.Event.StorePreparation, orderResult.list);
+            client.emit(global_1.Event.StorePreparation, {
+                storeId,
+                preparing: orderResult.list,
+            });
         });
     }
 };
@@ -6612,7 +6615,10 @@ let OrderService = class OrderService extends core_1.BaseService {
                     orderBy: 'createdAt',
                     status: global_1.OrderStatus.Preparing,
                 });
-                this.eventGateway.emitToUser(order.store.owner.id, global_1.Event.StorePreparation, orderResult.list);
+                this.eventGateway.emitToUser(order.store.owner.id, global_1.Event.StorePreparation, {
+                    storeId,
+                    preparing: orderResult.list,
+                });
                 baseMetadata.status = order.status;
             }
             if (((_a = prev.payment) === null || _a === void 0 ? void 0 : _a.id) !== ((_b = order.payment) === null || _b === void 0 ? void 0 : _b.id)) {
@@ -7642,6 +7648,7 @@ let StatisticService = class StatisticService {
     getStoreDashboard(storeId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return {
+                storeId,
                 categoriesCount: yield this.getStoreCategoriesCount(storeId),
                 productsCount: yield this.getStoreProductsCount(storeId),
                 ordersCount: yield this.getStoreOrdersCount(storeId),
@@ -8079,6 +8086,7 @@ let StoreService = class StoreService extends core_1.BaseService {
     getStatus(storeId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return {
+                storeId,
                 preparing: yield this.orderRepository.find({
                     where: {
                         status: global_1.OrderStatus.Preparing,

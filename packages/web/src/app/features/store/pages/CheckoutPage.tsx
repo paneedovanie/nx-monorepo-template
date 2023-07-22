@@ -8,6 +8,7 @@ import {
   formatCurrency,
   Loading,
   TopBar,
+  LayoutLoader,
 } from '@/core';
 import {
   Box,
@@ -79,7 +80,7 @@ export const CheckoutPage = () => {
   }, [params.storeId, length, navigate]);
 
   if (isFetching) {
-    return <Loading />;
+    return <LayoutLoader color={store?.config?.primaryColor} />;
   }
 
   if (!store) {

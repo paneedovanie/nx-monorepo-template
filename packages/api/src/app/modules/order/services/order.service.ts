@@ -83,7 +83,10 @@ export class OrderService extends BaseService<
       this.eventGateway.emitToUser(
         order.store.owner.id,
         Event.StorePreparation,
-        orderResult.list
+        {
+          storeId,
+          preparing: orderResult.list,
+        }
       );
       baseMetadata.status = order.status;
     }

@@ -17,7 +17,7 @@ import {
   Payment as PaymentIcon,
 } from '@mui/icons-material';
 import { Event, StoreDashboardEvent } from '@nx-monorepo-template/global';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
@@ -26,7 +26,9 @@ const Container = styled.div`
 export const StoreViewPageContent = () => {
   const navigate = useNavigate();
   const { storeQueryResult } = usePageContext();
-  const [dashboard, setDashboard] = useState<StoreDashboardEvent>({
+  const [dashboard, setDashboard] = useState<
+    Omit<StoreDashboardEvent, 'storeId'>
+  >({
     categoriesCount: 0,
     productsCount: 0,
     ordersCount: 0,
@@ -36,12 +38,26 @@ export const StoreViewPageContent = () => {
 
   const store = storeQueryResult.data?.body;
 
+  const onDashboard = useCallback(
+    (e: StoreDashboardEvent) => {
+      if (store?.id === e.storeId) {
+        setDashboard({
+          categoriesCount: e.categoriesCount,
+          productsCount: e.paymentsCount,
+          ordersCount: e.ordersCount,
+          paymentsCount: e.paymentsCount,
+        });
+      }
+    },
+    [store]
+  );
+
   useEffect(() => {
-    socket?.on(Event.StoreDashboard, setDashboard);
+    socket?.on(Event.StoreDashboard, onDashboard);
     if (store?.id) {
       socket?.emit(Event.StoreDashboard, store?.id);
     }
-  }, [socket, socket?.connected, store?.id]);
+  }, [socket, socket?.connected, store?.id, onDashboard]);
 
   if (storeQueryResult.isFetching) {
     return <Loading />;

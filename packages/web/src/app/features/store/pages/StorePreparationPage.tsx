@@ -7,9 +7,13 @@ import {
   Typography,
 } from '@mui/material';
 import styled from 'styled-components';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Event, Order } from '@nx-monorepo-template/global';
+import {
+  Event,
+  Order,
+  StorePreparingEvent,
+} from '@nx-monorepo-template/global';
 import { useEventContext } from '@/core';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -83,10 +87,20 @@ export const StorePreparationPage = () => {
   const [preparing, setPreparing] = useState<Order[]>([]);
   const { socket } = useEventContext();
 
+  const onPreparing = useCallback(
+    (e: StorePreparingEvent) => {
+      console.log(e);
+      if (storeId === e.storeId) {
+        setPreparing(e.preparing);
+      }
+    },
+    [storeId]
+  );
+
   useEffect(() => {
-    socket?.on(Event.StorePreparation, setPreparing);
+    socket?.on(Event.StorePreparation, onPreparing);
     socket?.emit(Event.StorePreparation, storeId);
-  }, [socket, socket?.connected, storeId]);
+  }, [socket, socket?.connected, storeId, onPreparing]);
 
   return (
     <Container>

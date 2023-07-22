@@ -99,6 +99,7 @@ export class StatisticService {
 
   async getStoreDashboard(storeId: string) {
     return {
+      storeId,
       categoriesCount: await this.getStoreCategoriesCount(storeId),
       productsCount: await this.getStoreProductsCount(storeId),
       ordersCount: await this.getStoreOrdersCount(storeId),

@@ -73,6 +73,10 @@ export class EventGateway extends BaseGateway {
       orderBy: 'createdAt',
       status: OrderStatus.Preparing,
     });
-    client.emit(Event.StorePreparation, orderResult.list);
+
+    client.emit(Event.StorePreparation, {
+      storeId,
+      preparing: orderResult.list,
+    });
   }
 }

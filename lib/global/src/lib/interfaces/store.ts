@@ -10,6 +10,7 @@ import {
   StoreConfigSchema,
 } from '../schemas';
 import { Product } from './product';
+import { Order } from './order';
 
 export type CreateStoreConfig = z.infer<typeof CreateStoreConfigSchema>;
 
@@ -34,7 +35,19 @@ export enum EStoreEvent {
   Dashboard = 'dashboard',
 }
 
+export type StoreStatusEvent = {
+  storeId: string;
+  preparing: Order[];
+  ready: Order[];
+};
+
+export type StorePreparingEvent = {
+  storeId: string;
+  preparing: Order[];
+};
+
 export type StoreDashboardEvent = {
+  storeId: string;
   categoriesCount: number;
   productsCount: number;
   ordersCount: number;

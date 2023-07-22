@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { OrderCard } from '../components';
 import {
+  LayoutLoader,
   Loading,
   PageContextProvider,
   TopBar,
@@ -20,7 +21,7 @@ export const PublicOrderViewContent = () => {
   const order = orderQueryResult.data?.body;
 
   if (orderQueryResult.isFetching) {
-    return <Loading />;
+    return <LayoutLoader color={store?.config?.primaryColor} />;
   }
   if (!order) {
     return <Typography>404</Typography>;

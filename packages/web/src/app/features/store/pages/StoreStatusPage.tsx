@@ -1,8 +1,8 @@
 import { Grid, Typography } from '@mui/material';
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Event, Order } from '@nx-monorepo-template/global';
+import { Event, Order, StoreStatusEvent } from '@nx-monorepo-template/global';
 import { useEventContext } from '@/core';
 
 const Container = styled.div`
@@ -16,17 +16,22 @@ export const StoreStatusPage = () => {
   const [ready, setReady] = useState<Order[]>([]);
   const { socket } = useEventContext();
 
-  const onStatus = (e: { preparing: Order[]; ready: Order[] }) => {
-    setPreparing(e.preparing);
-    setReady(e.ready);
-  };
+  const onStatus = useCallback(
+    (e: StoreStatusEvent) => {
+      if (storeId === e.storeId) {
+        setPreparing(e.preparing);
+        setReady(e.ready);
+      }
+    },
+    [storeId]
+  );
 
   useEffect(() => {
     socket?.on(Event.StoreStatus, onStatus);
     socket?.on('connect', () => {
       socket?.emit(Event.StoreStatus, storeId);
     });
-  }, [socket, socket?.connected, storeId]);
+  }, [socket, socket?.connected, storeId, onStatus]);
 
   return (
     <Container>

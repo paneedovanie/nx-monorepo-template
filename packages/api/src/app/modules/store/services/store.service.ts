@@ -26,6 +26,7 @@ export class StoreService extends BaseService<StoreEntity> {
 
   async getStatus(storeId: string) {
     return {
+      storeId,
       preparing: await this.orderRepository.find({
         where: {
           status: OrderStatus.Preparing,
