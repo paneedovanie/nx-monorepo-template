@@ -23,7 +23,7 @@ const drawerWidth = 250;
 export const Layout = () => {
   const { user, isFetching } = useAuthContext();
 
-  if (isFetching) return <LayoutLoader />;
+  if (isFetching) return <LayoutLoader sx={{ height: '100vh'}} />;
 
   return (
     <Routes>

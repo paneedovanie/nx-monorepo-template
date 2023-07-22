@@ -1,6 +1,6 @@
 import {
   Breadcrumbs,
-  Loading,
+  LayoutLoader,
   PageContextProvider,
   usePageContext,
 } from '@/core';
@@ -17,7 +17,7 @@ export const StoreOrderViewPageContent = () => {
   const order = orderQueryResult.data?.body;
 
   if (orderQueryResult.isFetching) {
-    return <Loading />;
+    return <LayoutLoader />;
   }
   if (!order) {
     return <Typography>404</Typography>;

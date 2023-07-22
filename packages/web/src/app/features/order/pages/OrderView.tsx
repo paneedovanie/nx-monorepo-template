@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { OrderCard } from '../components';
 import {
   Breadcrumbs,
-  Loading,
+  LayoutLoader,
   PageContextProvider,
   usePageContext,
 } from '@/core';
@@ -18,7 +18,7 @@ export const OrderViewContent = () => {
   const order = orderQueryResult.data?.body;
 
   if (orderQueryResult.isFetching) {
-    return <Loading />;
+    return <LayoutLoader />;
   }
   if (!order) {
     return <Typography>404</Typography>;

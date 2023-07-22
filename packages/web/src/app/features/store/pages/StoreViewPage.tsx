@@ -1,6 +1,7 @@
 import {
   Breadcrumbs,
   DashboardCountWidget,
+  LayoutLoader,
   Loading,
   PageContextProvider,
   useEventContext,
@@ -60,7 +61,7 @@ export const StoreViewPageContent = () => {
   }, [socket, socket?.connected, store?.id, onDashboard]);
 
   if (storeQueryResult.isFetching) {
-    return <Loading />;
+    return <LayoutLoader sx={{ height: 500 }} />;
   }
   if (!store) {
     return <Typography>404</Typography>;

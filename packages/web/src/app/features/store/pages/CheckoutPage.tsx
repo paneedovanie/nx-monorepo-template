@@ -80,7 +80,12 @@ export const CheckoutPage = () => {
   }, [params.storeId, length, navigate]);
 
   if (isFetching) {
-    return <LayoutLoader color={store?.config?.primaryColor} />;
+    return (
+      <LayoutLoader
+        color={store?.config?.primaryColor}
+        sx={{ height: '100vh' }}
+      />
+    );
   }
 
   if (!store) {

@@ -1,6 +1,6 @@
 import {
   Breadcrumbs,
-  Loading,
+  LayoutLoader,
   PageContextProvider,
   usePageContext,
 } from '@/core';
@@ -18,7 +18,7 @@ export const StoreProductListPageContent = () => {
   const store = storeQueryResult.data?.body;
 
   if (storeQueryResult.isFetching) {
-    return <Loading />;
+    return <LayoutLoader />;
   }
   if (!store) {
     <Typography>404</Typography>;

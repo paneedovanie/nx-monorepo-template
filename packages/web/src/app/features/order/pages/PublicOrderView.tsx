@@ -21,7 +21,12 @@ export const PublicOrderViewContent = () => {
   const order = orderQueryResult.data?.body;
 
   if (orderQueryResult.isFetching) {
-    return <LayoutLoader color={store?.config?.primaryColor} />;
+    return (
+      <LayoutLoader
+        color={store?.config?.primaryColor}
+        sx={{ height: '100vh' }}
+      />
+    );
   }
   if (!order) {
     return <Typography>404</Typography>;

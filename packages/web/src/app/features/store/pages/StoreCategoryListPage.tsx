@@ -1,6 +1,7 @@
 import {
   Breadcrumbs,
   CategoriesTable,
+  LayoutLoader,
   Loading,
   PageContextProvider,
   usePageContext,
@@ -18,7 +19,7 @@ export const StoreCategoryListPageContent = () => {
   const store = storeQueryResult.data?.body;
 
   if (storeQueryResult.isFetching) {
-    return <Loading />;
+    return <LayoutLoader />;
   }
   if (!store) {
     return <Typography>404</Typography>;

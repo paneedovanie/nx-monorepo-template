@@ -218,7 +218,12 @@ export const PublicStoreViewPage = () => {
   }, [store]);
 
   if (isFetchingStore) {
-    return <LayoutLoader color={store?.config?.primaryColor} />;
+    return (
+      <LayoutLoader
+        color={store?.config?.primaryColor}
+        sx={{ height: '100vh' }}
+      />
+    );
   } else if (!store) {
     navigate('/');
     return null;
