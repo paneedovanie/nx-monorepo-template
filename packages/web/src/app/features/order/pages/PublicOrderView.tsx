@@ -1,8 +1,7 @@
 import styled from 'styled-components';
-import { OrderCard } from '../components';
+import { OrderCard, OrderCardLoader } from '../components';
 import {
   LayoutLoader,
-  Loading,
   PageContextProvider,
   TopBar,
   useCartContext,
@@ -28,6 +27,7 @@ export const PublicOrderViewContent = () => {
       />
     );
   }
+
   if (!order) {
     return <Typography>404</Typography>;
   }
@@ -36,7 +36,11 @@ export const PublicOrderViewContent = () => {
     <>
       <TopBar store={store} />
       <Container component="main">
-        <OrderCard order={order} onUpdate={orderQueryResult.refetch} />
+        {orderQueryResult.isFetching ? (
+          <OrderCardLoader />
+        ) : (
+          <OrderCard order={order} onUpdate={orderQueryResult.refetch} />
+        )}
       </Container>
     </>
   );
