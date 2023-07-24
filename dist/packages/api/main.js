@@ -1842,7 +1842,7 @@ const base = {
     items: exports.OrderProductSchema.array(),
     status: zod_1.z.string(),
 };
-exports.OrderSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), ref: zod_1.z.number(), store: store_1.StoreSchema.optional(), user: user_1.UserSchema.optional(), payment: payment_1.NonCircularPaymentSchema, createdAt: zod_1.z.date() }, base));
+exports.OrderSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), ref: zod_1.z.number(), store: store_1.StoreSchema.optional(), user: user_1.UserSchema.optional(), payment: payment_1.NonCircularPaymentSchema, tax: zod_1.z.number(), createdAt: zod_1.z.date() }, base));
 exports.CreateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string().optional() }, base));
 exports.UpdateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string().optional() }, base));
 exports.GetOrdersResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.OrderSchema.array() }));
@@ -2076,16 +2076,19 @@ exports.CreateStoreConfigSchema = zod_1.z.object({
     headerTextColor: zod_1.z.string(),
     primaryColor: zod_1.z.string(),
     secondaryColor: zod_1.z.string(),
+    tax: zod_1.z.number(),
 });
 exports.UpdateStoreConfigSchema = zod_1.z.object({
     headerTextColor: zod_1.z.string(),
     primaryColor: zod_1.z.string(),
     secondaryColor: zod_1.z.string(),
+    tax: zod_1.z.number(),
 });
 exports.StoreConfigSchema = zod_1.z.object({
     headerTextColor: zod_1.z.string(),
     primaryColor: zod_1.z.string(),
     secondaryColor: zod_1.z.string(),
+    tax: zod_1.z.number(),
 });
 exports.NonCircularStoreSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), owner: user_1.UserSchema, image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array(), config: exports.StoreConfigSchema.optional() }, base));
 exports.StoreSchema = zod_1.z.lazy(() => zod_1.z.object(Object.assign({ id: zod_1.z.string(), image: zod_1.z.string().optional(), rating: zod_1.z.number(), owner: user_1.UserSchema, tags: tag_1.TagSchema.array(), products: product_1.ProductSchema.array(), config: exports.StoreConfigSchema.optional() }, base)));
@@ -3403,6 +3406,12 @@ tslib_1.__decorate([
     (0, typeorm_1.JoinColumn)(),
     tslib_1.__metadata("design:type", typeof (_c = typeof payment_entity_1.PaymentEntity !== "undefined" && payment_entity_1.PaymentEntity) === "function" ? _c : Object)
 ], OrderEntity.prototype, "payment", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.Column)({
+        default: 0,
+    }),
+    tslib_1.__metadata("design:type", Number)
+], OrderEntity.prototype, "tax", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     tslib_1.__metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
@@ -6397,8 +6406,10 @@ let OrderController = class OrderController {
         this.storeService = storeService;
     }
     create({ body }) {
+        var _a, _b;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const order = yield this.orderService.create(body);
+            const store = yield this.storeService.getById(body.store);
+            const order = yield this.orderService.create(Object.assign(Object.assign({}, body), { tax: (_b = (_a = store === null || store === void 0 ? void 0 : store.config) === null || _a === void 0 ? void 0 : _a.tax) !== null && _b !== void 0 ? _b : 0 }));
             return { status: 201, body: order };
         });
     }

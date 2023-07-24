@@ -7,8 +7,8 @@ import { UserSchema } from './user';
 import { FileSchema } from './file';
 import { UnrestrictedSchema } from './unrestricted';
 import { TagSchema } from './tag';
-import { NonCircularProductSchema, ProductSchema } from './product';
-import { Product, Store } from '../interfaces';
+import { ProductSchema } from './product';
+import { Store } from '../interfaces';
 
 const base = {
   title: z.string(),
@@ -19,18 +19,21 @@ export const CreateStoreConfigSchema = z.object({
   headerTextColor: z.string(),
   primaryColor: z.string(),
   secondaryColor: z.string(),
+  tax: z.number(),
 });
 
 export const UpdateStoreConfigSchema = z.object({
   headerTextColor: z.string(),
   primaryColor: z.string(),
   secondaryColor: z.string(),
+  tax: z.number(),
 });
 
 export const StoreConfigSchema = z.object({
   headerTextColor: z.string(),
   primaryColor: z.string(),
   secondaryColor: z.string(),
+  tax: z.number(),
 });
 
 export const NonCircularStoreSchema = z.object({

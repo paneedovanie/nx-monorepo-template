@@ -9,3 +9,4 @@ export * from './StoreOrderListPage';
 export * from './StorePaymentListPage';
 export * from './StorePreparationPage';
 export * from './StoreOrderViewPage';
+export * from './StoreEditPage';

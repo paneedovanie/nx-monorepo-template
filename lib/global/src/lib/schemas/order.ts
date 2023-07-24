@@ -27,6 +27,7 @@ export const OrderSchema = z.object({
   store: StoreSchema.optional(),
   user: UserSchema.optional(),
   payment: NonCircularPaymentSchema,
+  tax: z.number(),
   createdAt: z.date(),
   ...base,
 });

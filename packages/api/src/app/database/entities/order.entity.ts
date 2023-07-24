@@ -65,6 +65,11 @@ export class OrderEntity {
   @JoinColumn()
   payment: PaymentEntity;
 
+  @Column({
+    default: 0,
+  })
+  tax: number;
+
   @UpdateDateColumn()
   updatedAt: Date;
 

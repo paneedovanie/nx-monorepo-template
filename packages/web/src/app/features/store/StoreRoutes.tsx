@@ -1,11 +1,11 @@
 import { Route, Routes } from 'react-router-dom';
 import {
   StoreCategoryListPage,
+  StoreEditPage,
   StoreListPage,
   StoreOrderListPage,
   StoreOrderViewPage,
   StorePaymentListPage,
-  StorePreparationPage,
   StoreProductListPage,
   StoreViewPage,
 } from './pages';
@@ -17,6 +17,7 @@ export const StoreRoutes = () => (
       element={
         <Routes>
           <Route path="/" element={<StoreViewPage />} />
+          <Route path="/edit" element={<StoreEditPage />} />
           <Route path="/categories" element={<StoreCategoryListPage />} />
           <Route path="/products" element={<StoreProductListPage />} />
           <Route

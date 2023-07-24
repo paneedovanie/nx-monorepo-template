@@ -55,6 +55,7 @@ export const EditorDialog = ({
                       options.context?.setFieldValue(options.name, v)
                     }
                     size="small"
+                    format="hex"
                   />
                 );
               },
@@ -71,6 +72,7 @@ export const EditorDialog = ({
                       options.context?.setFieldValue(options.name, v)
                     }
                     size="small"
+                    format="hex"
                   />
                 );
               },
@@ -87,6 +89,7 @@ export const EditorDialog = ({
                       options.context?.setFieldValue(options.name, v)
                     }
                     size="small"
+                    format="hex"
                   />
                 );
               },

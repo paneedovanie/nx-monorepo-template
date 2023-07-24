@@ -39,7 +39,11 @@ export class OrderController implements NestControllerInterface<typeof c> {
   @AllowUnauthorize()
   @TsRest(c.create)
   async create(@TsRestRequest() { body }: RequestShapes['create']) {
-    const order = await this.orderService.create(body);
+    const store = await this.storeService.getById(body.store);
+    const order = await this.orderService.create({
+      ...body,
+      tax: store?.config?.tax ?? 0,
+    });
 
     return { status: 201 as const, body: order };
   }

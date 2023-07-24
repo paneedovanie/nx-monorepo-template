@@ -26,6 +26,7 @@ export const StorePublicRoutesContent = () => {
     headerTextColor: theme.color.white,
     primaryColor: theme.color.primary,
     secondaryColor: theme.color.secondary,
+    tax: 0,
   });
   const [openThemeEditor, setOpenThemeEditor] = useState(false);
 

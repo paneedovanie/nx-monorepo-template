@@ -47,6 +47,11 @@ export const OrderCard = ({
     });
     return total;
   }, [order?.items]);
+  const taxPercentage = (order.tax ?? 0) / 100;
+
+  const tax = totalCost * taxPercentage;
+
+  const subTotal = totalCost - tax;
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -205,6 +210,8 @@ export const OrderCard = ({
 
         <CardActions>
           <Box>
+            <Typography>Sub Total: {formatCurrency(subTotal)}</Typography>
+            <Typography>Tax: {formatCurrency(tax)}</Typography>
             <Typography variant="h6">
               Total Cost: {formatCurrency(totalCost)}
             </Typography>

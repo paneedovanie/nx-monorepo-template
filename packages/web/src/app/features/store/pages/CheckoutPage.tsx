@@ -116,6 +116,12 @@ export const CheckoutPage = () => {
     return total;
   }, [cart, products?.list]);
 
+  const taxPercentage = (store?.config?.tax ?? 0) / 100;
+
+  const tax = totalCost * taxPercentage;
+
+  const subTotal = totalCost - tax;
+
   useEffect(() => {
     if (!length) {
       navigate(`/stores/${params.storeId}`);
@@ -176,6 +182,8 @@ export const CheckoutPage = () => {
             </CardContent>
 
             <CardContent>
+              <Typography>Sub Total: {formatCurrency(subTotal)}</Typography>
+              <Typography>Tax: {formatCurrency(tax)}</Typography>
               <Typography variant="h6">
                 Total Cost: {formatCurrency(totalCost)}
               </Typography>

@@ -18,7 +18,7 @@ import { NotificationService } from '../../notification';
 @Injectable()
 export class OrderService extends BaseService<
   OrderEntity,
-  CreateOrder,
+  CreateOrder & { tax: number },
   UpdateOrder,
   GetOrdersOptions
 > {

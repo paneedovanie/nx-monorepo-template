@@ -33,6 +33,7 @@ import {
   Tag,
 } from '@nx-monorepo-template/global';
 import { SyntheticEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export interface StoreDetailsCard extends CardProps {
   store: Store;
@@ -45,6 +46,7 @@ export const StoreDetailsCard = ({
   ...props
 }: StoreDetailsCard) => {
   const tsQueryClient = useTsQueryClient();
+  const navigate = useNavigate();
   const [editable, setEditable] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [qrOpen, setQrOpen] = useState(false);
@@ -210,7 +212,7 @@ export const StoreDetailsCard = ({
             >
               <MenuItem
                 onClick={() => {
-                  setEditable(true);
+                  navigate(`/manage/stores/${store.id}/edit`);
                   handleClose();
                 }}
               >
