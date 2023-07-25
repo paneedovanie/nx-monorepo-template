@@ -40,6 +40,17 @@ export const DashboardPage = () => {
   return (
     <Box sx={{ p: 1, height: '100vh' }}>
       <Breadcrumbs sx={{ my: 1 }} />
+      <button
+        onClick={() => {
+          window.open(
+            'https://payments-web-sandbox.paymaya.com/invoice?id=694edfdf-1a57-4d58-bbda-2bad977ca2ce&amt=100',
+            '_blank',
+            'rel=noopener noreferrer'
+          );
+        }}
+      >
+        a
+      </button>
 
       <BeAStoreOwnerAlert />
 

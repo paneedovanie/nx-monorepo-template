@@ -27,7 +27,9 @@ export class PaymentRepository extends BaseRepository<
 
   protected relations(): FindOptionsRelations<PaymentEntity> {
     return {
-      order: true,
+      order: {
+        store: true,
+      },
     };
   }
 }

@@ -411,6 +411,17 @@ exports.payment = (0, core_1.initContract)().router({
         },
         summary: 'Delete payment',
     },
+    receipt: {
+        method: 'GET',
+        path: `${prefix}/:id/receipt`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
+        responses: {
+            200: zod_1.z.object({ file: zod_1.z.string() }),
+        },
+        summary: 'Get a payment receipt',
+    },
 });
 
 
@@ -1029,11 +1040,12 @@ exports.user = (0, core_1.initContract)().router({
 /***/ }),
 
 /***/ "../../lib/global/src/lib/helpers/currency.helper.ts":
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransformCurrency = void 0;
+exports.formatCurrency = exports.TransformCurrency = void 0;
+const constant_1 = __webpack_require__("../../lib/global/src/lib/constant.ts");
 class TransformCurrency {
     to(v) {
         return v * 100;
@@ -1043,6 +1055,13 @@ class TransformCurrency {
     }
 }
 exports.TransformCurrency = TransformCurrency;
+const formatCurrency = (amount) => {
+    const displayAmount = [undefined, null, 0].includes(amount)
+        ? 0
+        : amount === null || amount === void 0 ? void 0 : amount.toFixed(2);
+    return constant_1.app.currencySymbol + displayAmount;
+};
+exports.formatCurrency = formatCurrency;
 
 
 /***/ }),
@@ -4341,7 +4360,9 @@ let PaymentRepository = class PaymentRepository extends core_1.BaseRepository {
     }
     relations() {
         return {
-            order: true,
+            order: {
+                store: true,
+            },
         };
     }
 };
@@ -6751,6 +6772,15 @@ let PaymentController = class PaymentController {
             return { status: 204, body: '' };
         });
     }
+    receipt({ params }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const receipt = yield this.paymentService.generateReceipt(params.id);
+            if (!receipt) {
+                return { status: 404, body: null };
+            }
+            return { status: 200, body: { file: receipt } };
+        });
+    }
 };
 tslib_1.__decorate([
     (0, common_1.UseGuards)(guards_1.JwtAuthGuard, guards_1.PermissionGuard),
@@ -6796,6 +6826,14 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], PaymentController.prototype, "delete", null);
+tslib_1.__decorate([
+    (0, auth_1.Permissions)(global_1.RolePermission.PaymentGet),
+    (0, nest_1.TsRest)(c.receipt),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], PaymentController.prototype, "receipt", null);
 PaymentController = tslib_1.__decorate([
     (0, common_1.Controller)(),
     tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.PaymentService !== "undefined" && services_1.PaymentService) === "function" ? _a : Object, typeof (_b = typeof order_1.OrderService !== "undefined" && order_1.OrderService) === "function" ? _b : Object])
@@ -6863,10 +6901,72 @@ const tslib_1 = __webpack_require__("tslib");
 const common_1 = __webpack_require__("@nestjs/common");
 const database_1 = __webpack_require__("./src/app/database/index.ts");
 const core_1 = __webpack_require__("./src/app/core/index.ts");
+const html_pdf_node_1 = tslib_1.__importDefault(__webpack_require__("html-pdf-node"));
+const global_1 = __webpack_require__("../../lib/global/src/index.ts");
 let PaymentService = class PaymentService extends core_1.BaseService {
     constructor(repository) {
         super(repository);
         this.repository = repository;
+    }
+    listItems(order) {
+        return order.items.map((item) => {
+            return `<tr>
+          <td style="text-align: left">${item.count} ${item.title}</td>
+          <td style="text-align: center">${item.count}</td>
+          <td style="text-align: right">${(0, global_1.formatCurrency)(item.price * item.count)}</td>
+        </tr>`;
+        });
+    }
+    generateReceipt(paymentId) {
+        var _a;
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const payment = yield this.getById(paymentId);
+            let totalCost = 0;
+            payment.order.items.forEach(({ price, count }) => {
+                const totalPrice = price * count;
+                totalCost += totalPrice;
+            });
+            const taxPercentage = ((_a = payment.order.tax) !== null && _a !== void 0 ? _a : 0) / 100;
+            const tax = totalCost * taxPercentage;
+            const subTotal = totalCost - tax;
+            const options = { width: 200 };
+            const file = {
+                content: `<center style="margin-bottom: 10px">
+        <h4>${payment.order.store.title}</h4>
+      </center>
+      <h6>Order Ref: ${payment.order.ref}</h6>
+      <hr />
+      <table style="font-size: 8px; width: 100%">
+      <thead>
+        <tr>
+          <th style="text-align: left">Item</th>
+          <th>Qty</th>
+          <th style="text-align: right">Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${this.listItems(payment.order)}
+      </tbody>
+      </table>
+      <hr />
+      <table style="font-size: 8px; width: 100%">
+      <tbody>
+        <tr>
+          <td style="width: 50px"></td><td>SUB-TOTAL</td><td style="text-align: right">${(0, global_1.formatCurrency)(subTotal)}</td>
+        </tr>
+        <tr>
+          <td></td><td>TAX</td><td style="text-align: right">${(0, global_1.formatCurrency)(tax)}</td>
+        </tr>
+        <tr>
+          <td></td><td>COST TENDERED</td><td style="text-align: right">${(0, global_1.formatCurrency)(totalCost)}</td>
+        </tr>
+      </tbody>
+      </table>
+      `,
+            };
+            const buffer = yield html_pdf_node_1.default.generatePdf(file, options);
+            return buffer.toString('base64');
+        });
     }
 };
 PaymentService = tslib_1.__decorate([
@@ -9027,6 +9127,13 @@ module.exports = require("cloudinary");
 /***/ ((module) => {
 
 module.exports = require("express");
+
+/***/ }),
+
+/***/ "html-pdf-node":
+/***/ ((module) => {
+
+module.exports = require("html-pdf-node");
 
 /***/ }),
 

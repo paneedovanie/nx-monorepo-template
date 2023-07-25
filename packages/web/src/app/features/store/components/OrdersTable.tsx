@@ -9,6 +9,7 @@ import {
   Box,
   Checkbox,
   FormControl,
+  Grid,
   IconButton,
   InputLabel,
   MenuItem,
@@ -92,64 +93,77 @@ export const OrdersTable = ({ store }: { store: Store }) => {
           flexDirection: ['column', null, 'row'],
           alignItems: 'center',
           gap: 1,
+          mb: [1, 1, 'unset'],
         }}
         disableGutters
       >
-        <TextField
-          label="Ref"
-          onChange={(e: BaseSyntheticEvent) =>
-            setRef(e.target.value === '' ? undefined : e.target.value)
-          }
-          size="small"
-        />
-        <TextField
-          type="date"
-          label="Start Date"
-          onChange={(e: BaseSyntheticEvent) => setStartDate(e.target.value)}
-          size="small"
-          InputLabelProps={{ shrink: true }}
-        />
-        <TextField
-          type="date"
-          label="End Date"
-          onChange={(e: BaseSyntheticEvent) => setEndDate(e.target.value)}
-          size="small"
-          InputLabelProps={{ shrink: true }}
-        />
-        <FormControl sx={{ maxWidth: 169, width: '100%' }}>
-          <InputLabel id="status-label" size="small">
-            Status
-          </InputLabel>
-          <Select
-            labelId="status-label"
-            label="Status"
-            size="small"
-            onChange={(e: SelectChangeEvent) => setStatus(e.target.value)}
-          >
-            {statusOptions.map((item, i) => (
-              <MenuItem value={item.value} key={i}>
-                {item.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl sx={{ maxWidth: 169, width: '100%' }}>
-          <InputLabel id="paid-label" size="small">
-            Paid
-          </InputLabel>
-          <Select
-            labelId="paid-label"
-            label="Paid"
-            size="small"
-            onChange={(e: SelectChangeEvent) => setPaid(e.target.value)}
-          >
-            {paidOptions.map((item, i) => (
-              <MenuItem value={item.value} key={i}>
-                {item.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={'auto'}>
+            <TextField
+              label="Ref"
+              onChange={(e: BaseSyntheticEvent) =>
+                setRef(e.target.value === '' ? undefined : e.target.value)
+              }
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={'auto'}>
+            <TextField
+              type="date"
+              label="Start Date"
+              onChange={(e: BaseSyntheticEvent) => setStartDate(e.target.value)}
+              size="small"
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={'auto'}>
+            <TextField
+              type="date"
+              label="End Date"
+              onChange={(e: BaseSyntheticEvent) => setEndDate(e.target.value)}
+              size="small"
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={'auto'}>
+            <FormControl sx={{ width: 169 }}>
+              <InputLabel id="status-label" size="small">
+                Status
+              </InputLabel>
+              <Select
+                labelId="status-label"
+                label="Status"
+                size="small"
+                onChange={(e: SelectChangeEvent) => setStatus(e.target.value)}
+              >
+                {statusOptions.map((item, i) => (
+                  <MenuItem value={item.value} key={i}>
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} md={'auto'}>
+            <FormControl sx={{ width: 169 }}>
+              <InputLabel id="paid-label" size="small">
+                Paid
+              </InputLabel>
+              <Select
+                labelId="paid-label"
+                label="Paid"
+                size="small"
+                onChange={(e: SelectChangeEvent) => setPaid(e.target.value)}
+              >
+                {paidOptions.map((item, i) => (
+                  <MenuItem value={item.value} key={i}>
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
       </Toolbar>
       <DataTable<Order>
         isLoading={isLoading}

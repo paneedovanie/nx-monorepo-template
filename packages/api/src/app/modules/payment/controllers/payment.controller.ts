@@ -81,4 +81,16 @@ export class PaymentController implements NestControllerInterface<typeof c> {
 
     return { status: 204 as const, body: '' };
   }
+
+  @Permissions(RolePermission.PaymentGet)
+  @TsRest(c.receipt)
+  async receipt(@TsRestRequest() { params }: RequestShapes['receipt']) {
+    const receipt = await this.paymentService.generateReceipt(params.id);
+
+    if (!receipt) {
+      return { status: 404 as const, body: null };
+    }
+
+    return { status: 200 as const, body: { file: receipt } };
+  }
 }

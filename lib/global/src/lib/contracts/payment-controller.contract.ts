@@ -64,4 +64,15 @@ export const payment = initContract().router({
     },
     summary: 'Delete payment',
   },
+  receipt: {
+    method: 'GET',
+    path: `${prefix}/:id/receipt`,
+    pathParams: z.object({
+      id: z.string().uuid(),
+    }),
+    responses: {
+      200: z.object({ file: z.string() }),
+    },
+    summary: 'Get a payment receipt',
+  },
 });

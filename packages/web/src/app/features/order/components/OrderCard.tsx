@@ -1,6 +1,12 @@
-import { QrcodeDialog, formatCurrency, useAuthContext } from '@/core';
+import {
+  QrcodeDialog,
+  formatCurrency,
+  useAuthContext,
+  useTsQueryClient,
+} from '@/core';
 import {
   Box,
+  Button,
   Card,
   CardActions,
   CardContent,
@@ -11,6 +17,11 @@ import {
   ListItemIcon,
   Menu,
   MenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Typography,
 } from '@mui/material';
 import { Order, OrderProduct, OrderStatus } from '@nx-monorepo-template/global';
@@ -30,6 +41,7 @@ export const OrderCard = ({
   order: Order;
   onUpdate?: () => void;
 }) => {
+  const tsQueryClient = useTsQueryClient();
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [billOpen, setBillOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
@@ -53,11 +65,39 @@ export const OrderCard = ({
 
   const subTotal = totalCost - tax;
 
+  const { data: receiptResult, isFetching: isFetchingReceipt } =
+    tsQueryClient.payment.receipt.useQuery(
+      ['orderReceipt'],
+      {
+        params: {
+          id: order?.payment?.id,
+        },
+      },
+      {
+        enabled: !!order?.payment?.id,
+      }
+    );
+
+  const receipt = receiptResult?.body;
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const downloadReceipt = () => {
+    if (!receipt) {
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = `data:application/pdf;base64,${receipt.file}`;
+    const fileName = 'sample.pdf';
+    link.download = fileName;
+    link.click();
   };
 
   return (
@@ -177,36 +217,31 @@ export const OrderCard = ({
               </Typography>
             </Grid>
           </Grid>
-          <Divider sx={{ my: 1 }} />
-          <Box sx={{ display: 'flex' }}>
-            <Typography fontSize={[12, 16]} sx={{ fontWeight: 700 }}>
-              Product
-            </Typography>
-            <Typography
-              fontSize={[12, 16]}
-              sx={{ flex: 1, textAlign: 'right', fontWeight: 700 }}
-            >
-              Total Price
-            </Typography>
-          </Box>
-          <Box>
+        </CardContent>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Item</TableCell>
+              <TableCell>Price</TableCell>
+              <TableCell>Cost</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {order?.items.map((item, i) => {
               return (
-                <Box key={i} sx={{ display: 'flex' }}>
-                  <Typography fontSize={[12, 16]}>{item.title}</Typography>
-                  <Typography
-                    fontSize={[12, 16]}
-                    sx={{ flex: 1, textAlign: 'right' }}
-                  >
-                    {formatCurrency(item.price)} x {item.count} ={' '}
+                <TableRow>
+                  <TableCell>
+                    {item.count} {item.title}
+                  </TableCell>
+                  <TableCell>{formatCurrency(item.price)}</TableCell>
+                  <TableCell>
                     {formatCurrency(item.price * item.count)}
-                  </Typography>
-                </Box>
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </Box>
-          <Divider sx={{ mt: 1 }} />
-        </CardContent>
+          </TableBody>
+        </Table>
 
         <CardActions>
           <Box>
@@ -236,6 +271,9 @@ export const OrderCard = ({
                 color="primary"
                 size="small"
               />
+              <Button disabled={isFetchingReceipt} onClick={downloadReceipt}>
+                Receipt
+              </Button>
             </Typography>
             <Typography>
               Amount Paid: {formatCurrency(order?.payment.amountPaid)}
