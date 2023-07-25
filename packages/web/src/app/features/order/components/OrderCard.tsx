@@ -95,7 +95,7 @@ export const OrderCard = ({
 
     const link = document.createElement('a');
     link.href = `data:application/pdf;base64,${receipt.file}`;
-    const fileName = 'sample.pdf';
+    const fileName = `Order_Ref_${order.ref}_receipt.pdf`;
     link.download = fileName;
     link.click();
   };

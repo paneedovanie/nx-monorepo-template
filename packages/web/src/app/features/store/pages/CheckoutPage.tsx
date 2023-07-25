@@ -14,6 +14,11 @@ import {
   CardContent,
   Divider,
   Skeleton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Typography,
 } from '@mui/material';
 import { useEffect, useMemo } from 'react';
@@ -144,42 +149,30 @@ export const CheckoutPage = () => {
             <CardContent>
               <Typography variant="h4">Checkout</Typography>
             </CardContent>
-            <CardContent>
-              <Divider sx={{ my: 1 }} />
-              <Box sx={{ display: 'flex' }}>
-                <Typography fontSize={[12, 16]} sx={{ fontWeight: 700 }}>
-                  Product
-                </Typography>
-                <Typography
-                  fontSize={[12, 16]}
-                  sx={{ flex: 1, textAlign: 'right', fontWeight: 700 }}
-                >
-                  Total Price
-                </Typography>
-              </Box>
-              <Box>
-                {products?.list.map((item: Product, i: number) => {
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Item</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell>Cost</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {products?.list.map((item, i) => {
                   return (
-                    <Box key={i} sx={{ display: 'flex' }}>
-                      <Typography
-                        fontSize={[12, 16]}
-                        sx={{ maxWidth: [150, 'auto'] }}
-                      >
-                        {item.title}
-                      </Typography>
-                      <Typography
-                        fontSize={[12, 16]}
-                        sx={{ flex: 1, textAlign: 'right' }}
-                      >
-                        {formatCurrency(item.price)} x {cart[item.id]} ={' '}
+                    <TableRow>
+                      <TableCell>
+                        {cart[item.id]} {item.title}
+                      </TableCell>
+                      <TableCell>{formatCurrency(item.price)}</TableCell>
+                      <TableCell>
                         {formatCurrency(item.price * cart[item.id])}
-                      </Typography>
-                    </Box>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
-              </Box>
-              <Divider sx={{ mt: 1 }} />
-            </CardContent>
+              </TableBody>
+            </Table>
 
             <CardContent>
               <Typography>Sub Total: {formatCurrency(subTotal)}</Typography>
