@@ -104,19 +104,18 @@ export const OrderCard = ({
     <>
       <Card sx={{ mb: 1 }}>
         <CardContent sx={{ position: 'relative' }}>
-          {isStoreOwner ||
-            (isCustomer && user && !order?.payment && (
-              <IconButton
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  right: 0,
-                }}
-                onClick={handleClick}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            ))}
+          {(isStoreOwner || (isCustomer && user)) && !order?.payment && (
+            <IconButton
+              sx={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+              }}
+              onClick={handleClick}
+            >
+              <MoreVertIcon />
+            </IconButton>
+          )}
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
