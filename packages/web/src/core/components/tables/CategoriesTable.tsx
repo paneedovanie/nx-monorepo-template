@@ -29,20 +29,23 @@ export const CategoriesTablePartial = ({
   const [selectedItem, setSelectedItem] = useState<Category>();
   const parent = breadcrumbs?.[breadcrumbs.length - 1];
 
-  const { data, refetch: refetchCategories } =
-    tsQueryClient.category.getAll.useQuery(
-      ['getCategories', perPage, page, parent?.id],
-      {
-        query: {
-          store: store?.id,
-          type: 'product',
-          parent: parent?.id,
-          isRoot: parent?.id ? undefined : true,
-          perPage,
-          page,
-        },
-      }
-    );
+  const {
+    data,
+    isFetching,
+    refetch: refetchCategories,
+  } = tsQueryClient.category.getAll.useQuery(
+    ['getCategories', perPage, page, parent?.id],
+    {
+      query: {
+        store: store?.id,
+        type: 'product',
+        parent: parent?.id,
+        isRoot: parent?.id ? undefined : true,
+        perPage,
+        page,
+      },
+    }
+  );
   const { mutate: deleteCategory } = tsQueryClient.category.delete.useMutation({
     onSuccess: () => {
       refetchCategories();
@@ -165,6 +168,7 @@ export const CategoriesTablePartial = ({
         data={categories?.list}
         onPage={setPage}
         onPerPage={setPerPage}
+        isLoading={isFetching}
       />
       <CategoryDialog
         data={selectedItem}

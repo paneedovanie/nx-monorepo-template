@@ -40,7 +40,11 @@ export const TagListPage = () => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Tag>();
 
-  const { data, refetch: refetchTags } = tsQueryClient.tag.getAll.useQuery(
+  const {
+    data,
+    isFetching,
+    refetch: refetchTags,
+  } = tsQueryClient.tag.getAll.useQuery(
     ['getTags', query.get('parent'), perPage, page],
     {
       query: {
@@ -144,6 +148,7 @@ export const TagListPage = () => {
           data={tags?.list}
           onPage={setPage}
           onPerPage={setPerPage}
+          isLoading={isFetching}
         />
       </Card>
       <TagDialog

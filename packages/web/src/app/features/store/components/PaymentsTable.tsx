@@ -19,7 +19,7 @@ export const PaymentsTable = ({ store }: { store: Store }) => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
-  const { data } = tsQueryClient.order.getAll.useQuery(
+  const { data, isFetching } = tsQueryClient.order.getAll.useQuery(
     ['getPayments', perPage, page, startDate, endDate, order?.by, order?.dir],
     {
       query: {
@@ -124,6 +124,7 @@ export const PaymentsTable = ({ store }: { store: Store }) => {
         onPage={setPage}
         onPerPage={setPerPage}
         onSort={setOrder}
+        isLoading={isFetching}
       />
     </>
   );

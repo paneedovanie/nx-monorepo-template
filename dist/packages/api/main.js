@@ -56,6 +56,24 @@ exports.auth = (0, core_1.initContract)().router({
         },
         summary: 'Login user',
     },
+    forgotPassword: {
+        method: 'POST',
+        path: `${prefix}/forgot-password`,
+        body: schemas_1.ForgotPasswordSchema,
+        responses: {
+            201: zod_1.z.boolean(),
+        },
+        summary: 'Reset password request',
+    },
+    resetPassword: {
+        method: 'POST',
+        path: `${prefix}/reset-password`,
+        body: schemas_1.ResetPasswordSchema,
+        responses: {
+            201: zod_1.z.boolean(),
+        },
+        summary: 'Reset password',
+    },
     verify: {
         method: 'GET',
         path: `${prefix}/verify`,
@@ -1186,17 +1204,17 @@ exports.notificationMessage = {
     [interfaces_1.NotificationType.StoreOrderCreated]: {
         title: 'Store Order Created',
         description: 'An order with reference id: :refId is created',
-        to: '/manage/stores/:storeId',
+        to: '/manage/stores/:storeId/orders/:orderId',
     },
     [interfaces_1.NotificationType.StoreOrderUpdated]: {
         title: 'Store Order Updated',
         description: 'You successfully updated order with reference id: :refId',
-        to: '/manage/stores/:storeId',
+        to: '/manage/stores/:storeId/orders/:orderId',
     },
     [interfaces_1.NotificationType.StoreOrderDeleted]: {
         title: 'Store Order Deleted',
         description: 'You successfully deleted order with reference id: :refId',
-        to: '/manage/stores',
+        to: '/manage/stores/:storeId/orders',
     },
 };
 const getNotificationMessages = (notification) => {
@@ -1665,7 +1683,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ChangePasswordSchema = exports.VerifyQuerySchema = exports.LoginResponseSchema = exports.LoginSchema = exports.RegisterSchema = exports.CreateAuthSchema = exports.AuthSchema = void 0;
+exports.ChangePasswordSchema = exports.VerifyQuerySchema = exports.LoginResponseSchema = exports.ResetPasswordSchema = exports.ForgotPasswordSchema = exports.LoginSchema = exports.RegisterSchema = exports.CreateAuthSchema = exports.AuthSchema = void 0;
 const zod_1 = __webpack_require__("zod");
 const user_1 = __webpack_require__("../../lib/global/src/lib/schemas/user.ts");
 const base = {
@@ -1676,6 +1694,18 @@ exports.AuthSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string() }, base
 exports.CreateAuthSchema = zod_1.z.object(base);
 exports.RegisterSchema = user_1.CreateUserSchema.merge(exports.CreateAuthSchema);
 exports.LoginSchema = zod_1.z.object(base);
+exports.ForgotPasswordSchema = zod_1.z.object({
+    email: zod_1.z.string().email(),
+});
+exports.ResetPasswordSchema = zod_1.z
+    .object({
+    newPassword: zod_1.z.string(),
+    confirmPassword: zod_1.z.string(),
+})
+    .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+});
 exports.LoginResponseSchema = zod_1.z.object({
     accessToken: zod_1.z.string(),
     user: user_1.UserSchema,
@@ -2309,7 +2339,7 @@ exports["default"] = () => {
     return {
         environment: (_a = process.env.ENVIRONMENT) !== null && _a !== void 0 ? _a : 'development',
         protocol: (_b = process.env.PROTOCOL) !== null && _b !== void 0 ? _b : 'http',
-        host: (_c = process.env.HOST) !== null && _c !== void 0 ? _c : 'localhost',
+        baseUrl: (_c = process.env.BASE_URL) !== null && _c !== void 0 ? _c : `http://localhost:${process.env.PORT ? parseInt(process.env.PORT, 10) : 3000}`,
         port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
         database: {
             type: process.env.DATABASE_TYPE,
@@ -5278,6 +5308,18 @@ let AuthController = class AuthController {
             return { status: 201, body: result };
         });
     }
+    forgotPassword({ body }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield this.authService.forgotPassword(body.email);
+            return { status: 201, body: true };
+        });
+    }
+    resetPassword({ user }, { body }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield this.authService.resetPassword(user.id, body);
+            return { status: 201, body: true };
+        });
+    }
 };
 tslib_1.__decorate([
     (0, nest_1.TsRest)(c.register),
@@ -5327,6 +5369,22 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], AuthController.prototype, "resendVerifyEmail", null);
+tslib_1.__decorate([
+    (0, nest_1.TsRest)(c.forgotPassword),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
+tslib_1.__decorate([
+    (0, common_1.UseGuards)(guards_1.JwtAuthGuard),
+    (0, nest_1.TsRest)(c.resetPassword),
+    tslib_1.__param(0, (0, common_1.Request)()),
+    tslib_1.__param(1, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object, Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
 AuthController = tslib_1.__decorate([
     (0, common_1.Controller)(),
     tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.AuthService !== "undefined" && services_1.AuthService) === "function" ? _a : Object])
@@ -5649,6 +5707,40 @@ let AuthService = class AuthService {
             catch (err) {
                 return;
             }
+        });
+    }
+    forgotPassword(email) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const user = yield this.userRepository.findOne({
+                where: {
+                    credential: {
+                        email: email,
+                    },
+                },
+                relations: ['credential'],
+            });
+            if (!user) {
+                throw new common_1.NotFoundException(`No user associated with this email "${email}"`);
+            }
+            const payload = { sub: user.id };
+            const accessToken = this.jwtService.sign(payload, { expiresIn: '5m' });
+            yield this.mailService.sendResetPassword(user, accessToken);
+            return {
+                accessToken,
+            };
+        });
+    }
+    resetPassword(id, input) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const credential = yield this.credentialRepository.findOneBy({
+                user: { id },
+            });
+            if (!credential || input.newPassword !== input.confirmPassword) {
+                throw new common_1.ForbiddenException();
+            }
+            credential.password = yield (0, helpers_1.hashPassword)(input.newPassword);
+            yield this.credentialRepository.save(credential);
+            return true;
         });
     }
 };
@@ -6091,12 +6183,31 @@ let MailService = class MailService {
     }
     sendUserConfirmation(user, token) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const url = `${this.configService.get('host')}:${this.configService.get('port')}/api/v1/auth/verify-email?accessToken=${token}`;
+            const baseUrl = this.configService.get('baseUrl');
+            const mailConfig = this.configService.get('mail');
+            const url = `${baseUrl}/api/v1/auth/verify-email?accessToken=${token}`;
             yield this.mailerService.sendMail({
                 to: user.credential.email,
-                // from: '"Support Team" <support@example.com>', // override default from
+                from: mailConfig.from,
                 subject: 'Please confirm your Email',
                 template: 'verification',
+                context: {
+                    name: user.firstName,
+                    url,
+                },
+            });
+        });
+    }
+    sendResetPassword(user, token) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const baseUrl = this.configService.get('baseUrl');
+            const mailConfig = this.configService.get('mail');
+            const url = `${baseUrl}/reset-password?accessToken=${token}`;
+            yield this.mailerService.sendMail({
+                to: user.credential.email,
+                from: mailConfig.from,
+                subject: 'Reset password request',
+                template: 'reset-password',
                 context: {
                     name: user.firstName,
                     url,

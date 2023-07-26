@@ -12,3 +12,4 @@ export * from './StoreRatingsCard';
 export * from './PriceRanges';
 export * from './EditorDialog';
 export * from './ProductsLoader';
+export * from './ShowMoreRatingDialog';

@@ -17,7 +17,7 @@ export const UserListPage = () => {
   const [perPage, setPerPage] = useState(5);
   const [page, setPage] = useState(1);
 
-  const { data } = tsQueryClient.user.getUsers.useQuery(
+  const { data, isFetching } = tsQueryClient.user.getUsers.useQuery(
     ['getUsers', perPage, page],
     {
       query: {
@@ -95,6 +95,7 @@ export const UserListPage = () => {
           data={users?.list}
           onPage={setPage}
           onPerPage={setPerPage}
+          isLoading={isFetching}
         />
       </Card>
     </Container>

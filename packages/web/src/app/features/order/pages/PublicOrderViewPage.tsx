@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { OrderCard, OrderCardLoader } from '../components';
 import {
-  LayoutLoader,
   PageContextProvider,
   TopBar,
   useCartContext,
@@ -13,7 +12,7 @@ const Container = styled(Box)`
   padding: ${({ theme }) => theme.padding.md};
 `;
 
-export const PublicOrderViewContent = () => {
+export const PublicOrderViewPageContent = () => {
   const { store } = useCartContext();
   const { orderQueryResult } = usePageContext();
 
@@ -21,35 +20,31 @@ export const PublicOrderViewContent = () => {
 
   if (orderQueryResult.isFetching) {
     return (
-      <LayoutLoader
-        color={store?.config?.primaryColor}
-        sx={{ height: '100vh' }}
-      />
+      <>
+        <TopBar store={store} />
+        <Container>
+          <OrderCardLoader />
+        </Container>
+      </>
     );
   }
-
   if (!order) {
     return <Typography>404</Typography>;
   }
-
   return (
     <>
       <TopBar store={store} />
       <Container component="main">
-        {orderQueryResult.isFetching ? (
-          <OrderCardLoader />
-        ) : (
-          <OrderCard order={order} onUpdate={orderQueryResult.refetch} />
-        )}
+        <OrderCard order={order} onUpdate={orderQueryResult.refetch} />
       </Container>
     </>
   );
 };
 
-export const PublicOrderView = () => {
+export const PublicOrderViewPage = () => {
   return (
     <PageContextProvider>
-      <PublicOrderViewContent />
+      <PublicOrderViewPageContent />
     </PageContextProvider>
   );
 };

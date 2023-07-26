@@ -47,17 +47,17 @@ export const notificationMessage: Record<
   [NotificationType.StoreOrderCreated]: {
     title: 'Store Order Created',
     description: 'An order with reference id: :refId is created',
-    to: '/manage/stores/:storeId',
+    to: '/manage/stores/:storeId/orders/:orderId',
   },
   [NotificationType.StoreOrderUpdated]: {
     title: 'Store Order Updated',
     description: 'You successfully updated order with reference id: :refId',
-    to: '/manage/stores/:storeId',
+    to: '/manage/stores/:storeId/orders/:orderId',
   },
   [NotificationType.StoreOrderDeleted]: {
     title: 'Store Order Deleted',
     description: 'You successfully deleted order with reference id: :refId',
-    to: '/manage/stores',
+    to: '/manage/stores/:storeId/orders',
   },
 };
 

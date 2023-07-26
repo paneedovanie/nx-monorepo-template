@@ -66,4 +66,24 @@ export class AuthController implements NestControllerInterface<typeof c> {
     const result = await this.authService.resendVerifyEmail(user.id);
     return { status: 201 as const, body: result };
   }
+
+  @TsRest(c.forgotPassword)
+  async forgotPassword(
+    @TsRestRequest()
+    { body }: RequestShapes['forgotPassword']
+  ) {
+    await this.authService.forgotPassword(body.email);
+    return { status: 201 as const, body: true };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @TsRest(c.resetPassword)
+  async resetPassword(
+    @Request() { user },
+    @TsRestRequest()
+    { body }: RequestShapes['resetPassword']
+  ) {
+    await this.authService.resetPassword(user.id, body);
+    return { status: 201 as const, body: true };
+  }
 }

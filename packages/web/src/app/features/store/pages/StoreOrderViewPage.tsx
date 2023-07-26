@@ -1,11 +1,6 @@
-import {
-  Breadcrumbs,
-  LayoutLoader,
-  PageContextProvider,
-  usePageContext,
-} from '@/core';
+import { Breadcrumbs, PageContextProvider, usePageContext } from '@/core';
 import styled from 'styled-components';
-import { OrderCard } from '../../order';
+import { OrderCard, OrderCardLoader } from '../../order';
 import { Typography } from '@mui/material';
 
 const Container = styled.div`
@@ -17,7 +12,12 @@ export const StoreOrderViewPageContent = () => {
   const order = orderQueryResult.data?.body;
 
   if (orderQueryResult.isFetching) {
-    return <LayoutLoader />;
+    return (
+      <Container>
+        <Breadcrumbs sx={{ my: 1 }} />
+        <OrderCardLoader />
+      </Container>
+    );
   }
   if (!order) {
     return <Typography>404</Typography>;

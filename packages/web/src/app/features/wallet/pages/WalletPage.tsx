@@ -38,6 +38,8 @@ export const WalletPage = () => {
           userIds: [user?.id as string],
           perPage,
           page,
+          orderBy: 'createdAt',
+          orderDir: 'DESC',
         },
       }
     );

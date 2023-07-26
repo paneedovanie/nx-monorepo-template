@@ -7,7 +7,6 @@ import {
 import { RemoveRedEye as EyeIcon } from '@mui/icons-material';
 import {
   Box,
-  Checkbox,
   FormControl,
   Grid,
   IconButton,
@@ -54,7 +53,7 @@ export const OrdersTable = ({ store }: { store: Store }) => {
     { label: 'Unpaid', value: 'unpaid' },
   ];
 
-  const { data, isLoading } = tsQueryClient.order.getAll.useQuery(
+  const { data, isFetching } = tsQueryClient.order.getAll.useQuery(
     [
       'getOrders',
       perPage,
@@ -166,7 +165,6 @@ export const OrdersTable = ({ store }: { store: Store }) => {
         </Grid>
       </Toolbar>
       <DataTable<Order>
-        isLoading={isLoading}
         columns={[
           {
             name: 'ref',
@@ -266,6 +264,7 @@ export const OrdersTable = ({ store }: { store: Store }) => {
         onPage={setPage}
         onPerPage={setPerPage}
         onSort={setOrder}
+        isLoading={isFetching}
       />
     </>
   );

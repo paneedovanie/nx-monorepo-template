@@ -18,6 +18,20 @@ export const RegisterSchema = CreateUserSchema.merge(CreateAuthSchema);
 
 export const LoginSchema = z.object(base);
 
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export const ResetPasswordSchema = z
+  .object({
+    newPassword: z.string(),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
 export const LoginResponseSchema = z.object({
   accessToken: z.string(),
   user: UserSchema,

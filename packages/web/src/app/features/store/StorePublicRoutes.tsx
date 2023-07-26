@@ -13,7 +13,7 @@ import {
   useAuthContext,
   useCartContext,
 } from '@/core';
-import { PublicOrderView } from '../order';
+import { PublicOrderViewPage } from '../order';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Button } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
@@ -90,7 +90,7 @@ export const StorePublicRoutesContent = () => {
         <Routes>
           <Route path="/" element={<PublicStoreViewPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/orders/:orderId" element={<PublicOrderView />} />
+          <Route path="/orders/:orderId" element={<PublicOrderViewPage />} />
           <Route path="/status" element={<StoreStatusPage />} />
           <Route path="/preparation" element={<StorePreparationPage />} />
         </Routes>

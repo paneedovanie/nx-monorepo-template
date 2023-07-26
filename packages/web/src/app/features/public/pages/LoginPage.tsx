@@ -1,8 +1,9 @@
 import { FormGenerator, useTsQueryClient } from '@/core';
 import { useAuthContext } from '@/core/components/contexts/AuthContext';
-import { Box, Card, CardContent, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Typography } from '@mui/material';
 import { Login, LoginResponse } from '@nx-monorepo-template/global';
 import { LoginSchema } from '@nx-monorepo-template/global';
+import { ForgotPasswordDialog } from '../components';
 
 export const LoginPage = () => {
   const tsQueryClient = useTsQueryClient();
@@ -55,6 +56,9 @@ export const LoginPage = () => {
               },
             ]}
           />
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ForgotPasswordDialog />
+          </Box>
         </CardContent>
       </Card>
     </Box>

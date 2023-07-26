@@ -2,7 +2,6 @@ import { StarRating, useTsQueryClient } from '@/core';
 import {
   Avatar,
   Box,
-  Button,
   Card,
   CardContent,
   CardProps,
@@ -10,6 +9,7 @@ import {
 } from '@mui/material';
 import { Store } from '@nx-monorepo-template/global';
 import { format } from 'date-fns';
+import { ShowMoreRatingDialog } from './ShowMoreRatingDialog';
 
 export interface StoreRatingsCardCardProps extends CardProps {
   store: Store;
@@ -48,9 +48,7 @@ export const StoreRatingsCard = ({
           }}
         >
           <Typography variant="h4">Ratings</Typography>
-          <Button variant="contained" disabled={!store.rating}>
-            See more
-          </Button>
+          <ShowMoreRatingDialog store={store} />
         </Box>
         <Box sx={{ flex: 1 }}>
           {!store.rating && (

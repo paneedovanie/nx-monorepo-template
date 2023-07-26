@@ -1,3 +1,3 @@
-export * from './OrderList';
-export * from './OrderView';
-export * from './PublicOrderView';
+export * from './OrderListPage';
+export * from './OrderViewPage';
+export * from './PublicOrderViewPage';

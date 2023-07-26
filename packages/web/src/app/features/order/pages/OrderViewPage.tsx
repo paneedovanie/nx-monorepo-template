@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { OrderCard } from '../components';
+import { OrderCard, OrderCardLoader } from '../components';
 import {
   Breadcrumbs,
   LayoutLoader,
@@ -12,13 +12,18 @@ const Container = styled(Box)`
   padding: ${({ theme }) => theme.padding.md};
 `;
 
-export const OrderViewContent = () => {
+export const OrderViewPageContent = () => {
   const { orderQueryResult } = usePageContext();
 
   const order = orderQueryResult.data?.body;
 
   if (orderQueryResult.isFetching) {
-    return <LayoutLoader />;
+    return (
+      <Container>
+        <Breadcrumbs sx={{ my: 1 }} />
+        <OrderCardLoader />
+      </Container>
+    );
   }
   if (!order) {
     return <Typography>404</Typography>;
@@ -32,10 +37,10 @@ export const OrderViewContent = () => {
   );
 };
 
-export const OrderView = () => {
+export const OrderViewPage = () => {
   return (
     <PageContextProvider>
-      <OrderViewContent />
+      <OrderViewPageContent />
     </PageContextProvider>
   );
 };

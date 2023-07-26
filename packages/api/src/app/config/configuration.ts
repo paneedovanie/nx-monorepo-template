@@ -10,7 +10,11 @@ export default () => {
   return {
     environment: process.env.ENVIRONMENT ?? 'development',
     protocol: process.env.PROTOCOL ?? 'http',
-    host: process.env.HOST ?? 'localhost',
+    baseUrl:
+      process.env.BASE_URL ??
+      `http://localhost:${
+        process.env.PORT ? parseInt(process.env.PORT, 10) : 3000
+      }`,
     port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
     database: {
       type: process.env.DATABASE_TYPE as 'postgres',

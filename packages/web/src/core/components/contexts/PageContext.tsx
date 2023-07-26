@@ -25,6 +25,7 @@ export const PageContextProvider = ({ children }: { children: ReactNode }) => {
       },
     },
     {
+      cacheTime: 10_000,
       enabled: !!storeId,
     }
   );

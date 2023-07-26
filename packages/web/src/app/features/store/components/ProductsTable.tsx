@@ -22,22 +22,25 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Product>();
 
-  const { data, refetch: refetchProducts } =
-    tsQueryClient.product.getAll.useQuery(
-      ['getProducts', perPage, page],
-      {
-        query: {
-          store: store?.id,
-          perPage,
-          page,
-        },
+  const {
+    data,
+    isFetching,
+    refetch: refetchProducts,
+  } = tsQueryClient.product.getAll.useQuery(
+    ['getProducts', perPage, page],
+    {
+      query: {
+        store: store?.id,
+        perPage,
+        page,
       },
-      {
-        onSuccess: () => {
-          setDialogOpen(false);
-        },
-      }
-    );
+    },
+    {
+      onSuccess: () => {
+        setDialogOpen(false);
+      },
+    }
+  );
   const products = data?.body;
 
   const { mutate: deleteProduct } = tsQueryClient.product.delete.useMutation({
@@ -155,6 +158,7 @@ export const ProductsTable = ({ store }: { store?: Store }) => {
         data={products?.list}
         onPage={setPage}
         onPerPage={setPerPage}
+        isLoading={isFetching}
       />
       <ProductDialog
         store={store}

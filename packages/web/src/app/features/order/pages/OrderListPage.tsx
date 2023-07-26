@@ -30,7 +30,7 @@ const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
 `;
 
-export const OrderList = () => {
+export const OrderListPage = () => {
   const tsQueryClient = useTsQueryClient();
   const navigate = useNavigate();
   const [unrestricted, setUnrestricted] = useState(false);
@@ -42,7 +42,7 @@ export const OrderList = () => {
     { query: true }
   );
 
-  const { data } = tsQueryClient.order.getAll.useQuery(
+  const { data, isFetching } = tsQueryClient.order.getAll.useQuery(
     [
       'getOrders',
       perPage,
@@ -200,6 +200,7 @@ export const OrderList = () => {
           onPage={setPage}
           onPerPage={setPerPage}
           onSort={setOrder}
+          isLoading={isFetching}
         />
       </Card>
     </Container>

@@ -48,7 +48,11 @@ export const StoreListPage = () => {
   const [selectedItem, setSelectedItem] = useState<Store>();
   const [unrestricted, setUnrestricted] = useState(false);
 
-  const { data, refetch: refetchStores } = tsQueryClient.store.getAll.useQuery(
+  const {
+    data,
+    isFetching,
+    refetch: refetchStores,
+  } = tsQueryClient.store.getAll.useQuery(
     ['getStores', search, perPage, page, unrestricted],
     {
       query: { search, perPage, page, unrestricted },
@@ -188,6 +192,7 @@ export const StoreListPage = () => {
           data={stores?.list}
           onPage={setPage}
           onPerPage={setPerPage}
+          isLoading={isFetching}
         />
       </Card>
       <StoreDialog

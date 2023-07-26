@@ -1,9 +1,11 @@
 import { initContract } from '@ts-rest/core';
 import {
   ChangePasswordSchema,
+  ForgotPasswordSchema,
   LoginResponseSchema,
   LoginSchema,
   RegisterSchema,
+  ResetPasswordSchema,
   TokenUserSchema,
   UserSchema,
   VerifyQuerySchema,
@@ -30,6 +32,24 @@ export const auth = initContract().router({
       201: LoginResponseSchema,
     },
     summary: 'Login user',
+  },
+  forgotPassword: {
+    method: 'POST',
+    path: `${prefix}/forgot-password`,
+    body: ForgotPasswordSchema,
+    responses: {
+      201: z.boolean(),
+    },
+    summary: 'Reset password request',
+  },
+  resetPassword: {
+    method: 'POST',
+    path: `${prefix}/reset-password`,
+    body: ResetPasswordSchema,
+    responses: {
+      201: z.boolean(),
+    },
+    summary: 'Reset password',
   },
   verify: {
     method: 'GET',

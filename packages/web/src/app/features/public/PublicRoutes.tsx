@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage, LoginPage, RegistrationPage } from './pages';
 import { useAuthContext } from '@/core';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 
 export const PublicRoutes = () => {
   const { user } = useAuthContext();
@@ -16,6 +17,7 @@ export const PublicRoutes = () => {
         path="/register"
         element={!user ? <RegistrationPage /> : <Navigate to="/" />}
       />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route
         path="*"
         element={

@@ -3,8 +3,15 @@ import {
   UnauthorizedException,
   ForbiddenException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
-import { ChangePassword, Login, Register } from '@nx-monorepo-template/global';
+import {
+  ChangePassword,
+  Login,
+  Register,
+  ResetPassword,
+  User,
+} from '@nx-monorepo-template/global';
 import { DataSource } from 'typeorm';
 import {
   CredentialRepository,
@@ -152,5 +159,46 @@ export class AuthService {
     } catch (err) {
       return;
     }
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.userRepository.findOne({
+      where: {
+        credential: {
+          email: email,
+        },
+      },
+      relations: ['credential'],
+    });
+    if (!user) {
+      throw new NotFoundException(
+        `No user associated with this email "${email}"`
+      );
+    }
+    const payload = { sub: user.id };
+
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '5m' });
+
+    await this.mailService.sendResetPassword(user, accessToken);
+
+    return {
+      accessToken,
+    };
+  }
+
+  async resetPassword(id: string, input: ResetPassword) {
+    const credential = await this.credentialRepository.findOneBy({
+      user: { id },
+    });
+
+    if (!credential || input.newPassword !== input.confirmPassword) {
+      throw new ForbiddenException();
+    }
+
+    credential.password = await hashPassword(input.newPassword);
+
+    await this.credentialRepository.save(credential);
+
+    return true;
   }
 }

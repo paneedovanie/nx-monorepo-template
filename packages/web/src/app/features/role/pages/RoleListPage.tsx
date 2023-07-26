@@ -26,7 +26,7 @@ export const RoleListPage = () => {
   const [perPage, setPerPage] = useState(5);
   const [page, setPage] = useState(1);
 
-  const { data, refetch } = tsQueryClient.role.getAll.useQuery(
+  const { data, isFetching, refetch } = tsQueryClient.role.getAll.useQuery(
     ['getRoles', perPage, page],
     {
       query: {
@@ -114,6 +114,7 @@ export const RoleListPage = () => {
           data={roles?.list}
           onPage={setPage}
           onPerPage={setPerPage}
+          isLoading={isFetching}
         />
       </Card>
       <RoleDialog
