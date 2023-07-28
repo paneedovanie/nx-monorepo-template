@@ -679,6 +679,15 @@ exports.statistic = (0, core_1.initContract)().router({
         },
         summary: 'Get dashboard data',
     },
+    storeOrdersPerDay: {
+        method: 'GET',
+        path: `${prefix}/store-orders-per-day`,
+        query: schemas_1.StoreOrdersPerDaySchema,
+        responses: {
+            200: schemas_1.StoreOrdersPerDayResponseSchema,
+        },
+        summary: 'Get store order per day',
+    },
 });
 
 
@@ -1873,13 +1882,15 @@ exports.NotificationsCountSchema = zod_1.z.object({
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetOrdersOptionsSchema = exports.GetOrdersResponseSchema = exports.UpdateOrderSchema = exports.CreateOrderSchema = exports.OrderSchema = exports.OrderProductSchema = void 0;
+exports.GetOrdersOptionsSchema = exports.GetOrdersResponseSchema = exports.UpdateOrderSchema = exports.CreateOrderSchema = exports.OrderSchema = exports.OrderProductSchema = exports.OrderStatusSchema = void 0;
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const store_1 = __webpack_require__("../../lib/global/src/lib/schemas/store.ts");
 const user_1 = __webpack_require__("../../lib/global/src/lib/schemas/user.ts");
 const unrestricted_1 = __webpack_require__("../../lib/global/src/lib/schemas/unrestricted.ts");
 const payment_1 = __webpack_require__("../../lib/global/src/lib/schemas/payment.ts");
+const interfaces_1 = __webpack_require__("../../lib/global/src/lib/interfaces/index.ts");
+exports.OrderStatusSchema = zod_1.z.nativeEnum(interfaces_1.OrderStatus);
 exports.OrderProductSchema = zod_1.z.object({
     title: zod_1.z.string(),
     description: zod_1.z.string(),
@@ -1889,7 +1900,7 @@ exports.OrderProductSchema = zod_1.z.object({
 });
 const base = {
     items: exports.OrderProductSchema.array(),
-    status: zod_1.z.string(),
+    status: exports.OrderStatusSchema,
 };
 exports.OrderSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), ref: zod_1.z.number(), store: store_1.StoreSchema.optional(), user: user_1.UserSchema.optional(), payment: payment_1.NonCircularPaymentSchema, tax: zod_1.z.number(), createdAt: zod_1.z.date() }, base));
 exports.CreateOrderSchema = zod_1.z.object(Object.assign({ store: zod_1.z.string(), user: zod_1.z.string().optional() }, base));
@@ -2058,7 +2069,7 @@ exports.GetRolesOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_1
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DashboardSchema = void 0;
+exports.StoreOrdersPerDayResponseSchema = exports.StoreOrdersPerDaySchema = exports.DashboardSchema = void 0;
 const zod_1 = __webpack_require__("zod");
 exports.DashboardSchema = zod_1.z.object({
     myStoresCount: zod_1.z.number(),
@@ -2071,6 +2082,23 @@ exports.DashboardSchema = zod_1.z.object({
     categoriesCount: zod_1.z.number().optional(),
     circulatingAmount: zod_1.z.number().optional(),
 });
+exports.StoreOrdersPerDaySchema = zod_1.z.object({
+    storeId: zod_1.z.string().uuid(),
+    from: zod_1.z
+        .string()
+        .datetime()
+        .transform((v) => new Date(v)),
+    to: zod_1.z
+        .string()
+        .datetime()
+        .transform((v) => new Date(v)),
+});
+exports.StoreOrdersPerDayResponseSchema = zod_1.z
+    .object({
+    date: zod_1.z.date(),
+    count: zod_1.z.number(),
+})
+    .array();
 
 
 /***/ }),
@@ -7720,6 +7748,12 @@ let StatisticController = class StatisticController {
             return { status: 200, body };
         });
     }
+    storeOrdersPerDay({ query }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const data = yield this.service.getStoreOrdersCountPerDay(query.storeId, query.from, query.to);
+            return { status: 200, body: data };
+        });
+    }
 };
 tslib_1.__decorate([
     (0, nest_1.TsRest)(c.dashboard),
@@ -7729,6 +7763,13 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [Object, Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], StatisticController.prototype, "dashboard", null);
+tslib_1.__decorate([
+    (0, nest_1.TsRest)(c.storeOrdersPerDay),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], StatisticController.prototype, "storeOrdersPerDay", null);
 StatisticController = tslib_1.__decorate([
     (0, common_1.UseGuards)(guards_1.JwtAuthGuard),
     (0, common_1.Controller)(),
@@ -7876,6 +7917,25 @@ let StatisticService = class StatisticService {
                 ordersCount: yield this.getStoreOrdersCount(storeId),
                 paymentsCount: yield this.getStorePaymentsCount(storeId),
             };
+        });
+    }
+    getStoreOrdersCountPerDay(storeId, from, to) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return this.orderRepository.query(`
+        SELECT all_dates.date AS date,
+        COUNT(orders.created_at) AS count
+        FROM (
+          SELECT generate_series(
+            $2::date,
+            $3::date,
+            INTERVAL '1 day'
+          ) AS date
+        ) all_dates
+        LEFT JOIN orders
+        ON DATE_TRUNC('day', orders.created_at) = all_dates.date AND orders.store_id = $1
+        GROUP BY all_dates.date
+        ORDER BY all_dates.date;
+      `, [storeId, from, to]);
         });
     }
 };

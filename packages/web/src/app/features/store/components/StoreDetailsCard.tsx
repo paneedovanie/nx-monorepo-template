@@ -274,7 +274,9 @@ export const StoreDetailsCard = ({
               </MenuItem>
             </Menu>
             <Tags tags={store?.tags} />
-            <Typography variant="h4">{store?.title}</Typography>
+            <Typography variant="h4" color="primary">
+              {store?.title}
+            </Typography>
             <Typography>{store?.description}</Typography>
             <QrcodeDialog
               displayTrigger={false}

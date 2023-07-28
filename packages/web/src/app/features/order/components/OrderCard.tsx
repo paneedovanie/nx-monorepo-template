@@ -100,6 +100,17 @@ export const OrderCard = ({
     link.click();
   };
 
+  const statusColor: Record<
+    OrderStatus,
+    'default' | 'error' | 'warning' | 'info' | 'success'
+  > = {
+    [OrderStatus.Pending]: 'default',
+    [OrderStatus.Cancelled]: 'error',
+    [OrderStatus.Preparing]: 'warning',
+    [OrderStatus.Ready]: 'info',
+    [OrderStatus.Completed]: 'success',
+  };
+
   return (
     <>
       <Card sx={{ mb: 1 }}>
@@ -194,7 +205,7 @@ export const OrderCard = ({
               </Box>
             </Grid>
             <Grid item xs={12} sm="auto">
-              <Typography variant="h4">
+              <Typography variant="h4" color="primary">
                 {order.store?.title ?? 'Deleted'}
               </Typography>
               <Typography variant="h5">#{order?.ref}</Typography>
@@ -207,12 +218,20 @@ export const OrderCard = ({
               </Typography>
               <Typography sx={{ textTransform: 'Capitalize', flex: 1 }}>
                 <b>Status:</b>{' '}
-                <span style={{ textTransform: 'capitalize', flex: 1 }}>
-                  {order?.status}
-                </span>
+                <Chip
+                  color={statusColor[order?.status]}
+                  label={order?.status}
+                  size="small"
+                />
               </Typography>
               <Typography>
-                <b>Paid:</b> {order?.payment ? 'Yes' : 'No'}
+                <b>Paid:</b>{' '}
+                <Typography
+                  component="span"
+                  color={order?.payment ? 'green' : 'red'}
+                >
+                  {order?.payment ? 'Yes' : 'No'}
+                </Typography>
               </Typography>
             </Grid>
           </Grid>

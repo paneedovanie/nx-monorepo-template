@@ -106,4 +106,25 @@ export class StatisticService {
       paymentsCount: await this.getStorePaymentsCount(storeId),
     };
   }
+
+  async getStoreOrdersCountPerDay(storeId: string, from: Date, to: Date) {
+    return this.orderRepository.query(
+      `
+        SELECT all_dates.date AS date,
+        COUNT(orders.created_at) AS count
+        FROM (
+          SELECT generate_series(
+            $2::date,
+            $3::date,
+            INTERVAL '1 day'
+          ) AS date
+        ) all_dates
+        LEFT JOIN orders
+        ON DATE_TRUNC('day', orders.created_at) = all_dates.date AND orders.store_id = $1
+        GROUP BY all_dates.date
+        ORDER BY all_dates.date;
+      `,
+      [storeId, from, to]
+    );
+  }
 }

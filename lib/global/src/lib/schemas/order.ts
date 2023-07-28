@@ -7,6 +7,9 @@ import { StoreSchema } from './store';
 import { UserSchema } from './user';
 import { UnrestrictedSchema } from './unrestricted';
 import { NonCircularPaymentSchema } from './payment';
+import { OrderStatus } from '../interfaces';
+
+export const OrderStatusSchema = z.nativeEnum(OrderStatus);
 
 export const OrderProductSchema = z.object({
   title: z.string(),
@@ -18,7 +21,7 @@ export const OrderProductSchema = z.object({
 
 const base = {
   items: OrderProductSchema.array(),
-  status: z.string(),
+  status: OrderStatusSchema,
 };
 
 export const OrderSchema = z.object({

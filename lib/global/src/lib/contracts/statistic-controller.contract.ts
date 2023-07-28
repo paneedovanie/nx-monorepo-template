@@ -1,5 +1,10 @@
 import { initContract } from '@ts-rest/core';
-import { DashboardSchema, UnrestrictedSchema } from '../schemas';
+import {
+  DashboardSchema,
+  StoreOrdersPerDayResponseSchema,
+  StoreOrdersPerDaySchema,
+  UnrestrictedSchema,
+} from '../schemas';
 
 const prefix = `/api/v1/statistics`;
 
@@ -12,5 +17,14 @@ export const statistic = initContract().router({
       200: DashboardSchema,
     },
     summary: 'Get dashboard data',
+  },
+  storeOrdersPerDay: {
+    method: 'GET',
+    path: `${prefix}/store-orders-per-day`,
+    query: StoreOrdersPerDaySchema,
+    responses: {
+      200: StoreOrdersPerDayResponseSchema,
+    },
+    summary: 'Get store order per day',
   },
 });

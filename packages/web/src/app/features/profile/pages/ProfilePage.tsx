@@ -98,7 +98,7 @@ export const ProfilePage = () => {
               >
                 <EditIcon color="warning" />
               </IconButton>
-              <Typography variant="h4">
+              <Typography variant="h4" color="primary">
                 {user?.firstName + ' ' + user?.lastName}
               </Typography>
               <Typography variant="body2">

@@ -54,4 +54,17 @@ export class StatisticController implements NestControllerInterface<typeof c> {
 
     return { status: 200 as const, body };
   }
+
+  @TsRest(c.storeOrdersPerDay)
+  async storeOrdersPerDay(
+    @TsRestRequest() { query }: RequestShapes['storeOrdersPerDay']
+  ) {
+    const data = await this.service.getStoreOrdersCountPerDay(
+      query.storeId,
+      query.from,
+      query.to
+    );
+
+    return { status: 200 as const, body: data };
+  }
 }

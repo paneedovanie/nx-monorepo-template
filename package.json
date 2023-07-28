@@ -95,6 +95,7 @@
     "vitest-preview": "latest"
   },
   "dependencies": {
+    "@mui/x-charts": "^6.0.0-alpha.5",
     "@nestjs-modules/mailer": "^1.8.1",
     "@nestjs/common": "^9.3.9",
     "@nestjs/config": "^2.3.1",

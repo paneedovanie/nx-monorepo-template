@@ -2,12 +2,19 @@ import {
   Breadcrumbs,
   DashboardCountWidget,
   LayoutLoader,
-  Loading,
   PageContextProvider,
   useEventContext,
   usePageContext,
+  useTsQueryClient,
 } from '@/core';
-import { Grid, Typography } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { StoreDetailsCard, StoreRatingsCard } from '../components';
@@ -17,8 +24,10 @@ import {
   Inventory as InventoryIcon,
   Payment as PaymentIcon,
 } from '@mui/icons-material';
+import { BarChart } from '@mui/x-charts';
 import { Event, StoreDashboardEvent } from '@nx-monorepo-template/global';
 import { useCallback, useEffect, useState } from 'react';
+import { format } from 'date-fns';
 
 const Container = styled.div`
   padding: ${({ theme }) => theme.padding.md};
@@ -26,6 +35,7 @@ const Container = styled.div`
 
 export const StoreViewPageContent = () => {
   const navigate = useNavigate();
+  const tsQueryClient = useTsQueryClient();
   const { storeQueryResult } = usePageContext();
   const [dashboard, setDashboard] = useState<
     Omit<StoreDashboardEvent, 'storeId'>
@@ -35,6 +45,10 @@ export const StoreViewPageContent = () => {
     ordersCount: 0,
     paymentsCount: 0,
   });
+  const fromValue = new Date();
+  fromValue.setDate(fromValue.getDate() - 30);
+  const [from, setFrom] = useState(fromValue);
+  const [to, setTo] = useState(new Date());
   const { socket } = useEventContext();
 
   const store = storeQueryResult.data?.body;
@@ -44,7 +58,7 @@ export const StoreViewPageContent = () => {
       if (store?.id === e.storeId) {
         setDashboard({
           categoriesCount: e.categoriesCount,
-          productsCount: e.paymentsCount,
+          productsCount: e.productsCount,
           ordersCount: e.ordersCount,
           paymentsCount: e.paymentsCount,
         });
@@ -52,6 +66,22 @@ export const StoreViewPageContent = () => {
     },
     [store]
   );
+  const { data: storeOrdersPerDayResult } =
+    tsQueryClient.statistic.storeOrdersPerDay.useQuery(
+      ['storeOrdersPerDay', from, to],
+      {
+        query: {
+          storeId: store?.id ?? '',
+          from: from.toISOString(),
+          to: to.toISOString(),
+        },
+      },
+      {
+        enabled: !!store,
+      }
+    );
+
+  const storeOrdersPerDay = storeOrdersPerDayResult?.body;
 
   useEffect(() => {
     socket?.on(Event.StoreDashboard, onDashboard);
@@ -117,6 +147,65 @@ export const StoreViewPageContent = () => {
           />
         </Grid>
       </Grid>
+      <Card>
+        <CardContent>
+          <Box
+            sx={{
+              display: ['block', null, 'flex'],
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box>
+              <Typography variant="h5">Orders Per Day</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <TextField
+                label="From"
+                type="date"
+                size="small"
+                onChange={(e) => {
+                  const tempValue = new Date(e.target.value);
+                  if (tempValue < to) {
+                    setFrom(new Date(e.target.value));
+                  }
+                }}
+              />
+              <TextField
+                label="to"
+                type="date"
+                size="small"
+                onChange={(e) => {
+                  const tempValue = new Date(e.target.value);
+                  if (tempValue > from) {
+                    setTo(new Date(e.target.value));
+                  }
+                }}
+              />
+            </Box>
+          </Box>
+          {storeOrdersPerDay && (
+            <BarChart
+              xAxis={[
+                {
+                  data:
+                    storeOrdersPerDay?.map(({ date }) =>
+                      format(new Date(date), 'dd')
+                    ) ?? [],
+                  scaleType: 'band',
+                },
+              ]}
+              series={[
+                {
+                  data: storeOrdersPerDay?.map(({ count }) => +count) ?? [],
+                },
+              ]}
+              height={300}
+              sx={{ width: '100%' }}
+            />
+          )}
+        </CardContent>
+      </Card>
     </Container>
   );
 };
