@@ -1,4 +1,4 @@
-import { useCartContext, formatCurrency } from '@/core';
+import { useCartContext, formatCurrency, theme } from '@/core';
 import {
   Add as AddIcon,
   Remove as RemoveIcon,
@@ -57,9 +57,26 @@ export const ProductCard = ({ data }: { data: Product }) => {
             boxShadow: '0 0 5px gray',
           },
           cursor: 'pointer',
+          overflow: 'hidden',
+          position: 'relative',
         }}
         onClick={handleOpen}
       >
+        {data.isBestSeller && (
+          <Box
+            sx={{
+              position: 'absolute',
+              bgcolor: 'red',
+              color: 'white',
+              transform: 'rotateZ(-45deg) translate(-95px, -60px)',
+              textAlign: 'center',
+              width: 300,
+              boxShadow: '0 0 5px gray',
+            }}
+          >
+            <Typography>Best Seller</Typography>
+          </Box>
+        )}
         {data.image ? (
           <CardMedia sx={{ height: [100, 200] }} image={data.image} />
         ) : (

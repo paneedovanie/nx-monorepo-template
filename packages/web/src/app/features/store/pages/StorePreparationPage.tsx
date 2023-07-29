@@ -89,7 +89,6 @@ export const StorePreparationPage = () => {
 
   const onPreparing = useCallback(
     (e: StorePreparingEvent) => {
-      console.log(e);
       if (storeId === e.storeId) {
         setPreparing(e.preparing);
       }

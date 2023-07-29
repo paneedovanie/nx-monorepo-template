@@ -19,6 +19,7 @@ export const NonCircularProductSchema = z.object({
   category: CategorySchema,
   categories: CategorySchema.array(),
   image: z.string(),
+  isBestSeller: z.boolean().optional(),
   ...base,
 });
 
@@ -29,6 +30,7 @@ export const ProductSchema = z.lazy(() =>
     category: CategorySchema,
     categories: CategorySchema.array(),
     image: z.string(),
+    isBestSeller: z.boolean().optional(),
     ...base,
   })
 );

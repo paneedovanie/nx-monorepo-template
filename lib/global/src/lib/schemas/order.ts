@@ -12,6 +12,7 @@ import { OrderStatus } from '../interfaces';
 export const OrderStatusSchema = z.nativeEnum(OrderStatus);
 
 export const OrderProductSchema = z.object({
+  id: z.string().uuid(),
   title: z.string(),
   description: z.string(),
   price: z.number(),

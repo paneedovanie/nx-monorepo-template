@@ -13,6 +13,7 @@ import { BaseRepository } from '../../core';
 import { StoreRepository } from './store.repository';
 import { CategoryRepository } from './category.repository';
 import { CreateProduct, UpdateProduct } from '@nx-monorepo-template/global';
+import { OrderRepository } from './order.repository';
 
 @Injectable()
 export class ProductRepository extends BaseRepository<
@@ -23,22 +24,41 @@ export class ProductRepository extends BaseRepository<
   constructor(
     dataSource: DataSource,
     private readonly storeRepository: StoreRepository,
-    private readonly categoryRepository: CategoryRepository
+    private readonly categoryRepository: CategoryRepository,
+    private readonly orderRepository: OrderRepository
   ) {
     super(ProductEntity, dataSource);
   }
 
   protected async modifyResult(
     item: ProductEntity
-  ): Promise<ProductEntity & { categories: CategoryEntity[] }> {
+  ): Promise<
+    ProductEntity & { categories: CategoryEntity[]; isBestSeller: boolean }
+  > {
     if (!item) {
       return null;
     }
+
+    const bestSeller = (
+      await this.orderRepository.query(
+        `
+        SELECT i->>'id' as id, SUM((i->>'count')::numeric) as count
+        FROM public.orders o
+        CROSS JOIN LATERAL jsonb_array_elements(o.items) as i
+        WHERE o.store_id = $1 AND i->>'id' IS NOT NULL
+        GROUP BY i->>'id'
+        ORDER BY count DESC
+      `,
+        [item.store.id]
+      )
+    )?.[0];
+
     return {
       ...item,
       categories: await this.categoryRepository.getParentsByCategoryId(
         item.category.id
       ),
+      isBestSeller: item.id === bestSeller?.id,
     };
   }
 

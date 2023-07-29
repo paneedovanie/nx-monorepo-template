@@ -24,7 +24,12 @@ import {
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { CreateOrder, Order, Product } from '@nx-monorepo-template/global';
+import {
+  CreateOrder,
+  Order,
+  OrderStatus,
+  Product,
+} from '@nx-monorepo-template/global';
 import { CreateOrderSchema } from '@nx-monorepo-template/global';
 
 const Container = styled(Box)`
@@ -187,6 +192,7 @@ export const CheckoutPage = () => {
                   items:
                     products?.list.map(
                       ({ id, title, description, price }: Product) => ({
+                        id,
                         title,
                         description,
                         price,
@@ -195,7 +201,7 @@ export const CheckoutPage = () => {
                     ) ?? [],
                   user: user?.id,
                   store: store.id,
-                  status: 'pending',
+                  status: OrderStatus.Pending,
                 }}
                 defaultEnableSubmit
                 schema={CreateOrderSchema}

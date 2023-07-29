@@ -1892,6 +1892,7 @@ const payment_1 = __webpack_require__("../../lib/global/src/lib/schemas/payment.
 const interfaces_1 = __webpack_require__("../../lib/global/src/lib/interfaces/index.ts");
 exports.OrderStatusSchema = zod_1.z.nativeEnum(interfaces_1.OrderStatus);
 exports.OrderProductSchema = zod_1.z.object({
+    id: zod_1.z.string().uuid(),
     title: zod_1.z.string(),
     description: zod_1.z.string(),
     price: zod_1.z.number(),
@@ -2023,8 +2024,8 @@ const base = {
     description: zod_1.z.string(),
     price: common_1.CurrencySchema,
 };
-exports.NonCircularProductSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base));
-exports.ProductSchema = zod_1.z.lazy(() => zod_1.z.object(Object.assign({ id: zod_1.z.string(), store: store_1.StoreSchema, category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string() }, base)));
+exports.NonCircularProductSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string(), isBestSeller: zod_1.z.boolean().optional() }, base));
+exports.ProductSchema = zod_1.z.lazy(() => zod_1.z.object(Object.assign({ id: zod_1.z.string(), store: store_1.StoreSchema, category: category_1.CategorySchema, categories: category_1.CategorySchema.array(), image: zod_1.z.string(), isBestSeller: zod_1.z.boolean().optional() }, base)));
 exports.CreateProductSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { store: zod_1.z.string(), category: zod_1.z.string(), image: file_1.FileSchema.optional() }));
 exports.UpdateProductSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { store: zod_1.z.string(), category: zod_1.z.string(), image: file_1.FileSchema.optional() }));
 exports.GetProductsResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.ProductSchema.array() }));
@@ -4469,7 +4470,7 @@ exports.PermissionRepository = PermissionRepository;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ProductRepository = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -4479,18 +4480,29 @@ const entities_1 = __webpack_require__("./src/app/database/entities/index.ts");
 const core_1 = __webpack_require__("./src/app/core/index.ts");
 const store_repository_1 = __webpack_require__("./src/app/database/repositories/store.repository.ts");
 const category_repository_1 = __webpack_require__("./src/app/database/repositories/category.repository.ts");
+const order_repository_1 = __webpack_require__("./src/app/database/repositories/order.repository.ts");
 let ProductRepository = class ProductRepository extends core_1.BaseRepository {
-    constructor(dataSource, storeRepository, categoryRepository) {
+    constructor(dataSource, storeRepository, categoryRepository, orderRepository) {
         super(entities_1.ProductEntity, dataSource);
         this.storeRepository = storeRepository;
         this.categoryRepository = categoryRepository;
+        this.orderRepository = orderRepository;
     }
     modifyResult(item) {
+        var _a;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             if (!item) {
                 return null;
             }
-            return Object.assign(Object.assign({}, item), { categories: yield this.categoryRepository.getParentsByCategoryId(item.category.id) });
+            const bestSeller = (_a = (yield this.orderRepository.query(`
+        SELECT i->>'id' as id, SUM((i->>'count')::numeric) as count
+        FROM public.orders o
+        CROSS JOIN LATERAL jsonb_array_elements(o.items) as i
+        WHERE o.store_id = $1 AND i->>'id' IS NOT NULL
+        GROUP BY i->>'id'
+        ORDER BY count DESC
+      `, [item.store.id]))) === null || _a === void 0 ? void 0 : _a[0];
+            return Object.assign(Object.assign({}, item), { categories: yield this.categoryRepository.getParentsByCategoryId(item.category.id), isBestSeller: item.id === (bestSeller === null || bestSeller === void 0 ? void 0 : bestSeller.id) });
         });
     }
     searchFields() {
@@ -4532,7 +4544,7 @@ let ProductRepository = class ProductRepository extends core_1.BaseRepository {
 };
 ProductRepository = tslib_1.__decorate([
     (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_1.DataSource !== "undefined" && typeorm_1.DataSource) === "function" ? _a : Object, typeof (_b = typeof store_repository_1.StoreRepository !== "undefined" && store_repository_1.StoreRepository) === "function" ? _b : Object, typeof (_c = typeof category_repository_1.CategoryRepository !== "undefined" && category_repository_1.CategoryRepository) === "function" ? _c : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_1.DataSource !== "undefined" && typeorm_1.DataSource) === "function" ? _a : Object, typeof (_b = typeof store_repository_1.StoreRepository !== "undefined" && store_repository_1.StoreRepository) === "function" ? _b : Object, typeof (_c = typeof category_repository_1.CategoryRepository !== "undefined" && category_repository_1.CategoryRepository) === "function" ? _c : Object, typeof (_d = typeof order_repository_1.OrderRepository !== "undefined" && order_repository_1.OrderRepository) === "function" ? _d : Object])
 ], ProductRepository);
 exports.ProductRepository = ProductRepository;
 

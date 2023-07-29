@@ -235,7 +235,6 @@ export const StoreEditPageContent = () => {
 };
 
 export const StoreEditPage = () => {
-  console.log('we');
   return (
     <PageContextProvider>
       <StoreEditPageContent />
