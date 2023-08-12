@@ -53,3 +53,45 @@ export const GetPaymentsOptionsSchema = PaginationOptionsSchema.merge(
     ids: z.string().array().optional(),
   })
 );
+
+export const MayaItem = z.object({
+  amount: z.object({ value: z.number() }),
+  totalAmount: z.object({
+    details: z
+      .object({
+        tax: z.number(),
+        shippingFee: z.number(),
+        serviceCharge: z.number(),
+        discount: z.number(),
+        subtotal: z.number(),
+      })
+      .optional(),
+    value: z.number(),
+  }),
+  name: z.string(),
+  quantity: z.number(),
+  code: z.string().optional(),
+  description: z.string().optional(),
+});
+
+export const CreatePaymentLink = z.object({
+  orderId: z.string().uuid(),
+});
+
+export const CreateMayaCheckoutSchema = z.object({
+  totalAmount: z.object({ value: z.number(), currency: z.string() }),
+  requestReferenceNumber: z.string(),
+  items: MayaItem.array().optional(),
+  redirectUrl: z
+    .object({
+      success: z.string().optional(),
+      failure: z.string().optional(),
+      cancel: z.string().optional(),
+    })
+    .optional(),
+});
+
+export const MayaCheckoutSchema = z.object({
+  checkoutId: z.string(),
+  redirectUrl: z.string(),
+});

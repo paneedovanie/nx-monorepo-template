@@ -2,6 +2,7 @@ import {
   QrcodeDialog,
   formatCurrency,
   useAuthContext,
+  usePageContext,
   useTsQueryClient,
 } from '@/core';
 import {
@@ -25,7 +26,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Order, OrderProduct, OrderStatus } from '@nx-monorepo-template/global';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BillDialog, PayDialog, StatusDialog } from '.';
 import { format } from 'date-fns';
 import {
@@ -41,12 +42,14 @@ export const OrderCard = ({
   order: Order;
   onUpdate?: () => void;
 }) => {
+  const { orderQueryResult } = usePageContext();
   const tsQueryClient = useTsQueryClient();
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [billOpen, setBillOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const { user } = useAuthContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [popup, setPopup] = useState<Window | null>(null);
 
   const isCustomer = order.user?.id === user?.id;
   const isStoreOwner = order.store?.owner?.id === user?.id;
@@ -79,6 +82,26 @@ export const OrderCard = ({
     );
 
   const receipt = receiptResult?.body;
+
+  const { mutate: createLink } =
+    tsQueryClient.payment.createPaymentLink.useMutation({
+      onSuccess: ({ body }) => {
+        setPopup(window.open(body.redirectUrl));
+      },
+    });
+
+  useEffect(() => {
+    window.addEventListener(
+      'message',
+      (event) => {
+        if (event.data === 'refresh-order') {
+          orderQueryResult.refetch();
+          popup?.close();
+        }
+      },
+      false
+    );
+  }, [popup, orderQueryResult]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -273,6 +296,21 @@ export const OrderCard = ({
                 Please pay to the shop's cashier or using your account wallet.
               </Typography>
             )}
+            <Box>
+              {!order.payment && (
+                <Button
+                  onClick={() =>
+                    createLink({
+                      body: {
+                        orderId: order.id,
+                      },
+                    })
+                  }
+                >
+                  Pay with Maya
+                </Button>
+              )}
+            </Box>
           </Box>
         </CardActions>
       </Card>

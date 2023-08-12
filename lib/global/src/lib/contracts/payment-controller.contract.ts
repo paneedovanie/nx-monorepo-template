@@ -5,6 +5,8 @@ import {
   GetPaymentsOptionsSchema,
   GetPaymentsResponseSchema,
   UpdatePaymentSchema,
+  MayaCheckoutSchema,
+  CreatePaymentLink,
 } from '../schemas';
 import { z } from 'zod';
 
@@ -74,5 +76,25 @@ export const payment = initContract().router({
       200: z.object({ file: z.string() }),
     },
     summary: 'Get a payment receipt',
+  },
+  createPaymentLink: {
+    method: 'POST',
+    path: `${prefix}/payment-link`,
+    body: CreatePaymentLink,
+    responses: {
+      201: MayaCheckoutSchema,
+    },
+    summary: 'Create payment link',
+  },
+  successPaymentRedirect: {
+    method: 'GET',
+    path: `${prefix}/success-payment-redirect/:orderId`,
+    pathParams: z.object({
+      orderId: z.string().uuid(),
+    }),
+    responses: {
+      200: z.null(),
+    },
+    summary: 'Success redirect url',
   },
 });

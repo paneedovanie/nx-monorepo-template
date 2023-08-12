@@ -9,6 +9,7 @@ import {
   Controller,
   ForbiddenException,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { contract, RolePermission } from '@nx-monorepo-template/global';
@@ -16,6 +17,8 @@ import { JwtAuthGuard, PermissionGuard } from '../../auth/guards';
 import { Permissions } from '../../auth';
 import { PaymentService } from '../services';
 import { OrderService } from '../../order';
+import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 const c = nestControllerContract(contract.payment);
 type RequestShapes = NestRequestShapes<typeof c>;
@@ -24,7 +27,8 @@ type RequestShapes = NestRequestShapes<typeof c>;
 export class PaymentController implements NestControllerInterface<typeof c> {
   constructor(
     private readonly paymentService: PaymentService,
-    private readonly orderService: OrderService
+    private readonly orderService: OrderService,
+    private readonly configService: ConfigService
   ) {}
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -92,5 +96,35 @@ export class PaymentController implements NestControllerInterface<typeof c> {
     }
 
     return { status: 200 as const, body: { file: receipt } };
+  }
+
+  @TsRest(c.createPaymentLink)
+  async createPaymentLink(
+    @TsRestRequest() { body }: RequestShapes['createPaymentLink']
+  ) {
+    const result = await this.paymentService.createPaymentLink(body.orderId);
+
+    if (!result) {
+      return { status: 404 as const, body: null };
+    }
+
+    return { status: 200 as const, body: result };
+  }
+
+  @TsRest(c.successPaymentRedirect)
+  async successPaymentRedirect(
+    @TsRestRequest() { params }: RequestShapes['successPaymentRedirect'],
+    @Res() res: Response
+  ) {
+    const frontEndUrl = this.configService.get('frontEndUrl');
+    await this.paymentService.successPayment(params.orderId);
+
+    res.send(`
+      <script>
+        window.opener.postMessage('refresh-order', '${frontEndUrl}')
+      </script>
+    `);
+
+    return { status: 200 as const, body: null };
   }
 }

@@ -109,6 +109,7 @@
     "@nestjs/websockets": "^9.3.9",
     "@ts-rest/core": "^3.17.0",
     "@ts-rest/nest": "^3.17.0",
+    "api": "^6.1.0",
     "aws-sdk": "^2.1410.0",
     "bcrypt": "^5.1.0",
     "canvas": "^2.11.2",

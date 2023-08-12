@@ -440,6 +440,26 @@ exports.payment = (0, core_1.initContract)().router({
         },
         summary: 'Get a payment receipt',
     },
+    createPaymentLink: {
+        method: 'POST',
+        path: `${prefix}/payment-link`,
+        body: schemas_1.CreatePaymentLink,
+        responses: {
+            201: schemas_1.MayaCheckoutSchema,
+        },
+        summary: 'Create payment link',
+    },
+    successPaymentRedirect: {
+        method: 'GET',
+        path: `${prefix}/success-payment-redirect/:orderId`,
+        pathParams: zod_1.z.object({
+            orderId: zod_1.z.string().uuid(),
+        }),
+        responses: {
+            200: zod_1.z.null(),
+        },
+        summary: 'Success redirect url',
+    },
 });
 
 
@@ -1951,7 +1971,7 @@ exports.PaginationResponseSchema = zod_1.z.object({
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetPaymentsOptionsSchema = exports.GetPaymentsResponseSchema = exports.UpdatePaymentSchema = exports.CreatePaymentSchema = exports.PaymentSchema = exports.NonCircularPaymentSchema = void 0;
+exports.MayaCheckoutSchema = exports.CreateMayaCheckoutSchema = exports.CreatePaymentLink = exports.MayaItem = exports.GetPaymentsOptionsSchema = exports.GetPaymentsResponseSchema = exports.UpdatePaymentSchema = exports.CreatePaymentSchema = exports.PaymentSchema = exports.NonCircularPaymentSchema = void 0;
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const order_1 = __webpack_require__("../../lib/global/src/lib/schemas/order.ts");
@@ -1981,6 +2001,44 @@ exports.GetPaymentsResponseSchema = pagination_1.PaginationResponseSchema.merge(
 exports.GetPaymentsOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_1.z.object({
     ids: zod_1.z.string().array().optional(),
 }));
+exports.MayaItem = zod_1.z.object({
+    amount: zod_1.z.object({ value: zod_1.z.number() }),
+    totalAmount: zod_1.z.object({
+        details: zod_1.z
+            .object({
+            tax: zod_1.z.number(),
+            shippingFee: zod_1.z.number(),
+            serviceCharge: zod_1.z.number(),
+            discount: zod_1.z.number(),
+            subtotal: zod_1.z.number(),
+        })
+            .optional(),
+        value: zod_1.z.number(),
+    }),
+    name: zod_1.z.string(),
+    quantity: zod_1.z.number(),
+    code: zod_1.z.string().optional(),
+    description: zod_1.z.string().optional(),
+});
+exports.CreatePaymentLink = zod_1.z.object({
+    orderId: zod_1.z.string().uuid(),
+});
+exports.CreateMayaCheckoutSchema = zod_1.z.object({
+    totalAmount: zod_1.z.object({ value: zod_1.z.number(), currency: zod_1.z.string() }),
+    requestReferenceNumber: zod_1.z.string(),
+    items: exports.MayaItem.array().optional(),
+    redirectUrl: zod_1.z
+        .object({
+        success: zod_1.z.string().optional(),
+        failure: zod_1.z.string().optional(),
+        cancel: zod_1.z.string().optional(),
+    })
+        .optional(),
+});
+exports.MayaCheckoutSchema = zod_1.z.object({
+    checkoutId: zod_1.z.string(),
+    redirectUrl: zod_1.z.string(),
+});
 
 
 /***/ }),
@@ -2363,22 +2421,23 @@ const factories_1 = tslib_1.__importDefault(__webpack_require__("./src/app/datab
 const typeorm_naming_strategies_1 = __webpack_require__("typeorm-naming-strategies");
 const path_1 = __webpack_require__("path");
 exports["default"] = () => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
     const isProduction = process.env.ENVIRONMENT === 'production';
     return {
         environment: (_a = process.env.ENVIRONMENT) !== null && _a !== void 0 ? _a : 'development',
         protocol: (_b = process.env.PROTOCOL) !== null && _b !== void 0 ? _b : 'http',
-        baseUrl: (_c = process.env.BASE_URL) !== null && _c !== void 0 ? _c : `http://localhost:${process.env.PORT ? parseInt(process.env.PORT, 10) : 3000}`,
+        frontEndUrl: (_c = process.env.FRONT_END_URL) !== null && _c !== void 0 ? _c : 'http://localhost:4200',
+        baseUrl: (_d = process.env.BASE_URL) !== null && _d !== void 0 ? _d : `http://localhost:${process.env.PORT ? parseInt(process.env.PORT, 10) : 3000}`,
         port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
         database: {
             type: process.env.DATABASE_TYPE,
-            host: (_d = process.env.DATABASE_HOST) !== null && _d !== void 0 ? _d : 'localhost',
+            host: (_e = process.env.DATABASE_HOST) !== null && _e !== void 0 ? _e : 'localhost',
             port: process.env.DATABASE_PORT
                 ? parseInt(process.env.DATABASE_PORT, 10)
                 : 5432,
-            username: (_e = process.env.DATABASE_USERNAME) !== null && _e !== void 0 ? _e : 'postgres',
-            password: (_f = process.env.DATABASE_PASSWORD) !== null && _f !== void 0 ? _f : 'password',
-            database: (_g = process.env.DATABASE_NAME) !== null && _g !== void 0 ? _g : 'users_ms',
+            username: (_f = process.env.DATABASE_USERNAME) !== null && _f !== void 0 ? _f : 'postgres',
+            password: (_g = process.env.DATABASE_PASSWORD) !== null && _g !== void 0 ? _g : 'password',
+            database: (_h = process.env.DATABASE_NAME) !== null && _h !== void 0 ? _h : 'users_ms',
             entities: entities_1.default,
             migrations: [(0, path_1.resolve)(__dirname, '../database/migrations/*.{ts,js}')],
             seeds: seeds_1.default,
@@ -2390,20 +2449,20 @@ exports["default"] = () => {
             ssl: isProduction ? { rejectUnauthorized: false } : false,
         },
         jwt: {
-            secret: (_h = process.env.JWT_SECRET) !== null && _h !== void 0 ? _h : 'supersecret',
-            signOptions: { expiresIn: (_j = process.env.JWT_EXPIRES_IN) !== null && _j !== void 0 ? _j : '60s' },
+            secret: (_j = process.env.JWT_SECRET) !== null && _j !== void 0 ? _j : 'supersecret',
+            signOptions: { expiresIn: (_k = process.env.JWT_EXPIRES_IN) !== null && _k !== void 0 ? _k : '60s' },
         },
         mail: {
             transport: {
-                host: (_k = process.env.MAIL_HOST) !== null && _k !== void 0 ? _k : 'smtp.gmail.com',
-                port: (_l = process.env.MAIL_PORT) !== null && _l !== void 0 ? _l : 465,
+                host: (_l = process.env.MAIL_HOST) !== null && _l !== void 0 ? _l : 'smtp.gmail.com',
+                port: (_m = process.env.MAIL_PORT) !== null && _m !== void 0 ? _m : 465,
                 secure: process.env.MAIL_SECURE === 'true',
                 auth: {
-                    user: (_m = process.env.MAIL_USERNAME) !== null && _m !== void 0 ? _m : '',
-                    pass: (_o = process.env.MAIL_PASSWORD) !== null && _o !== void 0 ? _o : '',
+                    user: (_o = process.env.MAIL_USERNAME) !== null && _o !== void 0 ? _o : '',
+                    pass: (_p = process.env.MAIL_PASSWORD) !== null && _p !== void 0 ? _p : '',
                 },
             },
-            from: (_p = process.env.MAIL_FROM) !== null && _p !== void 0 ? _p : 'admin@email.com',
+            from: (_q = process.env.MAIL_FROM) !== null && _q !== void 0 ? _q : 'admin@email.com',
         },
         multer: {
             dest: (0, path_1.resolve)(__dirname, (isProduction ? './' : '../../../packages/api/') + 'storage/uploads'),
@@ -6869,7 +6928,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/payment/controllers/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PaymentController = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -6880,11 +6939,14 @@ const guards_1 = __webpack_require__("./src/app/modules/auth/guards/index.ts");
 const auth_1 = __webpack_require__("./src/app/modules/auth/index.ts");
 const services_1 = __webpack_require__("./src/app/modules/payment/services/index.ts");
 const order_1 = __webpack_require__("./src/app/modules/order/index.ts");
+const express_1 = __webpack_require__("express");
+const config_1 = __webpack_require__("@nestjs/config");
 const c = (0, nest_1.nestControllerContract)(global_1.contract.payment);
 let PaymentController = class PaymentController {
-    constructor(paymentService, orderService) {
+    constructor(paymentService, orderService, configService) {
         this.paymentService = paymentService;
         this.orderService = orderService;
+        this.configService = configService;
     }
     create({ body }, { user }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -6930,6 +6992,27 @@ let PaymentController = class PaymentController {
                 return { status: 404, body: null };
             }
             return { status: 200, body: { file: receipt } };
+        });
+    }
+    createPaymentLink({ body }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const result = yield this.paymentService.createPaymentLink(body.orderId);
+            if (!result) {
+                return { status: 404, body: null };
+            }
+            return { status: 200, body: result };
+        });
+    }
+    successPaymentRedirect({ params }, res) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const frontEndUrl = this.configService.get('frontEndUrl');
+            yield this.paymentService.successPayment(params.orderId);
+            res.send(`
+      <script>
+        window.opener.postMessage('refresh-order', '${frontEndUrl}')
+      </script>
+    `);
+            return { status: 200, body: null };
         });
     }
 };
@@ -6985,9 +7068,24 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], PaymentController.prototype, "receipt", null);
+tslib_1.__decorate([
+    (0, nest_1.TsRest)(c.createPaymentLink),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], PaymentController.prototype, "createPaymentLink", null);
+tslib_1.__decorate([
+    (0, nest_1.TsRest)(c.successPaymentRedirect),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__param(1, (0, common_1.Res)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object, typeof (_d = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _d : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], PaymentController.prototype, "successPaymentRedirect", null);
 PaymentController = tslib_1.__decorate([
     (0, common_1.Controller)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.PaymentService !== "undefined" && services_1.PaymentService) === "function" ? _a : Object, typeof (_b = typeof order_1.OrderService !== "undefined" && order_1.OrderService) === "function" ? _b : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.PaymentService !== "undefined" && services_1.PaymentService) === "function" ? _a : Object, typeof (_b = typeof order_1.OrderService !== "undefined" && order_1.OrderService) === "function" ? _b : Object, typeof (_c = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _c : Object])
 ], PaymentController);
 exports.PaymentController = PaymentController;
 
@@ -7045,7 +7143,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/payment/services/pay
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a;
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PaymentService = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -7054,10 +7152,16 @@ const database_1 = __webpack_require__("./src/app/database/index.ts");
 const core_1 = __webpack_require__("./src/app/core/index.ts");
 const html_pdf_node_1 = tslib_1.__importDefault(__webpack_require__("html-pdf-node"));
 const global_1 = __webpack_require__("../../lib/global/src/index.ts");
+const api_1 = tslib_1.__importDefault(__webpack_require__("api"));
+const config_1 = __webpack_require__("@nestjs/config");
+const sdk = (0, api_1.default)('@paymaya/v5.16#1bmd73pl9p4h9zf');
+sdk.auth('pk-Z0OSzLvIcOI2UIvDhdTGVVfRSSeiGStnceqwUE7n0Ah');
 let PaymentService = class PaymentService extends core_1.BaseService {
-    constructor(repository) {
+    constructor(repository, orderRepository, configService) {
         super(repository);
         this.repository = repository;
+        this.orderRepository = orderRepository;
+        this.configService = configService;
     }
     listItems(order) {
         return order.items.map((item) => {
@@ -7119,10 +7223,73 @@ let PaymentService = class PaymentService extends core_1.BaseService {
             return buffer.toString('base64');
         });
     }
+    createPaymentLink(orderId) {
+        var _a;
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const baseUrl = this.configService.get('baseUrl');
+            const order = yield this.orderRepository.getByIdWithRelations(orderId);
+            const getTotalCost = () => {
+                let total = 0;
+                order === null || order === void 0 ? void 0 : order.items.forEach(({ price, count }) => {
+                    const totalPrice = price * count;
+                    total += totalPrice;
+                });
+                return total;
+            };
+            const totalCost = getTotalCost();
+            const taxPercentage = ((_a = order.tax) !== null && _a !== void 0 ? _a : 0) / 100;
+            const tax = totalCost * taxPercentage;
+            const subTotal = totalCost - tax;
+            return this.generateMayaPayment({
+                totalAmount: {
+                    value: totalCost,
+                    currency: 'PHP',
+                },
+                items: order.items.map((item) => ({
+                    name: item.title,
+                    quantity: item.count,
+                    amount: { value: item.price },
+                    totalAmount: {
+                        value: item.count * item.price,
+                    },
+                })),
+                requestReferenceNumber: orderId,
+                redirectUrl: {
+                    success: baseUrl + '/api/v1/payments/success-payment-redirect/' + orderId,
+                },
+            });
+        });
+    }
+    generateMayaPayment(input) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const result = yield sdk.createV1Checkout(input);
+            return result.data;
+        });
+    }
+    successPayment(orderId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const order = yield this.orderRepository.getByIdWithRelations(orderId);
+            const getTotalCost = () => {
+                let total = 0;
+                order === null || order === void 0 ? void 0 : order.items.forEach(({ price, count }) => {
+                    const totalPrice = price * count;
+                    total += totalPrice;
+                });
+                return total;
+            };
+            const totalCost = getTotalCost();
+            yield this.repository.createWithRelations({
+                type: global_1.PaymentType.Online,
+                totalCost,
+                amountPaid: totalCost,
+                order: orderId,
+            });
+        });
+    }
 };
 PaymentService = tslib_1.__decorate([
     (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof database_1.PaymentRepository !== "undefined" && database_1.PaymentRepository) === "function" ? _a : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof database_1.PaymentRepository !== "undefined" && database_1.PaymentRepository) === "function" ? _a : Object, typeof (_b = typeof database_1.OrderRepository !== "undefined" && database_1.OrderRepository) === "function" ? _b : Object, typeof (_c = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _c : Object])
 ], PaymentService);
 exports.PaymentService = PaymentService;
 
@@ -9289,6 +9456,13 @@ module.exports = require("@ts-rest/core");
 /***/ ((module) => {
 
 module.exports = require("@ts-rest/nest");
+
+/***/ }),
+
+/***/ "api":
+/***/ ((module) => {
+
+module.exports = require("api");
 
 /***/ }),
 

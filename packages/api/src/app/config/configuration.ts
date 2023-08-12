@@ -10,6 +10,7 @@ export default () => {
   return {
     environment: process.env.ENVIRONMENT ?? 'development',
     protocol: process.env.PROTOCOL ?? 'http',
+    frontEndUrl: process.env.FRONT_END_URL ?? 'http://localhost:4200',
     baseUrl:
       process.env.BASE_URL ??
       `http://localhost:${

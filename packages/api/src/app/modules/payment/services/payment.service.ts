@@ -1,16 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { PaymentEntity, PaymentRepository } from '../../../database';
+import {
+  OrderRepository,
+  PaymentEntity,
+  PaymentRepository,
+} from '../../../database';
 import { BaseService } from '../../../core';
 import htmlPdfNode from 'html-pdf-node';
 import {
+  CreateMayaCheckout,
+  CreatePayment,
+  MayaCheckout,
   Order,
   OrderProduct,
+  PaymentType,
+  UpdatePayment,
   formatCurrency,
 } from '@nx-monorepo-template/global';
+import api from 'api';
+import { ConfigService } from '@nestjs/config';
+const sdk = api('@paymaya/v5.16#1bmd73pl9p4h9zf');
+
+sdk.auth('pk-Z0OSzLvIcOI2UIvDhdTGVVfRSSeiGStnceqwUE7n0Ah');
 
 @Injectable()
-export class PaymentService extends BaseService<PaymentEntity> {
-  constructor(protected readonly repository: PaymentRepository) {
+export class PaymentService extends BaseService<
+  PaymentEntity,
+  CreatePayment,
+  UpdatePayment
+> {
+  constructor(
+    protected readonly repository: PaymentRepository,
+    protected readonly orderRepository: OrderRepository,
+    protected readonly configService: ConfigService
+  ) {
     super(repository);
   }
 
@@ -83,5 +105,71 @@ export class PaymentService extends BaseService<PaymentEntity> {
     };
     const buffer = await htmlPdfNode.generatePdf(file, options);
     return buffer.toString('base64');
+  }
+
+  async createPaymentLink(orderId: string): Promise<MayaCheckout> {
+    const baseUrl = this.configService.get('baseUrl');
+    const order = await this.orderRepository.getByIdWithRelations(orderId);
+
+    const getTotalCost = () => {
+      let total = 0;
+      order?.items.forEach(({ price, count }: OrderProduct) => {
+        const totalPrice = price * count;
+        total += totalPrice;
+      });
+      return total;
+    };
+    const totalCost = getTotalCost();
+    const taxPercentage = (order.tax ?? 0) / 100;
+
+    const tax = totalCost * taxPercentage;
+
+    const subTotal = totalCost - tax;
+
+    return this.generateMayaPayment({
+      totalAmount: {
+        value: totalCost,
+        currency: 'PHP',
+      },
+      items: order.items.map((item) => ({
+        name: item.title,
+        quantity: item.count,
+        amount: { value: item.price },
+        totalAmount: {
+          value: item.count * item.price,
+        },
+      })),
+      requestReferenceNumber: orderId,
+      redirectUrl: {
+        success:
+          baseUrl + '/api/v1/payments/success-payment-redirect/' + orderId,
+      },
+    });
+  }
+
+  async generateMayaPayment(input: CreateMayaCheckout): Promise<MayaCheckout> {
+    const result = await sdk.createV1Checkout(input);
+    return result.data;
+  }
+
+  async successPayment(orderId: string) {
+    const order = await this.orderRepository.getByIdWithRelations(orderId);
+
+    const getTotalCost = () => {
+      let total = 0;
+      order?.items.forEach(({ price, count }: OrderProduct) => {
+        const totalPrice = price * count;
+        total += totalPrice;
+      });
+      return total;
+    };
+    const totalCost = getTotalCost();
+
+    await this.repository.createWithRelations({
+      type: PaymentType.Online,
+      totalCost,
+      amountPaid: totalCost,
+      order: orderId,
+    });
   }
 }
