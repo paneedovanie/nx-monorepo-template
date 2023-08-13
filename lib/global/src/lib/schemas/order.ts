@@ -57,7 +57,7 @@ export const GetOrdersOptionsSchema = PaginationOptionsSchema.merge(
     .object({
       ids: z.string().array().optional(),
       storeIds: z.string().array().optional(),
-      isPaid: z.preprocess((a) => a === 'true', z.boolean().optional()),
+      isPaid: z.preprocess((a) => a && a === 'true', z.boolean().optional()),
       userIds: z.string().array().optional(),
       startDate: z.preprocess(
         (a: string) => a && new Date(a),

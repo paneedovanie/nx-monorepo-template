@@ -24,6 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         roles: {
           permissions: true,
         },
+        jobs: {
+          store: true,
+          roles: { permissions: true },
+        },
       },
     });
     if (!user) throw new UnauthorizedException();
@@ -36,6 +40,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           permissions: role.permissions.map(({ code }) => code),
         };
       }),
+      jobs: user.jobs.map((job) => ({
+        ...job,
+        roles: job.roles.map((role) => {
+          return {
+            ...role,
+            permissions: role.permissions.map(({ code }) => code),
+          };
+        }),
+      })),
     };
   }
 }

@@ -13,3 +13,4 @@ export * from './permission';
 export * from './notification';
 export * from './store-rating';
 export * from './tag';
+export * from './employee';

@@ -14,6 +14,7 @@ import { notification } from './notification-controller.contract';
 import { storeRating } from './store-rating-controller.contract';
 import { tag } from './tag-controller.contract';
 import { qrcode } from './qrcode-controller.contract';
+import { employee } from './employee-controller.contract';
 
 export const contract = initContract().router({
   user,
@@ -31,4 +32,5 @@ export const contract = initContract().router({
   storeRating,
   tag,
   qrcode,
+  employee,
 });

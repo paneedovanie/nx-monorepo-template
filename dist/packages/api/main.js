@@ -183,6 +183,75 @@ exports.category = (0, core_1.initContract)().router({
 
 /***/ }),
 
+/***/ "../../lib/global/src/lib/contracts/employee-controller.contract.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.employee = void 0;
+const core_1 = __webpack_require__("@ts-rest/core");
+const schemas_1 = __webpack_require__("../../lib/global/src/lib/schemas/index.ts");
+const zod_1 = __webpack_require__("zod");
+const prefix = `/api/v1/employees`;
+exports.employee = (0, core_1.initContract)().router({
+    create: {
+        method: 'POST',
+        path: `${prefix}`,
+        responses: {
+            201: schemas_1.EmployeeSchema,
+        },
+        body: schemas_1.CreateEmployeeSchema,
+        summary: 'Create a employee',
+    },
+    get: {
+        method: 'GET',
+        path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
+        responses: {
+            200: schemas_1.EmployeeSchema,
+        },
+        summary: 'Get a employee by id',
+    },
+    getAll: {
+        method: 'GET',
+        path: `${prefix}`,
+        query: schemas_1.GetEmployeesOptionsSchema,
+        responses: {
+            200: schemas_1.GetEmployeesResponseSchema,
+        },
+        summary: 'Get a paginated list of employees',
+    },
+    update: {
+        method: 'PATCH',
+        path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
+        body: schemas_1.UpdateEmployeeSchema,
+        responses: {
+            201: schemas_1.EmployeeSchema,
+        },
+        summary: 'Update employee',
+    },
+    delete: {
+        method: 'DELETE',
+        path: `${prefix}/:id`,
+        pathParams: zod_1.z.object({
+            id: zod_1.z.string().uuid(),
+        }),
+        body: zod_1.z.any().optional(),
+        responses: {
+            204: zod_1.z.any().optional(),
+        },
+        summary: 'Delete employee',
+    },
+});
+
+
+/***/ }),
+
 /***/ "../../lib/global/src/lib/contracts/index.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -205,6 +274,7 @@ const notification_controller_contract_1 = __webpack_require__("../../lib/global
 const store_rating_controller_contract_1 = __webpack_require__("../../lib/global/src/lib/contracts/store-rating-controller.contract.ts");
 const tag_controller_contract_1 = __webpack_require__("../../lib/global/src/lib/contracts/tag-controller.contract.ts");
 const qrcode_controller_contract_1 = __webpack_require__("../../lib/global/src/lib/contracts/qrcode-controller.contract.ts");
+const employee_controller_contract_1 = __webpack_require__("../../lib/global/src/lib/contracts/employee-controller.contract.ts");
 exports.contract = (0, core_1.initContract)().router({
     user: user_controller_contract_1.user,
     auth: auth_controller_contract_1.auth,
@@ -221,6 +291,7 @@ exports.contract = (0, core_1.initContract)().router({
     storeRating: store_rating_controller_contract_1.storeRating,
     tag: tag_controller_contract_1.tag,
     qrcode: qrcode_controller_contract_1.qrcode,
+    employee: employee_controller_contract_1.employee,
 });
 
 
@@ -1392,6 +1463,15 @@ const checkUserPermission = (user, permissions) => {
             }
         }
     }
+    // for (const job of user.jobs) {
+    //   for (const role of job.roles) {
+    //     for (const permission of permissions) {
+    //       if (role.permissions?.find((code) => permission === code)) {
+    //         return true;
+    //       }
+    //     }
+    //   }
+    // }
     return false;
 };
 exports.checkUserPermission = checkUserPermission;
@@ -1441,6 +1521,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
+/***/ "../../lib/global/src/lib/interfaces/employee.ts":
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
 /***/ "../../lib/global/src/lib/interfaces/event.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -1482,6 +1571,7 @@ tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/ta
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/common.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/socket.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/event.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/interfaces/employee.ts"), exports);
 
 
 /***/ }),
@@ -1615,6 +1705,11 @@ var RolePermission;
     RolePermission["RoleUpdate"] = "role.update";
     RolePermission["RoleDelete"] = "role.delete";
     RolePermission["RoleGetAll"] = "role.get_all";
+    RolePermission["EmployeeCreate"] = "employee.create";
+    RolePermission["EmployeeGet"] = "employee.get";
+    RolePermission["EmployeeUpdate"] = "employee.update";
+    RolePermission["EmployeeDelete"] = "employee.delete";
+    RolePermission["EmployeeGetAll"] = "employee.get_all";
 })(RolePermission = exports.RolePermission || (exports.RolePermission = {}));
 
 
@@ -1797,6 +1892,44 @@ exports.CurrencySchema = zod_1.z.number().max(1000000000000000).min(0.01);
 
 /***/ }),
 
+/***/ "../../lib/global/src/lib/schemas/employee.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GetEmployeesOptionsSchema = exports.GetEmployeesResponseSchema = exports.UpdateEmployeeSchema = exports.CreateEmployeeSchema = exports.EmployeeSchema = exports.NonCircularEmployeeSchema = void 0;
+const zod_1 = __webpack_require__("zod");
+const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
+const user_1 = __webpack_require__("../../lib/global/src/lib/schemas/user.ts");
+const store_1 = __webpack_require__("../../lib/global/src/lib/schemas/store.ts");
+const role_1 = __webpack_require__("../../lib/global/src/lib/schemas/role.ts");
+const base = {
+    uniqueCode: zod_1.z.string(),
+    store: zod_1.z.string().uuid(),
+    role: zod_1.z.string().uuid(),
+};
+exports.NonCircularEmployeeSchema = zod_1.z.object({
+    id: zod_1.z.string(),
+    user: zod_1.z.lazy(() => user_1.UserSchema),
+    store: store_1.NonCircularStoreSchema,
+    roles: role_1.RoleSchema.array(),
+    createdAt: zod_1.z.date(),
+});
+exports.EmployeeSchema = zod_1.z.lazy(() => zod_1.z.object({
+    id: zod_1.z.string(),
+    user: user_1.UserSchema,
+    store: store_1.StoreSchema,
+    roles: role_1.RoleSchema.array(),
+    createdAt: zod_1.z.date(),
+}));
+exports.CreateEmployeeSchema = zod_1.z.object(base);
+exports.UpdateEmployeeSchema = zod_1.z.object(base);
+exports.GetEmployeesResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.EmployeeSchema.array() }));
+exports.GetEmployeesOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_1.z.object({}));
+
+
+/***/ }),
+
 /***/ "../../lib/global/src/lib/schemas/file.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -1837,6 +1970,7 @@ tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/notif
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/store-rating.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/tag.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/common.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("../../lib/global/src/lib/schemas/employee.ts"), exports);
 
 
 /***/ }),
@@ -1931,7 +2065,7 @@ exports.GetOrdersOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_
     .object({
     ids: zod_1.z.string().array().optional(),
     storeIds: zod_1.z.string().array().optional(),
-    isPaid: zod_1.z.preprocess((a) => a === 'true', zod_1.z.boolean().optional()),
+    isPaid: zod_1.z.preprocess((a) => a && a === 'true', zod_1.z.boolean().optional()),
     userIds: zod_1.z.string().array().optional(),
     startDate: zod_1.z.preprocess((a) => a && new Date(a), zod_1.z.date().optional()),
     endDate: zod_1.z.preprocess((a) => a && new Date(a), zod_1.z.date().optional()),
@@ -2118,7 +2252,9 @@ exports.UpdateRolePermissionsSchema = zod_1.z.object({
     ids: zod_1.z.string().array(),
 });
 exports.GetRolesResponseSchema = pagination_1.PaginationResponseSchema.merge(zod_1.z.object({ list: exports.RoleSchema.array() }));
-exports.GetRolesOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_1.z.object({}));
+exports.GetRolesOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_1.z.object({
+    isEmployee: zod_1.z.preprocess((a) => a && a === 'true', zod_1.z.boolean().optional()),
+}));
 
 
 /***/ }),
@@ -2226,7 +2362,9 @@ exports.StoreConfigSchema = zod_1.z.object({
     secondaryColor: zod_1.z.string(),
     tax: zod_1.z.number(),
 });
-exports.NonCircularStoreSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), owner: user_1.UserSchema, image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array(), config: exports.StoreConfigSchema.optional() }, base));
+exports.NonCircularStoreSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), 
+    // owner: UserSchema,
+    image: zod_1.z.string().optional(), rating: zod_1.z.number(), tags: tag_1.TagSchema.array(), config: exports.StoreConfigSchema.optional() }, base));
 exports.StoreSchema = zod_1.z.lazy(() => zod_1.z.object(Object.assign({ id: zod_1.z.string(), image: zod_1.z.string().optional(), rating: zod_1.z.number(), owner: user_1.UserSchema, tags: tag_1.TagSchema.array(), products: product_1.ProductSchema.array(), config: exports.StoreConfigSchema.optional() }, base)));
 exports.CreateStoreSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { owner: zod_1.z.string(), image: file_1.FileSchema.optional(), tags: zod_1.z.string().array() }));
 exports.UpdateStoreSchema = zod_1.z.object(Object.assign(Object.assign({}, base), { owner: zod_1.z.string(), image: file_1.FileSchema.optional(), tags: zod_1.z.string().array(), config: exports.StoreConfigSchema.optional() }));
@@ -2236,6 +2374,8 @@ exports.GetStoresOptionsSchema = pagination_1.PaginationOptionsSchema.merge(zod_
     search: zod_1.z.string().uuid().optional(),
     owner: zod_1.z.string().uuid().optional(),
     tags: zod_1.z.string().uuid().array().optional(),
+    ids: zod_1.z.string().uuid().array().optional(),
+    isEmployee: zod_1.z.preprocess((a) => a && a === 'true', zod_1.z.boolean().optional()),
 })
     .merge(unrestricted_1.UnrestrictedSchema));
 
@@ -2327,12 +2467,15 @@ exports.GetUsersResponseSchema = exports.UpdateUserRoleSchema = exports.UpdateUs
 const zod_1 = __webpack_require__("zod");
 const pagination_1 = __webpack_require__("../../lib/global/src/lib/schemas/pagination.ts");
 const role_1 = __webpack_require__("../../lib/global/src/lib/schemas/role.ts");
+const employee_1 = __webpack_require__("../../lib/global/src/lib/schemas/employee.ts");
 const base = {
     firstName: zod_1.z.string(),
     lastName: zod_1.z.string(),
 };
 exports.UserSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), roles: role_1.RoleSchema.array(), createdAt: zod_1.z.date(), uniqueCode: zod_1.z.string() }, base));
-exports.TokenUserSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), roles: role_1.RoleSchema.merge(zod_1.z.object({ permissions: zod_1.z.string().array() })).array(), createdAt: zod_1.z.date(), uniqueCode: zod_1.z.string() }, base));
+exports.TokenUserSchema = zod_1.z.object(Object.assign({ id: zod_1.z.string(), roles: role_1.RoleSchema.merge(zod_1.z.object({ permissions: zod_1.z.string().array() })).array(), createdAt: zod_1.z.date(), uniqueCode: zod_1.z.string(), jobs: zod_1.z.lazy(() => employee_1.NonCircularEmployeeSchema.merge(zod_1.z.object({
+        roles: role_1.RoleSchema.merge(zod_1.z.object({ permissions: zod_1.z.string().array() })).array(),
+    })).array()) }, base));
 exports.CreateUserSchema = zod_1.z.object(base);
 exports.UpdateUserSchema = zod_1.z.object(base);
 exports.UpdateUserRoleSchema = zod_1.z.object({ roleId: zod_1.z.string() });
@@ -2401,6 +2544,7 @@ AppModule = tslib_1.__decorate([
             modules_1.StoreRatingModule,
             modules_1.TagModule,
             event_1.EventModule,
+            modules_1.EmployeeModule,
         ],
     })
 ], AppModule);
@@ -2497,6 +2641,10 @@ exports.roles = [
     {
         title: 'Store Owner',
         description: 'User that owns a store',
+    },
+    {
+        title: 'Cashier',
+        description: 'User that works as a cashier',
     },
 ];
 const AuthPermissions = {
@@ -2765,13 +2913,13 @@ const OrderPermissions = {
             code: 'order.get',
             title: 'Get Order',
             description: 'Allow to get order',
-            roles: ['Superadmin', 'User', 'Store Owner'],
+            roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
         },
         {
             code: 'order.get_all',
             title: 'Get All Orders',
             description: 'Allow to get all orders',
-            roles: ['Superadmin', 'User', 'Store Owner'],
+            roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
         },
         {
             code: 'order.get_all_unrestricted',
@@ -2783,7 +2931,7 @@ const OrderPermissions = {
             code: 'order.update',
             title: 'Update Order',
             description: 'Allow to update order',
-            roles: ['Superadmin', 'User', 'Store Owner'],
+            roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
         },
         {
             code: 'order.update_unrestricted',
@@ -2813,19 +2961,19 @@ const PaymentPermissions = {
             code: 'payment.create',
             title: 'Create Payment',
             description: 'Allow to create payment',
-            roles: ['Superadmin', 'User', 'Store Owner'],
+            roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
         },
         {
             code: 'payment.get',
             title: 'Get Payment',
             description: 'Allow to get payment',
-            roles: ['Superadmin', 'User', 'Store Owner'],
+            roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
         },
         {
             code: 'payment.get_all',
             title: 'Get All Payments',
             description: 'Allow to get all payments',
-            roles: ['Superadmin', 'User', 'Store Owner'],
+            roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
         },
         {
             code: 'payment.update',
@@ -2877,6 +3025,42 @@ const RolePermissions = {
         },
     ],
 };
+const EmployeePermissions = {
+    title: 'Employee',
+    description: 'Employee related permissions',
+    permissions: [
+        {
+            code: 'employee.create',
+            title: 'Create Employee',
+            description: 'Allow to create employee',
+            roles: ['Superadmin'],
+        },
+        {
+            code: 'employee.get',
+            title: 'Get Employee',
+            description: 'Allow to get employee',
+            roles: ['Superadmin'],
+        },
+        {
+            code: 'employee.get_all',
+            title: 'Get All Employees',
+            description: 'Allow to get all categories',
+            roles: ['Superadmin'],
+        },
+        {
+            code: 'employee.update',
+            title: 'Update Employee',
+            description: 'Allow to update employee',
+            roles: ['Superadmin'],
+        },
+        {
+            code: 'employee.delete',
+            title: 'Delete Employee',
+            description: 'Allow to delete employee',
+            roles: ['Superadmin'],
+        },
+    ],
+};
 exports.permissions = [
     AuthPermissions,
     UserPermissions,
@@ -2888,6 +3072,7 @@ exports.permissions = [
     OrderPermissions,
     PaymentPermissions,
     RolePermissions,
+    EmployeePermissions,
 ];
 
 
@@ -3080,7 +3265,13 @@ let BaseRepository = class BaseRepository extends typeorm_1.Repository {
             const getValue = (key, value) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                 return typeof this.mapRelations()[key] === 'function'
                     ? (yield this.mapRelations()[key])(input)
-                    : this.mapRelations()[key].getById(value);
+                    : Array.isArray(value)
+                        ? this.mapRelations()[key].findBy({
+                            id: (0, typeorm_1.In)(value),
+                        })
+                        : this.mapRelations()[key].findOneBy({
+                            id: value,
+                        });
             });
             return ((_a = this.mapRelations()) === null || _a === void 0 ? void 0 : _a[key])
                 ? yield getValue(key, input[key])
@@ -3363,6 +3554,53 @@ exports.CredentialEntity = CredentialEntity;
 
 /***/ }),
 
+/***/ "./src/app/database/entities/employee.entity.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EmployeeEntity = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const typeorm_1 = __webpack_require__("typeorm");
+const role_entity_1 = __webpack_require__("./src/app/database/entities/role.entity.ts");
+const store_entity_1 = __webpack_require__("./src/app/database/entities/store.entity.ts");
+const user_entity_1 = __webpack_require__("./src/app/database/entities/user.entity.ts");
+let EmployeeEntity = class EmployeeEntity {
+};
+tslib_1.__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    tslib_1.__metadata("design:type", String)
+], EmployeeEntity.prototype, "id", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.UserEntity, (user) => user.jobs),
+    tslib_1.__metadata("design:type", typeof (_a = typeof user_entity_1.UserEntity !== "undefined" && user_entity_1.UserEntity) === "function" ? _a : Object)
+], EmployeeEntity.prototype, "user", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.ManyToOne)(() => store_entity_1.StoreEntity, (store) => store.employees),
+    tslib_1.__metadata("design:type", typeof (_b = typeof store_entity_1.StoreEntity !== "undefined" && store_entity_1.StoreEntity) === "function" ? _b : Object)
+], EmployeeEntity.prototype, "store", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.ManyToMany)(() => role_entity_1.RoleEntity, (role) => role.users),
+    (0, typeorm_1.JoinTable)({ name: 'employee_roles' }),
+    tslib_1.__metadata("design:type", Array)
+], EmployeeEntity.prototype, "roles", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    tslib_1.__metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], EmployeeEntity.prototype, "createdAt", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.DeleteDateColumn)(),
+    tslib_1.__metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
+], EmployeeEntity.prototype, "deletedAt", void 0);
+EmployeeEntity = tslib_1.__decorate([
+    (0, typeorm_1.Entity)('employees')
+], EmployeeEntity);
+exports.EmployeeEntity = EmployeeEntity;
+
+
+/***/ }),
+
 /***/ "./src/app/database/entities/index.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -3382,8 +3620,10 @@ tslib_1.__exportStar(__webpack_require__("./src/app/database/entities/payment.en
 tslib_1.__exportStar(__webpack_require__("./src/app/database/entities/notification.entity.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/database/entities/store-rating.entity.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/database/entities/tag.entity.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("./src/app/database/entities/employee.entity.ts"), exports);
 const category_entity_1 = __webpack_require__("./src/app/database/entities/category.entity.ts");
 const credential_entity_1 = __webpack_require__("./src/app/database/entities/credential.entity.ts");
+const employee_entity_1 = __webpack_require__("./src/app/database/entities/employee.entity.ts");
 const notification_entity_1 = __webpack_require__("./src/app/database/entities/notification.entity.ts");
 const order_entity_1 = __webpack_require__("./src/app/database/entities/order.entity.ts");
 const payment_entity_1 = __webpack_require__("./src/app/database/entities/payment.entity.ts");
@@ -3409,6 +3649,7 @@ exports["default"] = [
     notification_entity_1.NotificationEntity,
     store_rating_entity_1.StoreRatingEntity,
     tag_entity_1.TagEntity,
+    employee_entity_1.EmployeeEntity,
 ];
 
 
@@ -3874,6 +4115,7 @@ const product_entity_1 = __webpack_require__("./src/app/database/entities/produc
 const tag_entity_1 = __webpack_require__("./src/app/database/entities/tag.entity.ts");
 const category_entity_1 = __webpack_require__("./src/app/database/entities/category.entity.ts");
 const global_1 = __webpack_require__("../../lib/global/src/index.ts");
+const employee_entity_1 = __webpack_require__("./src/app/database/entities/employee.entity.ts");
 let StoreEntity = class StoreEntity {
 };
 tslib_1.__decorate([
@@ -3888,6 +4130,10 @@ tslib_1.__decorate([
     (0, typeorm_1.OneToMany)(() => product_entity_1.ProductEntity, (product) => product.store),
     tslib_1.__metadata("design:type", Array)
 ], StoreEntity.prototype, "products", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.OneToMany)(() => employee_entity_1.EmployeeEntity, (employee) => employee.store),
+    tslib_1.__metadata("design:type", Array)
+], StoreEntity.prototype, "employees", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.Column)(),
     tslib_1.__metadata("design:type", String)
@@ -4037,6 +4283,7 @@ const credential_entity_1 = __webpack_require__("./src/app/database/entities/cre
 const role_entity_1 = __webpack_require__("./src/app/database/entities/role.entity.ts");
 const transaction_entity_1 = __webpack_require__("./src/app/database/entities/transaction.entity.ts");
 const store_entity_1 = __webpack_require__("./src/app/database/entities/store.entity.ts");
+const employee_entity_1 = __webpack_require__("./src/app/database/entities/employee.entity.ts");
 let UserEntity = class UserEntity {
     generateRandomString() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -4084,6 +4331,10 @@ tslib_1.__decorate([
     (0, typeorm_1.OneToMany)(() => store_entity_1.StoreEntity, (store) => store.owner),
     tslib_1.__metadata("design:type", Array)
 ], UserEntity.prototype, "stores", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.OneToMany)(() => employee_entity_1.EmployeeEntity, (employee) => employee.user),
+    tslib_1.__metadata("design:type", Array)
+], UserEntity.prototype, "jobs", void 0);
 tslib_1.__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     tslib_1.__metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
@@ -4266,6 +4517,46 @@ exports.CredentialRepository = CredentialRepository;
 
 /***/ }),
 
+/***/ "./src/app/database/repositories/employee.repository.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EmployeeRepository = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const common_1 = __webpack_require__("@nestjs/common");
+const typeorm_1 = __webpack_require__("typeorm");
+const entities_1 = __webpack_require__("./src/app/database/entities/index.ts");
+const core_1 = __webpack_require__("./src/app/core/index.ts");
+const role_repository_1 = __webpack_require__("./src/app/database/repositories/role.repository.ts");
+let EmployeeRepository = class EmployeeRepository extends core_1.BaseRepository {
+    constructor(dataSource, roleRepository) {
+        super(entities_1.EmployeeEntity, dataSource);
+        this.roleRepository = roleRepository;
+    }
+    mapRelations() {
+        return {
+            roles: this.roleRepository,
+        };
+    }
+    relations() {
+        return {
+            user: true,
+            store: true,
+            roles: { permissions: true },
+        };
+    }
+};
+EmployeeRepository = tslib_1.__decorate([
+    (0, common_1.Injectable)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_1.DataSource !== "undefined" && typeorm_1.DataSource) === "function" ? _a : Object, typeof (_b = typeof role_repository_1.RoleRepository !== "undefined" && role_repository_1.RoleRepository) === "function" ? _b : Object])
+], EmployeeRepository);
+exports.EmployeeRepository = EmployeeRepository;
+
+
+/***/ }),
+
 /***/ "./src/app/database/repositories/index.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -4285,6 +4576,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/database/repositories/permis
 tslib_1.__exportStar(__webpack_require__("./src/app/database/repositories/notification.repository.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/database/repositories/store-rating.repository.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/database/repositories/tag.repository.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("./src/app/database/repositories/employee.repository.ts"), exports);
 const user_repository_1 = __webpack_require__("./src/app/database/repositories/user.repository.ts");
 const credential_repository_1 = __webpack_require__("./src/app/database/repositories/credential.repository.ts");
 const transaction_repository_1 = __webpack_require__("./src/app/database/repositories/transaction.repository.ts");
@@ -4298,6 +4590,7 @@ const permission_repository_1 = __webpack_require__("./src/app/database/reposito
 const notification_repository_1 = __webpack_require__("./src/app/database/repositories/notification.repository.ts");
 const store_rating_repository_1 = __webpack_require__("./src/app/database/repositories/store-rating.repository.ts");
 const tag_repository_1 = __webpack_require__("./src/app/database/repositories/tag.repository.ts");
+const employee_repository_1 = __webpack_require__("./src/app/database/repositories/employee.repository.ts");
 exports["default"] = [
     user_repository_1.UserRepository,
     credential_repository_1.CredentialRepository,
@@ -4312,6 +4605,7 @@ exports["default"] = [
     notification_repository_1.NotificationRepository,
     store_rating_repository_1.StoreRatingRepository,
     tag_repository_1.TagRepository,
+    employee_repository_1.EmployeeRepository,
 ];
 
 
@@ -4426,6 +4720,7 @@ let OrderRepository = class OrderRepository extends core_1.BaseRepository {
         if (storeIds) {
             conditions.store = { id: (0, typeorm_1.In)(storeIds) };
         }
+        console.log(isPaid);
         if (isPaid !== undefined) {
             conditions.payment = isPaid ? (0, typeorm_1.Not)((0, typeorm_1.IsNull)()) : (0, typeorm_1.IsNull)();
         }
@@ -4631,6 +4926,13 @@ let RoleRepository = class RoleRepository extends core_1.BaseRepository {
             permissions: true,
         };
     }
+    modifyWhere(_a) {
+        var { isEmployee } = _a, conditions = tslib_1.__rest(_a, ["isEmployee"]);
+        if (isEmployee !== undefined) {
+            conditions.title = (0, typeorm_1.In)(['Cashier']);
+        }
+        return conditions;
+    }
 };
 RoleRepository = tslib_1.__decorate([
     (0, common_1.Injectable)(),
@@ -4735,6 +5037,12 @@ let StoreRepository = class StoreRepository extends core_1.BaseRepository {
             tags: true,
             products: true,
         };
+    }
+    modifyWhere(_a) {
+        var { ids } = _a, conditions = tslib_1.__rest(_a, ["ids"]);
+        if (ids)
+            conditions.id = (0, typeorm_1.In)(ids);
+        return conditions;
     }
     getTags(items) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -4918,6 +5226,9 @@ let UserRepository = class UserRepository extends core_1.BaseRepository {
         return {
             roles: { permissions: true },
         };
+    }
+    getByUniqueCode(uniqueCode) {
+        return this.findOne({ where: { uniqueCode: uniqueCode } });
     }
 };
 UserRepository = tslib_1.__decorate([
@@ -5646,6 +5957,7 @@ let PermissionGuard = class PermissionGuard {
             return true;
         const request = context.switchToHttp().getRequest();
         const user = request.user;
+        console.log('checkUserPermission(user, permissions)', (0, global_1.checkUserPermission)(user, permissions));
         return (0, global_1.checkUserPermission)(user, permissions);
     }
 };
@@ -5906,13 +6218,19 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
                     roles: {
                         permissions: true,
                     },
+                    jobs: {
+                        store: true,
+                        roles: { permissions: true },
+                    },
                 },
             });
             if (!user)
                 throw new common_1.UnauthorizedException();
             return Object.assign(Object.assign({}, user), { roles: user.roles.map((role) => {
                     return Object.assign(Object.assign({}, role), { permissions: role.permissions.map(({ code }) => code) });
-                }) });
+                }), jobs: user.jobs.map((job) => (Object.assign(Object.assign({}, job), { roles: job.roles.map((role) => {
+                        return Object.assign(Object.assign({}, role), { permissions: role.permissions.map(({ code }) => code) });
+                    }) }))) });
         });
     }
 };
@@ -6169,6 +6487,203 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/category/services/ca
 
 /***/ }),
 
+/***/ "./src/app/modules/employee/controllers/employee.controller.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EmployeeController = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const nest_1 = __webpack_require__("@ts-rest/nest");
+const common_1 = __webpack_require__("@nestjs/common");
+const global_1 = __webpack_require__("../../lib/global/src/index.ts");
+const guards_1 = __webpack_require__("./src/app/modules/auth/guards/index.ts");
+const auth_1 = __webpack_require__("./src/app/modules/auth/index.ts");
+const services_1 = __webpack_require__("./src/app/modules/employee/services/index.ts");
+const user_1 = __webpack_require__("./src/app/modules/user/index.ts");
+const c = (0, nest_1.nestControllerContract)(global_1.contract.employee);
+let EmployeeController = class EmployeeController {
+    constructor(service, userService) {
+        this.service = service;
+        this.userService = userService;
+    }
+    create({ body }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const user = yield this.userService.getByUniqueCode(body.uniqueCode);
+            const employee = yield this.service.create({
+                user: user.id,
+                store: body.store,
+                roles: [body.role],
+            });
+            return { status: 201, body: employee };
+        });
+    }
+    get({ params }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const employee = yield this.service.getById(params.id);
+            if (!employee) {
+                return { status: 404, body: null };
+            }
+            return { status: 200, body: employee };
+        });
+    }
+    getAll({ query }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const users = yield this.service.getAll(query);
+            return { status: 200, body: users };
+        });
+    }
+    update({ params, body }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const updatedEmployee = yield this.service.update(params.id, body);
+            return { status: 201, body: updatedEmployee };
+        });
+    }
+    delete({ params }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield this.service.delete(params.id);
+            return { status: 204, body: '' };
+        });
+    }
+};
+tslib_1.__decorate([
+    (0, common_1.UseGuards)(guards_1.JwtAuthGuard, guards_1.PermissionGuard),
+    (0, auth_1.Permissions)(global_1.RolePermission.EmployeeCreate),
+    (0, nest_1.TsRest)(c.create),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], EmployeeController.prototype, "create", null);
+tslib_1.__decorate([
+    (0, auth_1.Permissions)(global_1.RolePermission.EmployeeGet),
+    (0, nest_1.TsRest)(c.get),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], EmployeeController.prototype, "get", null);
+tslib_1.__decorate([
+    (0, auth_1.Permissions)(global_1.RolePermission.EmployeeGetAll),
+    (0, nest_1.TsRest)(c.getAll),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], EmployeeController.prototype, "getAll", null);
+tslib_1.__decorate([
+    (0, common_1.UseGuards)(guards_1.JwtAuthGuard, guards_1.PermissionGuard),
+    (0, auth_1.Permissions)(global_1.RolePermission.EmployeeUpdate),
+    (0, nest_1.TsRest)(c.update),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], EmployeeController.prototype, "update", null);
+tslib_1.__decorate([
+    (0, common_1.UseGuards)(guards_1.JwtAuthGuard, guards_1.PermissionGuard),
+    (0, auth_1.Permissions)(global_1.RolePermission.EmployeeDelete),
+    (0, nest_1.TsRest)(c.delete),
+    tslib_1.__param(0, (0, nest_1.TsRestRequest)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], EmployeeController.prototype, "delete", null);
+EmployeeController = tslib_1.__decorate([
+    (0, common_1.Controller)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof services_1.EmployeeService !== "undefined" && services_1.EmployeeService) === "function" ? _a : Object, typeof (_b = typeof user_1.UserService !== "undefined" && user_1.UserService) === "function" ? _b : Object])
+], EmployeeController);
+exports.EmployeeController = EmployeeController;
+
+
+/***/ }),
+
+/***/ "./src/app/modules/employee/controllers/index.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/employee/controllers/employee.controller.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/app/modules/employee/employee.module.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EmployeeModule = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const common_1 = __webpack_require__("@nestjs/common");
+const controllers_1 = __webpack_require__("./src/app/modules/employee/controllers/index.ts");
+const services_1 = __webpack_require__("./src/app/modules/employee/services/index.ts");
+let EmployeeModule = class EmployeeModule {
+};
+EmployeeModule = tslib_1.__decorate([
+    (0, common_1.Global)(),
+    (0, common_1.Module)({
+        controllers: [controllers_1.EmployeeController],
+        providers: [services_1.EmployeeService],
+        exports: [services_1.EmployeeService],
+    })
+], EmployeeModule);
+exports.EmployeeModule = EmployeeModule;
+
+
+/***/ }),
+
+/***/ "./src/app/modules/employee/index.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/employee/employee.module.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/app/modules/employee/services/employee.service.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EmployeeService = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const common_1 = __webpack_require__("@nestjs/common");
+const database_1 = __webpack_require__("./src/app/database/index.ts");
+const core_1 = __webpack_require__("./src/app/core/index.ts");
+let EmployeeService = class EmployeeService extends core_1.BaseService {
+    constructor(repository, permissionRepository) {
+        super(repository);
+        this.repository = repository;
+        this.permissionRepository = permissionRepository;
+    }
+};
+EmployeeService = tslib_1.__decorate([
+    (0, common_1.Injectable)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof database_1.EmployeeRepository !== "undefined" && database_1.EmployeeRepository) === "function" ? _a : Object, typeof (_b = typeof database_1.PermissionRepository !== "undefined" && database_1.PermissionRepository) === "function" ? _b : Object])
+], EmployeeService);
+exports.EmployeeService = EmployeeService;
+
+
+/***/ }),
+
+/***/ "./src/app/modules/employee/services/index.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/employee/services/employee.service.ts"), exports);
+
+
+/***/ }),
+
 /***/ "./src/app/modules/index.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -6190,6 +6705,7 @@ tslib_1.__exportStar(__webpack_require__("./src/app/modules/permission/index.ts"
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/notification/index.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/store-rating/index.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/tag/index.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/employee/index.ts"), exports);
 
 
 /***/ }),
@@ -6659,7 +7175,10 @@ let OrderController = class OrderController {
             if (!unrestricted && rest.storeIds) {
                 const stores = yield this.storeService.getManyByIds(rest.storeIds);
                 const storeIds = stores.reduce((curr, item) => {
-                    return item.owner.id === user.id ? [...curr, item.id] : curr;
+                    return item.owner.id === user.id ||
+                        user.jobs.find((job) => { var _a; return ((_a = job.store) === null || _a === void 0 ? void 0 : _a.id) === item.id; })
+                        ? [...curr, item.id]
+                        : curr;
                 }, []);
                 rest.storeIds = storeIds;
             }
@@ -6679,7 +7198,8 @@ let OrderController = class OrderController {
             const order = yield this.orderService.getById(params.id);
             if (!unrestricted &&
                 order.store.owner.id !== user.id &&
-                !(0, global_1.checkUserPermission)(user, [global_1.RolePermission.OrderUpdateUnrestricted])) {
+                !(0, global_1.checkUserPermission)(user, [global_1.RolePermission.OrderUpdateUnrestricted]) &&
+                !user.jobs.find((job) => { var _a; return ((_a = job.store) === null || _a === void 0 ? void 0 : _a.id) === order.store.id; })) {
                 throw new common_1.ForbiddenException();
             }
             const updatedUser = yield this.orderService.update(params.id, body);
@@ -6951,7 +7471,9 @@ let PaymentController = class PaymentController {
     create({ body }, { user }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const order = yield this.orderService.getById(body.order);
-            if (order.user !== user.id && order.store.owner.id !== user.id) {
+            if (order.user !== user.id &&
+                order.store.owner.id !== user.id &&
+                !user.jobs.find((job) => { var _a; return ((_a = job.store) === null || _a === void 0 ? void 0 : _a.id) === order.store.id; })) {
                 throw new common_1.ForbiddenException();
             }
             const payment = yield this.paymentService.create(body);
@@ -8398,8 +8920,11 @@ let StoreController = class StoreController {
     }
     getAll({ query }, { user }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { unrestricted } = query, rest = tslib_1.__rest(query, ["unrestricted"]);
-            if (!unrestricted && user) {
+            const { unrestricted, isEmployee } = query, rest = tslib_1.__rest(query, ["unrestricted", "isEmployee"]);
+            if (isEmployee) {
+                rest.ids = user.jobs.map((job) => job.store.id);
+            }
+            else if (!unrestricted && user) {
                 rest.owner = user.id;
             }
             const stores = yield this.storeService.getAll(rest);
@@ -9277,6 +9802,7 @@ exports.UserController = UserController;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./src/app/modules/user/services/index.ts"), exports);
 tslib_1.__exportStar(__webpack_require__("./src/app/modules/user/user.module.ts"), exports);
 
 
@@ -9309,6 +9835,9 @@ let UserService = class UserService extends core_1.BaseService {
         super(repository);
         this.repository = repository;
         this.roleRepository = roleRepository;
+    }
+    getByUniqueCode(code) {
+        return this.repository.getByUniqueCode(code);
     }
     assignRole(id, roleId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {

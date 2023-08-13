@@ -11,6 +11,7 @@ import {
 } from '../schemas';
 import { Product } from './product';
 import { Order } from './order';
+import { User } from './user';
 
 export type CreateStoreConfig = z.infer<typeof CreateStoreConfigSchema>;
 
@@ -19,6 +20,7 @@ export type UpdateStoreConfig = z.infer<typeof UpdateStoreConfigSchema>;
 export type StoreConfig = z.infer<typeof StoreConfigSchema>;
 
 export interface Store extends z.infer<typeof NonCircularStoreSchema> {
+  owner?: User;
   products?: Product[];
 }
 

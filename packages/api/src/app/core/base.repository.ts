@@ -192,7 +192,13 @@ export class BaseRepository<
               input: Record<string, any>
             ) => any
           )(input)
-        : (this.mapRelations()[key] as BaseRepository<unknown>).getById(value);
+        : Array.isArray(value)
+        ? (this.mapRelations()[key] as BaseRepository<unknown>).findBy({
+            id: In(value),
+          })
+        : (this.mapRelations()[key] as BaseRepository<unknown>).findOneBy({
+            id: value,
+          });
     };
     return this.mapRelations()?.[key]
       ? await getValue(key, input[key])

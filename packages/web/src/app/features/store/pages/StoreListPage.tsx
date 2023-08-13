@@ -47,15 +47,16 @@ export const StoreListPage = () => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Store>();
   const [unrestricted, setUnrestricted] = useState(false);
+  const [isEmployee, setIsEmployee] = useState(false);
 
   const {
     data,
     isFetching,
     refetch: refetchStores,
   } = tsQueryClient.store.getAll.useQuery(
-    ['getStores', search, perPage, page, unrestricted],
+    ['getStores', search, perPage, page, unrestricted, isEmployee],
     {
-      query: { search, perPage, page, unrestricted },
+      query: { search, perPage, page, unrestricted, isEmployee },
     },
     {
       onSuccess: () => {
@@ -98,7 +99,16 @@ export const StoreListPage = () => {
               />
               <Typography>All</Typography>
             </Box>
-          </Allow>
+          </Allow>{' '}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Checkbox
+              value={isEmployee}
+              onChange={(e) => {
+                setIsEmployee(e.target.checked);
+              }}
+            />
+            <Typography>Employee</Typography>
+          </Box>
         </Box>
         <Allow permissions={[RolePermission.StoreCreate]}>
           <Button variant="contained" onClick={() => setDialogOpen(true)}>

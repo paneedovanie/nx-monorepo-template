@@ -38,7 +38,7 @@ export const StoreConfigSchema = z.object({
 
 export const NonCircularStoreSchema = z.object({
   id: z.string(),
-  owner: UserSchema,
+  // owner: UserSchema,
   image: z.string().optional(),
   rating: z.number(),
   tags: TagSchema.array(),
@@ -84,6 +84,11 @@ export const GetStoresOptionsSchema = PaginationOptionsSchema.merge(
       search: z.string().uuid().optional(),
       owner: z.string().uuid().optional(),
       tags: z.string().uuid().array().optional(),
+      ids: z.string().uuid().array().optional(),
+      isEmployee: z.preprocess(
+        (a: string) => a && a === 'true',
+        z.boolean().optional()
+      ),
     })
     .merge(UnrestrictedSchema)
 );

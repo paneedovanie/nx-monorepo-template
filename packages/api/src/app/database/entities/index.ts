@@ -11,9 +11,11 @@ export * from './payment.entity';
 export * from './notification.entity';
 export * from './store-rating.entity';
 export * from './tag.entity';
+export * from './employee.entity';
 
 import { CategoryEntity } from './category.entity';
 import { CredentialEntity } from './credential.entity';
+import { EmployeeEntity } from './employee.entity';
 import { NotificationEntity } from './notification.entity';
 import { OrderEntity } from './order.entity';
 import { PaymentEntity } from './payment.entity';
@@ -40,4 +42,5 @@ export default [
   NotificationEntity,
   StoreRatingEntity,
   TagEntity,
+  EmployeeEntity,
 ];

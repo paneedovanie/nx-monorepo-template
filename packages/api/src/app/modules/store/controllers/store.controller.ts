@@ -17,6 +17,7 @@ import {
   contract,
   CreateStore,
   RolePermission,
+  TokenUser,
   UpdateStore,
 } from '@nx-monorepo-template/global';
 import {
@@ -80,12 +81,15 @@ export class StoreController implements NestControllerInterface<typeof c> {
   @TsRest(c.getAll)
   async getAll(
     @TsRestRequest() { query }: RequestShapes['getAll'],
-    @Request() { user }
+    @Request() { user }: { user: TokenUser }
   ) {
-    const { unrestricted, ...rest } = query;
-    if (!unrestricted && user) {
+    const { unrestricted, isEmployee, ...rest } = query;
+    if (isEmployee) {
+      rest.ids = user.jobs.map((job) => job.store.id);
+    } else if (!unrestricted && user) {
       rest.owner = user.id;
     }
+
     const stores = await this.storeService.getAll(rest);
 
     return { status: 200 as const, body: stores };

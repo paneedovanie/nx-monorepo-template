@@ -30,5 +30,7 @@ export const GetRolesResponseSchema = PaginationResponseSchema.merge(
 );
 
 export const GetRolesOptionsSchema = PaginationOptionsSchema.merge(
-  z.object({})
+  z.object({
+    isEmployee: z.preprocess((a) => a && a === 'true', z.boolean().optional()),
+  })
 );

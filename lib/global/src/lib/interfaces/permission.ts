@@ -75,4 +75,10 @@ export enum RolePermission {
   RoleUpdate = 'role.update',
   RoleDelete = 'role.delete',
   RoleGetAll = 'role.get_all',
+
+  EmployeeCreate = 'employee.create',
+  EmployeeGet = 'employee.get',
+  EmployeeUpdate = 'employee.update',
+  EmployeeDelete = 'employee.delete',
+  EmployeeGetAll = 'employee.get_all',
 }

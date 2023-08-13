@@ -15,6 +15,7 @@ import { ProductEntity } from './product.entity';
 import { TagEntity } from './tag.entity';
 import { CategoryEntity } from './category.entity';
 import { StoreConfig } from '@nx-monorepo-template/global';
+import { EmployeeEntity } from './employee.entity';
 
 @Entity('stores')
 @Index(['title', 'owner'], { unique: true })
@@ -27,6 +28,9 @@ export class StoreEntity {
 
   @OneToMany(() => ProductEntity, (product) => product.store)
   products: ProductEntity[];
+
+  @OneToMany(() => EmployeeEntity, (employee) => employee.store)
+  employees: EmployeeEntity[];
 
   @Column()
   title: string;

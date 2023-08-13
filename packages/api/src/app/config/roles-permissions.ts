@@ -11,6 +11,10 @@ export const roles = [
     title: 'Store Owner',
     description: 'User that owns a store',
   },
+  {
+    title: 'Cashier',
+    description: 'User that works as a cashier',
+  },
 ];
 
 const AuthPermissions = {
@@ -286,13 +290,13 @@ const OrderPermissions = {
       code: 'order.get',
       title: 'Get Order',
       description: 'Allow to get order',
-      roles: ['Superadmin', 'User', 'Store Owner'],
+      roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
     },
     {
       code: 'order.get_all',
       title: 'Get All Orders',
       description: 'Allow to get all orders',
-      roles: ['Superadmin', 'User', 'Store Owner'],
+      roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
     },
     {
       code: 'order.get_all_unrestricted',
@@ -304,7 +308,7 @@ const OrderPermissions = {
       code: 'order.update',
       title: 'Update Order',
       description: 'Allow to update order',
-      roles: ['Superadmin', 'User', 'Store Owner'],
+      roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
     },
     {
       code: 'order.update_unrestricted',
@@ -335,19 +339,19 @@ const PaymentPermissions = {
       code: 'payment.create',
       title: 'Create Payment',
       description: 'Allow to create payment',
-      roles: ['Superadmin', 'User', 'Store Owner'],
+      roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
     },
     {
       code: 'payment.get',
       title: 'Get Payment',
       description: 'Allow to get payment',
-      roles: ['Superadmin', 'User', 'Store Owner'],
+      roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
     },
     {
       code: 'payment.get_all',
       title: 'Get All Payments',
       description: 'Allow to get all payments',
-      roles: ['Superadmin', 'User', 'Store Owner'],
+      roles: ['Superadmin', 'User', 'Store Owner', 'Cashier'],
     },
     {
       code: 'payment.update',
@@ -401,6 +405,43 @@ const RolePermissions = {
   ],
 };
 
+const EmployeePermissions = {
+  title: 'Employee',
+  description: 'Employee related permissions',
+  permissions: [
+    {
+      code: 'employee.create',
+      title: 'Create Employee',
+      description: 'Allow to create employee',
+      roles: ['Superadmin'],
+    },
+    {
+      code: 'employee.get',
+      title: 'Get Employee',
+      description: 'Allow to get employee',
+      roles: ['Superadmin'],
+    },
+    {
+      code: 'employee.get_all',
+      title: 'Get All Employees',
+      description: 'Allow to get all categories',
+      roles: ['Superadmin'],
+    },
+    {
+      code: 'employee.update',
+      title: 'Update Employee',
+      description: 'Allow to update employee',
+      roles: ['Superadmin'],
+    },
+    {
+      code: 'employee.delete',
+      title: 'Delete Employee',
+      description: 'Allow to delete employee',
+      roles: ['Superadmin'],
+    },
+  ],
+};
+
 export const permissions = [
   AuthPermissions,
   UserPermissions,
@@ -412,4 +453,5 @@ export const permissions = [
   OrderPermissions,
   PaymentPermissions,
   RolePermissions,
+  EmployeePermissions,
 ];

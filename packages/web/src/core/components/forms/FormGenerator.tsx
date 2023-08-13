@@ -303,6 +303,8 @@ export const FormGenerator = <R, I extends FormikValues = any>({
     onChange?.(values);
   }, [values, onChange]);
 
+  console.log(!dirty && !defaultEnableSubmit, !isValid, isSubmitting, errors);
+
   return (
     <form onSubmit={handleSubmit} style={{ width: '100%' }}>
       <fieldset

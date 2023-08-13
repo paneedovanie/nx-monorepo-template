@@ -16,3 +16,4 @@ export * from './tag';
 export * from './common';
 export * from './socket';
 export * from './event';
+export * from './employee';

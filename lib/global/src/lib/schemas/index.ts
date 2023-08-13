@@ -16,3 +16,4 @@ export * from './notification';
 export * from './store-rating';
 export * from './tag';
 export * from './common';
+export * from './employee';

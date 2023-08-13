@@ -13,3 +13,4 @@ export * from './PriceRanges';
 export * from './EditorDialog';
 export * from './ProductsLoader';
 export * from './ShowMoreRatingDialog';
+export * from './EmployeeDialog';

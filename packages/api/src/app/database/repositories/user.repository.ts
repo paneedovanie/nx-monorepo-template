@@ -23,4 +23,8 @@ export class UserRepository extends BaseRepository<
       roles: { permissions: true },
     };
   }
+
+  public getByUniqueCode(uniqueCode: string) {
+    return this.findOne({ where: { uniqueCode: uniqueCode } });
+  }
 }

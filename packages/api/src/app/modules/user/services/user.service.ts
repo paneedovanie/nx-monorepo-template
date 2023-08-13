@@ -11,6 +11,10 @@ export class UserService extends BaseService<UserEntity> {
     super(repository);
   }
 
+  public getByUniqueCode(code: string) {
+    return this.repository.getByUniqueCode(code);
+  }
+
   public async assignRole(id: string, roleId: string) {
     const user = await this.repository.getByIdWithRelations(id);
     const role = await this.roleRepository.findOneBy({ id: roleId });

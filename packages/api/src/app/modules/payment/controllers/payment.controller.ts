@@ -39,7 +39,11 @@ export class PaymentController implements NestControllerInterface<typeof c> {
     @Request() { user }
   ) {
     const order = await this.orderService.getById(body.order);
-    if (order.user !== user.id && order.store.owner.id !== user.id) {
+    if (
+      order.user !== user.id &&
+      order.store.owner.id !== user.id &&
+      !user.jobs.find((job) => job.store?.id === order.store.id)
+    ) {
       throw new ForbiddenException();
     }
 

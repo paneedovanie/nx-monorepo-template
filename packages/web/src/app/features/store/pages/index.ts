@@ -10,3 +10,4 @@ export * from './StorePaymentListPage';
 export * from './StorePreparationPage';
 export * from './StoreOrderViewPage';
 export * from './StoreEditPage';
+export * from './StoreEmployeeListPage';

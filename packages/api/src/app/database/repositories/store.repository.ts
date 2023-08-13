@@ -8,11 +8,7 @@ import {
 import { StoreEntity, TagEntity } from '../entities';
 import { BaseRepository } from '../../core';
 import { UserRepository } from './user.repository';
-import {
-  CreateStore,
-  UpdateStore,
-  isUUID,
-} from '@nx-monorepo-template/global';
+import { CreateStore, UpdateStore, isUUID } from '@nx-monorepo-template/global';
 import { StoreRatingRepository } from './store-rating.repository';
 import { TagRepository } from './tag.repository';
 
@@ -67,6 +63,16 @@ export class StoreRepository extends BaseRepository<
       tags: true,
       products: true,
     };
+  }
+
+  protected modifyWhere({
+    ids,
+    ...conditions
+  }: FindOptionsWhere<StoreEntity> & {
+    ids?: string[];
+  }): FindOptionsWhere<StoreEntity> {
+    if (ids) conditions.id = In(ids);
+    return conditions;
   }
 
   async getTags(items: string[]) {

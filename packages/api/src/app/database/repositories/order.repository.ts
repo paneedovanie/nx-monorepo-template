@@ -68,6 +68,7 @@ export class OrderRepository extends BaseRepository<
     if (storeIds) {
       conditions.store = { id: In(storeIds) };
     }
+    console.log(isPaid);
     if (isPaid !== undefined) {
       conditions.payment = isPaid ? Not(IsNull()) : IsNull();
     }

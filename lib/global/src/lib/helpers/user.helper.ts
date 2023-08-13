@@ -10,5 +10,16 @@ export const checkUserPermission = (user: TokenUser, permissions: string[]) => {
       }
     }
   }
+
+  // for (const job of user.jobs) {
+  //   for (const role of job.roles) {
+  //     for (const permission of permissions) {
+  //       if (role.permissions?.find((code) => permission === code)) {
+  //         return true;
+  //       }
+  //     }
+  //   }
+  // }
+
   return false;
 };

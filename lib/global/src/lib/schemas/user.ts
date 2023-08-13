@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { PaginationResponseSchema } from './pagination';
 import { RoleSchema } from './role';
+import { NonCircularEmployeeSchema } from './employee';
 
 const base = {
   firstName: z.string(),
@@ -22,6 +23,15 @@ export const TokenUserSchema = z.object({
   ).array(),
   createdAt: z.date(),
   uniqueCode: z.string(),
+  jobs: z.lazy(() =>
+    NonCircularEmployeeSchema.merge(
+      z.object({
+        roles: RoleSchema.merge(
+          z.object({ permissions: z.string().array() })
+        ).array(),
+      })
+    ).array()
+  ),
   ...base,
 });
 

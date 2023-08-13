@@ -15,6 +15,7 @@ import { CredentialEntity } from './credential.entity';
 import { RoleEntity } from './role.entity';
 import { TransactionEntity } from './transaction.entity';
 import { StoreEntity } from './store.entity';
+import { EmployeeEntity } from './employee.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -45,6 +46,9 @@ export class UserEntity {
 
   @OneToMany(() => StoreEntity, (store) => store.owner)
   stores: StoreEntity[];
+
+  @OneToMany(() => EmployeeEntity, (employee) => employee.user)
+  jobs: EmployeeEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

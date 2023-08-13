@@ -11,6 +11,7 @@ export * from './permission.repository';
 export * from './notification.repository';
 export * from './store-rating.repository';
 export * from './tag.repository';
+export * from './employee.repository';
 
 import { UserRepository } from './user.repository';
 import { CredentialRepository } from './credential.repository';
@@ -25,6 +26,7 @@ import { PermissionRepository } from './permission.repository';
 import { NotificationRepository } from './notification.repository';
 import { StoreRatingRepository } from './store-rating.repository';
 import { TagRepository } from './tag.repository';
+import { EmployeeRepository } from './employee.repository';
 
 export default [
   UserRepository,
@@ -40,4 +42,5 @@ export default [
   NotificationRepository,
   StoreRatingRepository,
   TagRepository,
+  EmployeeRepository,
 ];

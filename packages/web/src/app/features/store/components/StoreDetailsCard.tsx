@@ -13,6 +13,7 @@ import {
   ListAlt as ListAltIcon,
   AvTimer as AvTimerIcon,
   Web as WebIcon,
+  AccountBox,
 } from '@mui/icons-material';
 import {
   Box,
@@ -96,7 +97,7 @@ export const StoreDetailsCard = ({
               initialValues={{
                 title: store.title,
                 description: store.description,
-                owner: store.owner.id,
+                owner: store.owner?.id ?? '',
                 tags: store.tags.map(({ id }: Tag) => id),
               }}
               schema={UpdateStoreSchema}
@@ -220,6 +221,16 @@ export const StoreDetailsCard = ({
                   <EditIcon fontSize="small" />
                 </ListItemIcon>
                 Edit
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  navigate(`/manage/stores/${store.id}/employees`);
+                }}
+              >
+                <ListItemIcon>
+                  <AccountBox fontSize="small" />
+                </ListItemIcon>
+                Employees
               </MenuItem>
               <MenuItem
                 onClick={() => {

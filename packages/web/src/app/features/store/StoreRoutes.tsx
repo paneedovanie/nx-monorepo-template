@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import {
   StoreCategoryListPage,
   StoreEditPage,
+  StoreEmployeeListPage,
   StoreListPage,
   StoreOrderListPage,
   StoreOrderViewPage,
@@ -30,6 +31,7 @@ export const StoreRoutes = () => (
             }
           />
           <Route path="/payments" element={<StorePaymentListPage />} />
+          <Route path="/employees" element={<StoreEmployeeListPage />} />
         </Routes>
       }
     />

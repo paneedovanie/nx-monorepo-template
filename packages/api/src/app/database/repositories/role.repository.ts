@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, FindOptionsRelations } from 'typeorm';
+import {
+  DataSource,
+  FindOptionsRelations,
+  FindOptionsWhere,
+  In,
+} from 'typeorm';
 import { RoleEntity } from '../entities';
 import { BaseRepository } from '../../core';
 import { CreateRole, UpdateRole } from '@nx-monorepo-template/global';
@@ -18,5 +23,17 @@ export class RoleRepository extends BaseRepository<
     return {
       permissions: true,
     };
+  }
+
+  protected modifyWhere({
+    isEmployee,
+    ...conditions
+  }: FindOptionsWhere<RoleEntity> & {
+    isEmployee?: boolean;
+  }): FindOptionsWhere<RoleEntity> {
+    if (isEmployee !== undefined) {
+      conditions.title = In(['Cashier']);
+    }
+    return conditions;
   }
 }

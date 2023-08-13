@@ -52,7 +52,9 @@ export const OrderCard = ({
   const [popup, setPopup] = useState<Window | null>(null);
 
   const isCustomer = order.user?.id === user?.id;
-  const isStoreOwner = order.store?.owner?.id === user?.id;
+  const isStoreOwner =
+    order.store?.owner?.id === user?.id ||
+    !!user?.jobs.find((job) => job.store.id === order.store?.id);
 
   const totalCost = useMemo(() => {
     let total = 0;
@@ -138,7 +140,7 @@ export const OrderCard = ({
     <>
       <Card sx={{ mb: 1 }}>
         <CardContent sx={{ position: 'relative' }}>
-          {(isStoreOwner || (isCustomer && user)) && !order?.payment && (
+          {(isStoreOwner || (isCustomer && user && !order?.payment)) && (
             <IconButton
               sx={{
                 position: 'absolute',

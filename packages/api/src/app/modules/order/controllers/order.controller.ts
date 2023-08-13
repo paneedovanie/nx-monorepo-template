@@ -15,6 +15,7 @@ import {
   checkUserPermission,
   contract,
   RolePermission,
+  TokenUser,
 } from '@nx-monorepo-template/global';
 import {
   AllowUnauthorize,
@@ -67,13 +68,16 @@ export class OrderController implements NestControllerInterface<typeof c> {
   @TsRest(c.getAll)
   async getAll(
     @TsRestRequest() { query }: RequestShapes['getAll'],
-    @Request() { user }
+    @Request() { user }: { user: TokenUser }
   ) {
     const { unrestricted, ...rest } = query;
     if (!unrestricted && rest.storeIds) {
       const stores = await this.storeService.getManyByIds(rest.storeIds);
       const storeIds = stores.reduce((curr, item) => {
-        return item.owner.id === user.id ? [...curr, item.id] : curr;
+        return item.owner.id === user.id ||
+          user.jobs.find((job) => job.store?.id === item.id)
+          ? [...curr, item.id]
+          : curr;
       }, []);
       rest.storeIds = storeIds;
     } else if (!unrestricted && user) {
@@ -100,7 +104,8 @@ export class OrderController implements NestControllerInterface<typeof c> {
     if (
       !unrestricted &&
       order.store.owner.id !== user.id &&
-      !checkUserPermission(user, [RolePermission.OrderUpdateUnrestricted])
+      !checkUserPermission(user, [RolePermission.OrderUpdateUnrestricted]) &&
+      !user.jobs.find((job) => job.store?.id === order.store.id)
     ) {
       throw new ForbiddenException();
     }

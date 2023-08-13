@@ -18,6 +18,11 @@ export class PermissionGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user as TokenUser;
 
+    console.log(
+      'checkUserPermission(user, permissions)',
+      checkUserPermission(user, permissions)
+    );
+
     return checkUserPermission(user, permissions);
   }
 }
