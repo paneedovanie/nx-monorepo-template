@@ -8,7 +8,10 @@
     "build": "nx build api",
     "start": "node dist/packages/api/main.js",
     "serve:api": "nx serve api",
-    "serve:web": "nx serve web"
+    "serve:web": "nx serve web",
+    "migration:generate": "nx migration-generate api",
+    "migration:run": "nx migration-run api",
+    "migration:revert": "nx migration-revert api"
   },
   "devDependencies": {
     "@emotion/react": "^11.10.6",
