@@ -53,11 +53,8 @@ export class StoreController implements NestControllerInterface<typeof c> {
     const input = body as CreateStore & { image?: string };
 
     if (image) {
-      const uploadedFile = await this.fileService.uploadFile(
-        'shop',
-        image.buffer
-      );
-      input.image = uploadedFile.secure_url;
+      const uploadedPath = await this.fileService.uploadFile('shop', image);
+      input.image = uploadedPath;
     }
 
     const store = await this.storeService.create(input);
@@ -105,11 +102,8 @@ export class StoreController implements NestControllerInterface<typeof c> {
     const input = body as UpdateStore & { image?: string };
 
     if (image) {
-      const uploadedFile = await this.fileService.uploadFile(
-        'shop',
-        image.buffer
-      );
-      input.image = uploadedFile.secure_url;
+      const uploadedPath = await this.fileService.uploadFile('shop', image);
+      input.image = uploadedPath;
     }
     const updatedUser = await this.storeService.update(params.id, input);
 

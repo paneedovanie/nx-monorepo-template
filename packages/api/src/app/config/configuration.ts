@@ -64,5 +64,12 @@ export default () => {
       api_secret: process.env.CLOUDINARY_API_SECRET,
       secure: process.env.CLOUDINARY_SECURE,
     },
+    s3: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      bucket: process.env.S3_BUCKET,
+      baseUrl: process.env.S3_BASE_URL,
+      region: process.env.S3_REGION ?? 'us-east-1',
+    },
   };
 };

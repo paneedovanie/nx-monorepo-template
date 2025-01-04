@@ -45,11 +45,8 @@ export class ProductController implements NestControllerInterface<typeof c> {
     const input = body as CreateProduct & { image?: string };
 
     if (image) {
-      const uploadedFile = await this.fileService.uploadFile(
-        'product',
-        image.buffer
-      );
-      input.image = uploadedFile.secure_url;
+      const uploadedPath = await this.fileService.uploadFile('product', image);
+      input.image = uploadedPath;
     }
 
     const product = await this.productService.create(input);
@@ -88,11 +85,8 @@ export class ProductController implements NestControllerInterface<typeof c> {
     const input = body as UpdateProduct & { image?: string };
 
     if (image) {
-      const uploadedFile = await this.fileService.uploadFile(
-        'product',
-        image.buffer
-      );
-      input.image = uploadedFile.secure_url;
+      const uploadedPath = await this.fileService.uploadFile('product', image);
+      input.image = uploadedPath;
     }
 
     const updatedUser = await this.productService.update(params.id, input);
